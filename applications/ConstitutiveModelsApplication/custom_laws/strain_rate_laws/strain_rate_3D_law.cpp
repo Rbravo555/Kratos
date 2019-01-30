@@ -284,32 +284,31 @@ namespace Kratos
     else{
 
       //4.-Calculate Total Kirchhoff stress
-
       if(rOptions.Is(ConstitutiveLaw::COMPUTE_STRESS)){
 
 	Vector& rStressVector       = rValues.GetStressVector();
 	this->CalculateStressVector(rModelValues, rStressVector);
 
       }
-
       //5.-Calculate Constitutive Matrix related to Total Kirchhoff stress
-
-      if(rOptions.Is(ConstitutiveLaw::COMPUTE_CONSTITUTIVE_TENSOR)){
+      else if(rOptions.Is(ConstitutiveLaw::COMPUTE_CONSTITUTIVE_TENSOR)){
 
       	Matrix& rConstitutiveMatrix = rValues.GetConstitutiveMatrix();
 	this->CalculateConstitutiveMatrix(rModelValues, rConstitutiveMatrix);
 
       }
-
-    }
-
-    if(rOptions.Is(ConstitutiveLaw::COMPUTE_STRAIN_ENERGY))
-      {
+      else{
+        this->CalculateInternalVariables(rModelValues);
 
       }
+    }
 
+    // if(rOptions.Is(ConstitutiveLaw::COMPUTE_STRAIN_ENERGY))
+    // {
 
-    //6.- Finalize hyperelastic model parameters
+    // }
+
+    //7.- Finalize hyperelastic model parameters
     this->FinalizeModelData(rValues,rModelValues);
 
 
@@ -398,6 +397,18 @@ namespace Kratos
 
     rStressVector = ConstitutiveModelUtilities::StressTensorToVector(StressMatrix, rStressVector);
 
+
+    KRATOS_CATCH(" ")
+  }
+
+  //************************************************************************************
+  //************************************************************************************
+
+  void StrainRate3DLaw::CalculateInternalVariables(ModelDataType& rModelValues)
+  {
+    KRATOS_TRY
+
+    mpModel->CalculateInternalVariables(rModelValues);
 
     KRATOS_CATCH(" ")
   }

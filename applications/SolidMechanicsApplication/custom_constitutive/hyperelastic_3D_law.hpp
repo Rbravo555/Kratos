@@ -142,6 +142,7 @@ public:
     bool Has( const Variable<Matrix>& rThisVariable ) override;
 
     double& CalculateValue(Parameters& rParameterValues, const Variable<double>& rThisVariable, double& rValue) override;
+    Vector& CalculateValue(Parameters& rParameterValues, const Variable<Vector>& rThisVariable, Vector& rValue) override;
 
     double& GetValue( const Variable<double>& rThisVariable, double& rValue ) override;
     Vector& GetValue( const Variable<Vector>& rThisVariable, Vector& rValue ) override;
@@ -404,6 +405,13 @@ protected:
     virtual double& CalculateVolumetricFactor (const MaterialResponseVariables & rElasticVariables,
 					       double & rFactor);
 
+    /**
+     * Calculates HyperElasticLaw Factors for the Neo-Hookean model
+     * @param rElasticResponseVariables the material variables
+     * @param rFactors vector of the calculated stress factors to be returned
+     */
+    virtual void CalculateVolumetricStressFactors (const MaterialResponseVariables & rElasticVariables,
+                                                   Vector& rFactors);
 
     /**
      * Calculates the Pressure of the domain (element)

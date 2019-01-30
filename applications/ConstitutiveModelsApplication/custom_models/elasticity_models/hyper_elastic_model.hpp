@@ -219,6 +219,10 @@ namespace Kratos
 
     void CalculateVolumetricStressAndConstitutiveTensors(ModelDataType& rValues, MatrixType& rStressMatrix, Matrix& rConstitutiveMatrix) override;
 
+    /**
+     * Calculate internal variables
+     */
+    void CalculateInternalVariables(ModelDataType& rValues) override;
 
     /**
      * Check
@@ -398,6 +402,9 @@ namespace Kratos
 
     virtual double& GetVolumetricFunction2ndJDerivative(HyperElasticDataType& rVariables, double& rDerivative); //ddU/dJdJ
 
+    virtual void GetVolumetricFunctionFactors(HyperElasticDataType& rVariables, Vector& rFactors);
+
+    virtual void GetVolumetricFunctionThermalFactors(HyperElasticDataType& rVariables, Vector& rFactors);
 
     //************// right cauchy green: C
     MatrixType& GetJRightCauchyGreenDerivative(const StrainData& rStrain, MatrixType& rDerivative); //dJ/dC
@@ -444,6 +451,9 @@ namespace Kratos
 					     const double& c,
 					     const double& d); //ddJ/dbdb
 
+
+    // set requested internal variables
+    virtual void SetInternalVariables(ModelDataType& rValues, HyperElasticDataType& rVariables);
 
     ///@}
     ///@name Protected  Access

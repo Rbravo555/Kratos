@@ -434,6 +434,10 @@ namespace Kratos
      */
     virtual double& CalculateDomainPressure (Parameters& rValues, double& rPressure);
 
+    /**
+     * Calculates an internal variable
+     */
+    virtual void CalculateInternalVariables(ModelDataType& rModelValues);
 
     /**
      * This function is designed to be called when before the material response

@@ -120,6 +120,9 @@ namespace Kratos
 
       this->CalculateAndAddVolumetricStressTensor(Variables, rStressMatrix);
 
+      // set requested internal variables
+      this->SetInternalVariables(rValues,Variables);
+
       Variables.State().Set(ConstitutiveModelData::STRESS_COMPUTED);
 
       KRATOS_CATCH(" ")
@@ -142,6 +145,9 @@ namespace Kratos
 
       //Calculate Constitutive Matrix
       this->CalculateAndAddConstitutiveTensor(Variables,rConstitutiveMatrix);
+
+      // set requested internal variables
+      this->SetInternalVariables(rValues,Variables);
 
       KRATOS_CATCH(" ")
     }

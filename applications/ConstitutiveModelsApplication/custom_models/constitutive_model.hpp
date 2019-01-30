@@ -156,6 +156,11 @@ namespace Kratos
 
     virtual void CalculateVolumetricStressAndConstitutiveTensors(ModelDataType& rValues, MatrixType& rStressMatrix, Matrix& rConstitutive);
 
+    /**
+     * Calculate internal variables
+     */
+    virtual void CalculateInternalVariables(ModelDataType& rValues);
+
 
     /**
      * Check
@@ -187,6 +192,7 @@ namespace Kratos
      * Get Values
      */
     virtual double& GetValue(const Variable<double>& rThisVariable, double& rValue);
+
 
     /**
      * method to ask the constituitve model the list of variables (dofs) needed from the domain

@@ -80,11 +80,45 @@ bool HyperElastic3DLaw::Has( const Variable<Matrix>& rThisVariable )
 //******************CALCULATE VALUE: DOUBLE - VECTOR - MATRIX*************************
 //************************************************************************************
 
-double& HyperElastic3DLaw::CalculateValue(Parameters& rParameterValues, const Variable<double>& rThisVariable, double& rValue )
+double& HyperElastic3DLaw::CalculateValue(Parameters& rParameterValues, const Variable<double>& rThisVariable, double& rValue)
 {
 
-  return (this->GetValue(rThisVariable,rValue ));
+  return (this->GetValue(rThisVariable,rValue));
 
+}
+
+
+Vector& HyperElastic3DLaw::CalculateValue(Parameters& rParameterValues, const Variable<Vector>& rThisVariable, Vector& rValue)
+{
+  if( rThisVariable == VOLUMETRIC_STRESS_FACTORS )
+  {
+    const Properties& MaterialProperties  = rParameterValues.GetMaterialProperties();
+
+    MaterialResponseVariables ElasticVariables;
+
+    ElasticVariables.SetElementGeometry(rParameterValues.GetElementGeometry());
+    ElasticVariables.SetShapeFunctionsValues(rParameterValues.GetShapeFunctionsValues());
+
+    //1.- Thermal constants
+    if( MaterialProperties.Has(THERMAL_EXPANSION_COEFFICIENT) )
+      ElasticVariables.ThermalExpansionCoefficient = MaterialProperties[THERMAL_EXPANSION_COEFFICIENT];
+    else
+      ElasticVariables.ThermalExpansionCoefficient = 0;
+
+    if( MaterialProperties.Has(REFERENCE_TEMPERATURE) )
+      ElasticVariables.ReferenceTemperature = MaterialProperties[REFERENCE_TEMPERATURE];
+    else
+      ElasticVariables.ReferenceTemperature = 0;
+
+    //2.-Determinant of the Total Deformation Gradient
+    ElasticVariables.DeterminantF = rParameterValues.GetDeterminantF();
+
+    this->CalculateVolumetricStressFactors(ElasticVariables,rValue);
+  }
+  else
+    this->GetValue(rThisVariable, rValue);
+
+  return rValue;
 }
 
 
@@ -194,6 +228,9 @@ void  HyperElastic3DLaw::CalculateMaterialResponsePK2 (Parameters& rValues)
   //0.- Initialize parameters
   MaterialResponseVariables ElasticVariables;
   ElasticVariables.Identity = identity_matrix<double> ( 3 );
+
+  ElasticVariables.SetElementGeometry(rValues.GetElementGeometry());
+  ElasticVariables.SetShapeFunctionsValues(rValues.GetShapeFunctionsValues());
 
   //1.- Lame constants
   const double& YoungModulus        = MaterialProperties[YOUNG_MODULUS];
@@ -315,6 +352,9 @@ void HyperElastic3DLaw::CalculateMaterialResponseKirchhoff (Parameters& rValues)
     //0.- Initialize parameters
     MaterialResponseVariables ElasticVariables;
     ElasticVariables.Identity = identity_matrix<double> ( 3 );
+
+    ElasticVariables.SetElementGeometry(rValues.GetElementGeometry());
+    ElasticVariables.SetShapeFunctionsValues(rValues.GetShapeFunctionsValues());
 
     //1.- Lame constants
     const double& YoungModulus       = MaterialProperties[YOUNG_MODULUS];
@@ -563,7 +603,7 @@ void HyperElastic3DLaw::CalculateAlmansiStrain( const Matrix & rLeftCauchyGreen,
 
 
 double &  HyperElastic3DLaw::CalculateDomainTemperature (const MaterialResponseVariables & rElasticVariables,
-								double & rTemperature)
+                                                         double & rTemperature)
 {
 
     //1.-Temperature from nodes
@@ -574,10 +614,10 @@ double &  HyperElastic3DLaw::CalculateDomainTemperature (const MaterialResponseV
     rTemperature=0;
 
     for ( unsigned int j = 0; j < number_of_nodes; j++ )
-      {
-	if( DomainGeometry[j].SolutionStepsDataHas(TEMPERATURE) )
-	  rTemperature += ShapeFunctionsValues[j] * DomainGeometry[j].GetSolutionStepValue(TEMPERATURE);
-      }
+    {
+      if( DomainGeometry[j].SolutionStepsDataHas(TEMPERATURE) )
+        rTemperature += ShapeFunctionsValues[j] * DomainGeometry[j].GetSolutionStepValue(TEMPERATURE);
+    }
 
     //2.-Temperature not included
     //rTemperature = 0;
@@ -603,6 +643,52 @@ double & HyperElastic3DLaw::CalculateVolumetricFactor (const MaterialResponseVar
 
 }
 
+//********************* COMPUTE VOLUMETRIC FACTORS************************************
+//************************************************************************************
+
+
+void HyperElastic3DLaw::CalculateVolumetricStressFactors(const MaterialResponseVariables & rElasticVariables,
+                                                         Vector& rFactors)
+{
+
+  if(rFactors.size()!=3)
+    rFactors.resize(3,false);
+
+  //Factor
+  //(J²-1)/(2J)
+  //rFactors[0] = 0.5*(rElasticVariables.DeterminantF*rElasticVariables.DeterminantF-1);
+  //ln(J)/J
+  rFactors[0] = std::log(rElasticVariables.DeterminantF)/(rElasticVariables.DeterminantF);
+
+  //Factor 1st Derivative
+  //(J²+1)/(2J²)
+  //rFactors[1] = (rElasticVariables.DeterminantF*rElasticVariables.DeterminantF+1.0)/(rElasticVariables.DeterminantF*rElasticVariables.DeterminantF);
+  //(1-ln(J))/(J²)
+  rFactors[1] = (1.0-std::log(rElasticVariables.DeterminantF))/(rElasticVariables.DeterminantF*rElasticVariables.DeterminantF);
+
+  //Factor 2nd Derivative
+  //(-1/J³)
+  //rFactors[2] = (-1.0)/(rElasticVariables.DeterminantF*rElasticVariables.DeterminantF*rElasticVariables.DeterminantF);
+  //(2ln(J)-3)/(J³)
+  rFactors[2] = (2.0 * std::log(rElasticVariables.DeterminantF) - 3.0) / (rElasticVariables.DeterminantF*rElasticVariables.DeterminantF*rElasticVariables.DeterminantF);
+
+  //Thermal volumetric factor:
+  double DeltaTemperature     = 0;
+  double CurrentTemperature   = 0;
+
+  CurrentTemperature = this->CalculateDomainTemperature(rElasticVariables, CurrentTemperature);
+  if( CurrentTemperature != 0){
+    DeltaTemperature = CurrentTemperature - rElasticVariables.ReferenceTemperature;
+  }
+  else{
+    CurrentTemperature = rElasticVariables.ReferenceTemperature;
+    DeltaTemperature = 0;
+  }
+
+  rFactors[0] += 3.0 * rElasticVariables.ThermalExpansionCoefficient * rFactors[1] * DeltaTemperature;
+  rFactors[1] += 3.0 * rElasticVariables.ThermalExpansionCoefficient * rFactors[2] * DeltaTemperature;
+
+}
 
 //***************************** COMPUTE VOLUMETRIC PRESSURE  *************************
 //************************************************************************************

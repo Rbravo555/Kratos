@@ -144,6 +144,9 @@ namespace Kratos
 
     rValues.StressMatrix = rStressMatrix; //store total stress as StressMatrix
 
+    // set requested internal variables
+    this->SetInternalVariables(rValues,Variables);
+
     KRATOS_CATCH(" ")
   }
 
@@ -199,6 +202,9 @@ namespace Kratos
     HyperElasticDataType Variables;
     this->CalculateStrainData(rValues,Variables);
     this->CalculateAndAddVolumetricStressTensor(Variables,rStressMatrix);
+
+    // set requested internal variables
+    this->SetInternalVariables(rValues,Variables);
 
     KRATOS_CATCH(" ")
   }
@@ -289,9 +295,48 @@ namespace Kratos
     //Calculate Constitutive Matrix
     this->CalculateAndAddConstitutiveTensor(Variables,rConstitutiveMatrix);
 
+    // set requested internal variables
+    this->SetInternalVariables(rValues,Variables);
+
     KRATOS_CATCH(" ")
   }
 
+  //************************************************************************************
+  //************************************************************************************
+
+  void HyperElasticModel::CalculateInternalVariables(ModelDataType& rValues)
+  {
+    KRATOS_TRY
+
+    //Initialize ConstitutiveMatrix
+    HyperElasticDataType Variables;
+    this->CalculateStrainData(rValues,Variables);
+
+    // set requested internal variables
+    this->SetInternalVariables(rValues,Variables);
+
+    KRATOS_CATCH(" ")
+  }
+
+  //************************************************************************************
+  //************************************************************************************
+
+  // set requested internal variables
+  void HyperElasticModel::SetInternalVariables(ModelDataType& rValues, HyperElasticDataType& rVariables)
+  {
+    KRATOS_TRY
+
+    if( rValues.InternalVariable.Is(VOLUMETRIC_STRESS_FACTORS) )
+    {
+      Vector Factors(3);
+      this->GetVolumetricFunctionFactors(rVariables, Factors);
+
+      //supply internal variable
+      rValues.InternalVariable.SetValue(VOLUMETRIC_STRESS_FACTORS, Factors);
+    }
+
+    KRATOS_CATCH(" ")
+  }
 
   //************************************************************************************
   //************************************************************************************
@@ -338,6 +383,9 @@ namespace Kratos
 
     //Calculate Constitutive Matrix
     this->CalculateAndAddVolumetricConstitutiveTensor(Variables,rConstitutiveMatrix);
+
+    // set requested internal variables
+    this->SetInternalVariables(rValues,Variables);
 
     KRATOS_CATCH(" ")
   }
@@ -717,6 +765,51 @@ namespace Kratos
     KRATOS_ERROR << "calling the base class function in HyperElasticModel ... illegal operation" << std::endl;
 
     return rDerivative;
+
+    KRATOS_CATCH(" ")
+  }
+
+
+  //************************************************************************************
+  //************************************************************************************
+
+  void HyperElasticModel::GetVolumetricFunctionFactors(HyperElasticDataType& rVariables, Vector& rFactors)
+  {
+    KRATOS_TRY
+
+    KRATOS_ERROR << "calling the base class function in HyperElasticModel ... illegal operation" << std::endl;
+
+    KRATOS_CATCH(" ")
+  }
+
+
+  //************************************************************************************
+  //************************************************************************************
+
+  void HyperElasticModel::GetVolumetricFunctionThermalFactors(HyperElasticDataType& rVariables, Vector& rFactors)
+  {
+    KRATOS_TRY
+
+    const ModelDataType& rModelData = rVariables.GetModelData();
+    const Properties& rProperties = rModelData.GetProperties();
+
+    //Thermal constants
+    double ThermalExpansionCoefficient = 0;
+    double ReferenceTemperature = 0;;
+    if( rProperties.Has(THERMAL_EXPANSION_COEFFICIENT) )
+      ThermalExpansionCoefficient = rProperties[THERMAL_EXPANSION_COEFFICIENT];
+
+    if( rProperties.Has(REFERENCE_TEMPERATURE) )
+      ReferenceTemperature = rProperties[REFERENCE_TEMPERATURE];
+
+    const double& rTemperature = rModelData.GetTemperature();
+    double DeltaTemperature = 0;
+    if( rTemperature != 0)
+      DeltaTemperature = rTemperature - ReferenceTemperature;
+
+    //Thermal volumetric factor:
+    rFactors[0] += 3.0 * ThermalExpansionCoefficient * rFactors[1] * DeltaTemperature;
+    rFactors[1] += 3.0 * ThermalExpansionCoefficient * rFactors[2] * DeltaTemperature;
 
     KRATOS_CATCH(" ")
   }

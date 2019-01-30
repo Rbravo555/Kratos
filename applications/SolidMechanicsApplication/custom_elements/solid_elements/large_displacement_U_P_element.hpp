@@ -328,6 +328,14 @@ protected:
             ElementDataType & rVariables,
             double& rIntegrationWeight);
 
+
+    /**
+     * Set Parameters for the Constitutive Law and Calculate Material Response
+     */
+    void CalculateMaterialResponse(ElementDataType& rVariables,
+                                   ConstitutiveLaw::Parameters& rValues,
+                                   const int & rPointNumber) override;
+
     /**
      * Get element size from the dofs
      */
