@@ -246,6 +246,11 @@ namespace Kratos
      */
     virtual void CalculateStressVectorAndConstitutiveMatrix(ModelDataType& rModelValues, Vector& rStressVector, Matrix& rConstitutiveMatrix);
 
+    /**
+     * Calculates an internal variable
+     */
+    void CalculateInternalVariables(ModelDataType& rModelValues) override;
+
 
     ///@}
 

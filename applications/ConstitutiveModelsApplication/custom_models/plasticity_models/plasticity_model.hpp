@@ -344,8 +344,18 @@ namespace Kratos
     ///@name Protected Operations
     ///@{
 
-    //set internal variables for output print
+   // calculate requested internal variables
+    void CalculateInternalVariables(ModelDataType& rValues) override
+    {
+      KRATOS_TRY
 
+      this->mElasticityModel.CalculateInternalVariables(rValues);
+
+      KRATOS_CATCH(" ")
+    }
+
+
+    //set calculated internal variables when requested
     virtual void SetInternalVariables(ModelDataType& rValues, PlasticDataType& rVariables)
     {
       KRATOS_TRY
@@ -355,7 +365,7 @@ namespace Kratos
 
     ///@}
     ///@name Protected  Access
-    ///@{
+    ///@{s
 
 
     ///@}

@@ -451,7 +451,22 @@ namespace Kratos
   {
     KRATOS_TRY
 
+    // When the variables is an internal variable one must set what calculations are needed
+    // Flags & Options = rValues.GetOptions();
+    // Options.Set(ConstitutiveLaw::COMPUTE_STRESS, False);
+    // Options.Set(ConstitutiveLaw::COMPUTE_CONSTITUTIVE_TENSOR, False);
     this->CalculateMaterialResponseKirchhoff(rValues,rModelValues);
+
+    KRATOS_CATCH(" ")
+  }
+
+  //************************************************************************************
+  //************************************************************************************
+
+  void Constitutive3DLaw::CalculateInternalVariables(ModelDataType& rModelValues)
+  {
+    KRATOS_TRY
+
 
     KRATOS_CATCH(" ")
   }
@@ -506,7 +521,8 @@ namespace Kratos
     const Matrix& rDeltaDeformationMatrix = rValues.GetDeformationGradientF();
     const double& rDeltaDeformationDet    = rValues.GetDeterminantF();
 
-    TransformStresses(rStressVector,rDeltaDeformationMatrix,rDeltaDeformationDet,StressMeasure_PK2,StressMeasure_PK1);
+    if(rValues.GetOptions().Is(ConstitutiveLaw::COMPUTE_STRESS))
+      TransformStresses(rStressVector,rDeltaDeformationMatrix,rDeltaDeformationDet,StressMeasure_PK2,StressMeasure_PK1);
 
     KRATOS_CATCH(" ")
 
@@ -562,8 +578,11 @@ namespace Kratos
     Matrix& rConstitutiveMatrix          = rValues.GetConstitutiveMatrix();
 
     //Set to cauchy Stress:
-    rStressVector       /= rDeltaDeformationDet;
-    rConstitutiveMatrix /= rDeltaDeformationDet;
+    if( rValues.GetOptions().Is( ConstitutiveLaw::COMPUTE_STRESS ) )
+      rStressVector /= rDeltaDeformationDet;
+
+    if( rValues.GetOptions().Is( ConstitutiveLaw::COMPUTE_CONSTITUTIVE_TENSOR ) )
+      rConstitutiveMatrix /= rDeltaDeformationDet;
 
     KRATOS_CATCH(" ")
   }

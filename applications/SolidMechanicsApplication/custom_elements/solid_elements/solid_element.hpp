@@ -107,9 +107,10 @@ protected:
         double  detJ;
         Vector  StrainVector;
         Vector  StressVector;
+        Vector  Factors; //Wildcard ( Volumetric stress factors... )
         Vector  N;
         Matrix  B;
-        Matrix  H;    //Wildcard ( Displacement Gradient, F(0 to n+1), B-bar, Velocity Gradient...)
+        Matrix  H;    //Wildcard ( Displacement Gradient, F(0 to n+1), B-bar, Velocity Gradient... )
         Matrix  F;    //Incremental Deformation Gradient (n to n+1)
         Matrix  F0;   //Historical Deformation Gradient  (0 to n)
         Matrix  DN_DX;

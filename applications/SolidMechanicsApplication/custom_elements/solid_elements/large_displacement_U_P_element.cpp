@@ -288,6 +288,36 @@ LargeDisplacementUPElement::SizeType LargeDisplacementUPElement::GetDofsSize()
 //************************************************************************************
 //************************************************************************************
 
+void LargeDisplacementUPElement::CalculateMaterialResponse(ElementDataType& rVariables,
+                                                           ConstitutiveLaw::Parameters& rValues,
+                                                           const int & rPointNumber)
+{
+    KRATOS_TRY
+
+    //set general variables to constitutivelaw parameters
+    this->SetElementData(rVariables,rValues,rPointNumber);
+
+    //compute stresses and constitutive parameters
+    mConstitutiveLawVector[rPointNumber]->CalculateMaterialResponse(rValues, rVariables.StressMeasure);
+
+    //compute volumetric factors from the UP law
+    Flags OriginalFlags = rValues.GetOptions();
+    // no calculation of stress or constitutive tensor is needed for computing VOLUMETRIC_STRESS_FACTORS
+    rValues.GetOptions().Set(ConstitutiveLaw::COMPUTE_STRESS, false);
+    rValues.GetOptions().Set(ConstitutiveLaw::COMPUTE_CONSTITUTIVE_TENSOR, false);
+
+    rVariables.Factors = mConstitutiveLawVector[rPointNumber]->CalculateValue(rValues, VOLUMETRIC_STRESS_FACTORS, rVariables.Factors);
+
+    KRATOS_ERROR_IF(!rVariables.Factors.size())<<" VOLUMETIC_STRESS_FACTORS not supplied correctly by the CLW "<<std::endl;
+
+    rValues.SetOptions(OriginalFlags);
+
+    KRATOS_CATCH("")
+}
+
+//************************************************************************************
+//************************************************************************************
+
 void LargeDisplacementUPElement::CalculateAndAddLHS(LocalSystemComponents& rLocalSystem, ElementDataType& rVariables, double& rIntegrationWeight)
 {
 
@@ -553,7 +583,8 @@ void LargeDisplacementUPElement::CalculateAndAddPressureForces(VectorType& rRigh
     //double consistent=1;
 
     double Coefficient = 0;
-    Coefficient = this->CalculatePUCoefficient( Coefficient, rVariables );
+    //Coefficient = this->CalculatePUCoefficient( Coefficient, rVariables );
+    Coefficient = rVariables.Factors[0];
 
     for ( SizeType i = 0; i < number_of_nodes; i++ )
     {
@@ -837,8 +868,8 @@ void LargeDisplacementUPElement::CalculateAndAddKpu (MatrixType& rLeftHandSideMa
     SizeType indexp = dimension;
 
     double DeltaCoefficient = 0;
-    DeltaCoefficient = this->CalculatePUDeltaCoefficient( DeltaCoefficient, rVariables );
-
+    //DeltaCoefficient = this->CalculatePUDeltaCoefficient( DeltaCoefficient, rVariables );
+    DeltaCoefficient = rVariables.Factors[1];
 
     for ( SizeType i = 0; i < number_of_nodes; i++ )
     {

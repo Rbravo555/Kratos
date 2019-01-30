@@ -167,6 +167,12 @@ namespace Kratos
 
 
     /**
+     * Calculate internal variables
+     */
+    void CalculateInternalVariables(ModelDataType& rValues) override;
+
+
+    /**
      * Check
      */
     int Check(const Properties& rProperties, const ProcessInfo& rCurrentProcessInfo) override;
@@ -317,6 +323,8 @@ namespace Kratos
 
     virtual void CalculateAndAddVolumetricStrainEnergy(ElasticDataType& rVariables, double& rIsochoricDensityFunction);
 
+    // set requested internal variables
+    virtual void SetInternalVariables(ModelDataType& rValues, ElasticDataType& rVariables);
 
     ///@}
     ///@name Protected  Access
