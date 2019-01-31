@@ -25,7 +25,6 @@ namespace Kratos
 UpdatedLagrangianUPElement::UpdatedLagrangianUPElement( IndexType NewId, GeometryType::Pointer pGeometry )
     : LargeDisplacementUPElement( NewId, pGeometry )
 {
-    //DO NOT ADD DOFS HERE!!!
 }
 
 

@@ -751,11 +751,23 @@ protected:
                                 const int & rPointNumber);
 
     /**
+     * Check Variables of the Element
+     */
+    virtual void CheckElementData(ElementDataType& rVariables,
+                                  const int & rPointNumber);
+
+    /**
      * Set Parameters for the Constitutive Law and Calculate Material Response
      */
     virtual void CalculateMaterialResponse(ElementDataType& rVariables,
                                            ConstitutiveLaw::Parameters& rValues,
                                            const int & rPointNumber);
+
+    /**
+     * Get dof size of a node
+     */
+    virtual SizeType GetNodeDofsSize();
+
     /**
      * Get element size from the dofs
      */

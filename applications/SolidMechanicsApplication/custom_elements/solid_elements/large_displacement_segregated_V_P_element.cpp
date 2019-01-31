@@ -634,21 +634,18 @@ void LargeDisplacementSegregatedVPElement::CalculateDampingMatrix( MatrixType& r
 //************************************************************************************
 //************************************************************************************
 
-LargeDisplacementSegregatedVPElement::SizeType LargeDisplacementSegregatedVPElement::GetDofsSize()
+LargeDisplacementSegregatedVPElement::SizeType LargeDisplacementSegregatedVPElement::GetNodeDofsSize()
 {
   KRATOS_TRY
-
-  const SizeType dimension        = GetGeometry().WorkingSpaceDimension();
-  const SizeType number_of_nodes  = GetGeometry().PointsNumber();
 
   SizeType size = 0;
   switch(mStepVariable)
   {
     case VELOCITY_STEP:
-      size = number_of_nodes * dimension; //size for velocity
+      size = GetGeometry().WorkingSpaceDimension(); //size for velocity
       break;
     case PRESSURE_STEP:
-      size = number_of_nodes; //size for pressure
+      size = 1; //size for pressure
       break;
     default:
       KRATOS_ERROR << "Unexpected value for SEGREGATED_STEP index: " << mStepVariable << std::endl;

@@ -130,10 +130,34 @@ void LargeDisplacementElement::SetElementData(ElementDataType& rVariables,
                                               const int & rPointNumber)
 {
 
-    //to take in account previous step for output print purposes
+    //set previous step for output print purposes
     if( this->Is(SolidElement::FINALIZED_STEP) ){
-      this->GetHistoricalVariables(rVariables,rPointNumber);
+      this->GetHistoricalVariables(rVariables, rPointNumber);
     }
+
+    //check inverted element
+    this->CheckElementData(rVariables, rPointNumber);
+
+    //Compute F and detF (from 0 to n+1) : store it in H variable and detH
+    rVariables.detH = rVariables.detF * rVariables.detF0;
+    noalias(rVariables.H) = prod( rVariables.F, rVariables.F0 );
+
+    rValues.SetDeterminantF(rVariables.detH);
+    rValues.SetDeformationGradientF(rVariables.H);
+    rValues.SetStrainVector(rVariables.StrainVector);
+    rValues.SetStressVector(rVariables.StressVector);
+    rValues.SetConstitutiveMatrix(rVariables.ConstitutiveMatrix);
+    rValues.SetShapeFunctionsDerivatives(rVariables.DN_DX);
+    rValues.SetShapeFunctionsValues(rVariables.N);
+
+}
+
+//************************************************************************************
+//************************************************************************************
+
+void LargeDisplacementElement::CheckElementData(ElementDataType& rVariables, const int & rPointNumber)
+{
+    KRATOS_TRY
 
     //to be accurate calculus must stop
     if(rVariables.detF<0){
@@ -176,20 +200,8 @@ void LargeDisplacementElement::SetElementData(ElementDataType& rVariables,
 
     }
 
-    //Compute F and detF (from 0 to n+1) : store it in H variable and detH
-    rVariables.detH = rVariables.detF * rVariables.detF0;
-    noalias(rVariables.H) = prod( rVariables.F, rVariables.F0 );
-
-    rValues.SetDeterminantF(rVariables.detH);
-    rValues.SetDeformationGradientF(rVariables.H);
-    rValues.SetStrainVector(rVariables.StrainVector);
-    rValues.SetStressVector(rVariables.StressVector);
-    rValues.SetConstitutiveMatrix(rVariables.ConstitutiveMatrix);
-    rValues.SetShapeFunctionsDerivatives(rVariables.DN_DX);
-    rValues.SetShapeFunctionsValues(rVariables.N);
-
+    KRATOS_CATCH( "" )
 }
-
 
 //************************************************************************************
 //************************************************************************************

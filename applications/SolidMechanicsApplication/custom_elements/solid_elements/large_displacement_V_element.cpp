@@ -144,7 +144,7 @@ void LargeDisplacementVElement::EquationIdVector( EquationIdVectorType& rResult,
 {
     const SizeType number_of_nodes  = GetGeometry().size();
     const SizeType dimension        = GetGeometry().WorkingSpaceDimension();
-    const SizeType dofs_size        = GetDofsSize();
+    const SizeType dofs_size        = this->GetDofsSize();
 
     if ( rResult.size() != dofs_size )
         rResult.resize( dofs_size, false );
@@ -186,25 +186,6 @@ void LargeDisplacementVElement::CalculateAndAddLHS(LocalSystemComponents& rLocal
 }
 
 
-
-
-//************************************************************************************
-//************************************************************************************
-
-LargeDisplacementVElement::SizeType LargeDisplacementVElement::GetDofsSize()
-{
-  KRATOS_TRY
-
-  const SizeType dimension        = GetGeometry().WorkingSpaceDimension();
-  const SizeType number_of_nodes  = GetGeometry().PointsNumber();
-
-  SizeType size = number_of_nodes * dimension; //usual size for velocity based elements
-
-  return size;
-
-  KRATOS_CATCH( "" )
-}
-
 //************************************************************************************
 //************************************************************************************
 
@@ -213,12 +194,56 @@ void LargeDisplacementVElement::SetElementData(ElementDataType& rVariables,
                                                const int & rPointNumber)
 {
 
-    //to take in account previous step for output print purposes
+    //set previous step for output print purposes
     unsigned int Alpha = 1; //current step
     if( this->Is(SolidElement::FINALIZED_STEP) ){
       Alpha = 0; //previous step
       this->GetHistoricalVariables(rVariables,rPointNumber);
     }
+
+    //check inverted element
+    this->CheckElementData(rVariables,rPointNumber);
+
+    //Compute strain rate measures if they are required by the constitutive law
+    ConstitutiveLaw::Features LawFeatures;
+    mConstitutiveLawVector[rPointNumber]->GetLawFeatures(LawFeatures);
+
+    bool strain_rate_measure = false;
+    for(SizeType i=0; i<LawFeatures.mStrainMeasures.size(); i++)
+    {
+      if(LawFeatures.mStrainMeasures[i] == ConstitutiveLaw::StrainMeasure_Velocity_Gradient)
+	strain_rate_measure = true;
+    }
+
+    if( strain_rate_measure ){
+      //Compute symmetric spatial velocity gradient [DN_DX = dN/dx_n*1] stored in a vector
+      GeometryType& rGeometry = GetGeometry();
+      ElementUtilities::CalculateVelocityGradientVector( rVariables.StrainVector, rGeometry, rVariables.DN_DX, Alpha );
+      Flags &ConstitutiveLawOptions=rValues.GetOptions();
+      ConstitutiveLawOptions.Set(ConstitutiveLaw::USE_ELEMENT_PROVIDED_STRAIN);
+    }
+
+    //Compute F and detF (from 0 to n+1) : store it in H variable and detH
+    rVariables.detH = rVariables.detF * rVariables.detF0;
+    noalias(rVariables.H) = prod( rVariables.F, rVariables.F0 );
+
+    rValues.SetDeterminantF(rVariables.detH);
+    rValues.SetDeformationGradientF(rVariables.H);
+    rValues.SetStrainVector(rVariables.StrainVector);
+    rValues.SetStressVector(rVariables.StressVector);
+    rValues.SetConstitutiveMatrix(rVariables.ConstitutiveMatrix);
+    rValues.SetShapeFunctionsDerivatives(rVariables.DN_DX);
+    rValues.SetShapeFunctionsValues(rVariables.N);
+
+}
+
+//************************************************************************************
+//************************************************************************************
+
+void LargeDisplacementVElement::CheckElementData(ElementDataType& rVariables,
+                                                 const int & rPointNumber)
+{
+    KRATOS_TRY
 
     if(rVariables.detF<0){
 
@@ -260,38 +285,7 @@ void LargeDisplacementVElement::SetElementData(ElementDataType& rVariables,
 
     }
 
-
-    //Compute strain rate measures if they are required by the constitutive law
-    ConstitutiveLaw::Features LawFeatures;
-    mConstitutiveLawVector[rPointNumber]->GetLawFeatures(LawFeatures);
-
-    bool strain_rate_measure = false;
-    for(SizeType i=0; i<LawFeatures.mStrainMeasures.size(); i++)
-    {
-      if(LawFeatures.mStrainMeasures[i] == ConstitutiveLaw::StrainMeasure_Velocity_Gradient)
-	strain_rate_measure = true;
-    }
-
-    if( strain_rate_measure ){
-      //Compute symmetric spatial velocity gradient [DN_DX = dN/dx_n*1] stored in a vector
-      GeometryType& rGeometry = GetGeometry();
-      ElementUtilities::CalculateVelocityGradientVector( rVariables.StrainVector, rGeometry, rVariables.DN_DX, Alpha );
-      Flags &ConstitutiveLawOptions=rValues.GetOptions();
-      ConstitutiveLawOptions.Set(ConstitutiveLaw::USE_ELEMENT_PROVIDED_STRAIN);
-    }
-
-    //Compute F and detF (from 0 to n+1) : store it in H variable and detH
-    rVariables.detH = rVariables.detF * rVariables.detF0;
-    noalias(rVariables.H) = prod( rVariables.F, rVariables.F0 );
-
-    rValues.SetDeterminantF(rVariables.detH);
-    rValues.SetDeformationGradientF(rVariables.H);
-    rValues.SetStrainVector(rVariables.StrainVector);
-    rValues.SetStressVector(rVariables.StressVector);
-    rValues.SetConstitutiveMatrix(rVariables.ConstitutiveMatrix);
-    rValues.SetShapeFunctionsDerivatives(rVariables.DN_DX);
-    rValues.SetShapeFunctionsValues(rVariables.N);
-
+    KRATOS_CATCH( "" )
 }
 
 //************************************************************************************
@@ -325,7 +319,7 @@ int  LargeDisplacementVElement::Check( const ProcessInfo& rCurrentProcessInfo )
 
     return ErrorCode;
 
-    KRATOS_CATCH( "" );
+    KRATOS_CATCH( "" )
 }
 
 //************************************************************************************
