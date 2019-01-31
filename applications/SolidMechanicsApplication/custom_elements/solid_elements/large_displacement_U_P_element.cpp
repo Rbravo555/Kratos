@@ -148,7 +148,7 @@ void LargeDisplacementUPElement::EquationIdVector( EquationIdVectorType& rResult
 {
     const SizeType number_of_nodes = GetGeometry().size();
     const SizeType dimension = GetGeometry().WorkingSpaceDimension();
-    const SizeType dofs_size = number_of_nodes * dimension + number_of_nodes;
+    const SizeType dofs_size = this->GetDofsSize();
 
     if ( rResult.size() != dofs_size )
         rResult.resize( dofs_size, false );
@@ -1014,8 +1014,8 @@ void LargeDisplacementUPElement::CalculateMassMatrix( MatrixType& rMassMatrix, P
     KRATOS_TRY
 
     //lumped
-    const SizeType dimension  = GetGeometry().WorkingSpaceDimension();
-    const SizeType number_of_nodes  = GetGeometry().size();
+    const SizeType dimension = GetGeometry().WorkingSpaceDimension();
+    const SizeType number_of_nodes = GetGeometry().size();
     const SizeType MatSize = this->GetDofsSize();
     const SizeType node_dofs = this->GetNodeDofsSize();
 

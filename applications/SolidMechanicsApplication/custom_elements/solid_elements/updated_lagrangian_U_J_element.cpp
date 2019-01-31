@@ -111,7 +111,7 @@ Element::Pointer UpdatedLagrangianUJElement::Clone( IndexType NewId, NodesArrayT
       KRATOS_THROW_ERROR( std::logic_error, "constitutive law not has the correct size ", pClonedElement.mConstitutiveLawVector.size() )
           }
 
-  for(unsigned int i=0; i<mConstitutiveLawVector.size(); i++)
+  for(SizeType i=0; i<mConstitutiveLawVector.size(); i++)
   {
     pClonedElement.mConstitutiveLawVector[i] = mConstitutiveLawVector[i]->Clone();
   }
@@ -125,7 +125,7 @@ Element::Pointer UpdatedLagrangianUJElement::Clone( IndexType NewId, NodesArrayT
     pClonedElement.mDeformationGradientJ0.resize(mDeformationGradientJ0.size());
 
 
-  for(unsigned int i=0; i<mDeformationGradientJ0.size(); i++)
+  for(SizeType i=0; i<mDeformationGradientJ0.size(); i++)
   {
     pClonedElement.mDeformationGradientF0[i] = mDeformationGradientF0[i];
     pClonedElement.mDeformationGradientJ[i] = mDeformationGradientJ0[i];
@@ -157,9 +157,9 @@ void UpdatedLagrangianUJElement::GetDofList( DofsVectorType& rElementalDofList, 
 {
   rElementalDofList.resize( 0 );
 
-  const unsigned int dimension = GetGeometry().WorkingSpaceDimension();
+  const SizeType dimension = GetGeometry().WorkingSpaceDimension();
 
-  for ( unsigned int i = 0; i < GetGeometry().size(); i++ )
+  for ( SizeType i = 0; i < GetGeometry().size(); i++ )
   {
     rElementalDofList.push_back( GetGeometry()[i].pGetDof( DISPLACEMENT_X ) );
     rElementalDofList.push_back( GetGeometry()[i].pGetDof( DISPLACEMENT_Y ) );
@@ -177,14 +177,14 @@ void UpdatedLagrangianUJElement::GetDofList( DofsVectorType& rElementalDofList, 
 
 void UpdatedLagrangianUJElement::EquationIdVector( EquationIdVectorType& rResult, ProcessInfo& rCurrentProcessInfo )
 {
-  const unsigned int number_of_nodes = GetGeometry().size();
-  const unsigned int dimension       = GetGeometry().WorkingSpaceDimension();
-  unsigned int element_size          = number_of_nodes * dimension + number_of_nodes;
+  const SizeType number_of_nodes = GetGeometry().size();
+  const SizeType dimension = GetGeometry().WorkingSpaceDimension();
+  const SizeType dofs_size = this->GetDofsSize();
 
-  if ( rResult.size() != element_size )
-    rResult.resize( element_size, false );
+  if ( rResult.size() != dofs_size )
+    rResult.resize( dofs_size, false );
 
-  for ( unsigned int i = 0; i < number_of_nodes; i++ )
+  for ( SizeType i = 0; i < number_of_nodes; i++ )
   {
     int index = i * dimension + i;
     rResult[index]     = GetGeometry()[i].GetDof( DISPLACEMENT_X ).EquationId();
@@ -207,91 +207,92 @@ void UpdatedLagrangianUJElement::EquationIdVector( EquationIdVectorType& rResult
 //*********************************DISPLACEMENT***************************************
 //************************************************************************************
 
-void UpdatedLagrangianUJElement::GetValuesVector( Vector& rValues, int Step )
+void LargeDisplacementUJElement::GetValuesVector( Vector& rValues, int Step )
 {
-  const unsigned int number_of_nodes = GetGeometry().size();
-  const unsigned int dimension       = GetGeometry().WorkingSpaceDimension();
-  unsigned int       element_size    = number_of_nodes * dimension + number_of_nodes;
+    const SizeType number_of_nodes = GetGeometry().size();
+    const SizeType dimension = GetGeometry().WorkingSpaceDimension();
+    const SizeType dofs_size = number_of_nodes * dimension + number_of_nodes;
 
-  if ( rValues.size() != element_size ) rValues.resize( element_size, false );
+    if ( rValues.size() != dofs_size )
+      rValues.resize( dofs_size, false );
 
-
-  for ( unsigned int i = 0; i < number_of_nodes; i++ )
-  {
-    unsigned int index = i * dimension + i;
-    rValues[index]     = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_X, Step );
-    rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_Y, Step );
-
-    if ( dimension == 3 )
+    for ( SizeType i = 0; i < number_of_nodes; i++ )
     {
-      rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_Z, Step );
-      rValues[index + 3] = GetGeometry()[i].GetSolutionStepValue( JACOBIAN, Step );
-    }
-    else
-    {
-      rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( JACOBIAN, Step );
-    }
+        SizeType index = i * dimension + i;
+        rValues[index]     = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_X, Step );
+        rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_Y, Step );
 
-  }
+        if ( dimension == 3 )
+        {
+            rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_Z, Step );
+            rValues[index + 3] = GetGeometry()[i].GetSolutionStepValue( JACOBIAN, Step );
+        }
+        else
+        {
+            rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( JACOBIAN, Step );
+        }
+
+    }
 }
 
 
 //************************************VELOCITY****************************************
 //************************************************************************************
 
-void UpdatedLagrangianUJElement::GetFirstDerivativesVector( Vector& rValues, int Step )
+void LargeDisplacementUJElement::GetFirstDerivativesVector( Vector& rValues, int Step )
 {
-  const unsigned int number_of_nodes = GetGeometry().size();
-  const unsigned int dimension       = GetGeometry().WorkingSpaceDimension();
-  unsigned int       element_size    = number_of_nodes * dimension + number_of_nodes;
+    const SizeType number_of_nodes = GetGeometry().size();
+    const SizeType dimension = GetGeometry().WorkingSpaceDimension();
+    const SizeType dofs_size = number_of_nodes * dimension + number_of_nodes;
 
-  if ( rValues.size() != element_size ) rValues.resize( element_size, false );
+    if ( rValues.size() != dofs_size )
+      rValues.resize( dofs_size, false );
 
-  for ( unsigned int i = 0; i < number_of_nodes; i++ )
-  {
-    unsigned int index = i * dimension + i;
-    rValues[index]     = GetGeometry()[i].GetSolutionStepValue( VELOCITY_X, Step );
-    rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( VELOCITY_Y, Step );
-    if ( dimension == 3 )
+    for ( SizeType i = 0; i < number_of_nodes; i++ )
     {
-      rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( VELOCITY_Z, Step );
-      rValues[index + 3] = 0;
+        SizeType index = i * dimension + i;
+        rValues[index]     = GetGeometry()[i].GetSolutionStepValue( VELOCITY_X, Step );
+        rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( VELOCITY_Y, Step );
+        if ( dimension == 3 )
+        {
+            rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( VELOCITY_Z, Step );
+            rValues[index + 3] = 0;
+        }
+        else
+        {
+            rValues[index + 2] = 0;
+        }
     }
-    else
-    {
-      rValues[index + 2] = 0;
-    }
-  }
 }
 
 //*********************************ACCELERATION***************************************
 //************************************************************************************
 
-void UpdatedLagrangianUJElement::GetSecondDerivativesVector( Vector& rValues, int Step )
+void LargeDisplacementUJElement::GetSecondDerivativesVector( Vector& rValues, int Step )
 {
-  const unsigned int number_of_nodes = GetGeometry().size();
-  const unsigned int dimension       = GetGeometry().WorkingSpaceDimension();
-  unsigned int       element_size    = number_of_nodes * dimension + number_of_nodes;
+    const SizeType number_of_nodes = GetGeometry().size();
+    const SizeType dimension = GetGeometry().WorkingSpaceDimension();
+    const SizeType dofs_size = number_of_nodes * dimension + number_of_nodes;
 
-  if ( rValues.size() != element_size ) rValues.resize( element_size, false );
+    if ( rValues.size() != dofs_size )
+      rValues.resize( dofs_size, false );
 
-
-  for ( unsigned int i = 0; i < number_of_nodes; i++ )
-  {
-    unsigned int index = i * dimension + i;
-    rValues[index]     = GetGeometry()[i].GetSolutionStepValue( ACCELERATION_X, Step );
-    rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( ACCELERATION_Y, Step );
-
-    if ( dimension == 3 )
+    for ( SizeType i = 0; i < number_of_nodes; i++ )
     {
-      rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( ACCELERATION_Z, Step );
-      rValues[index + 3] = 0;
+        SizeType index = i * dimension + i;
+        rValues[index]     = GetGeometry()[i].GetSolutionStepValue( ACCELERATION_X, Step );
+        rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( ACCELERATION_Y, Step );
+
+        if ( dimension == 3 )
+        {
+            rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( ACCELERATION_Z, Step );
+            rValues[index + 3] = 0;
+        }
+        else
+        {
+            rValues[index + 2] = 0;
+        }
     }
-    else
-    {
-      rValues[index + 2] = 0;
-    }
-  }
 
 }
 
@@ -306,28 +307,44 @@ UpdatedLagrangianUJElement::SizeType UpdatedLagrangianUJElement::GetNodeDofsSize
 //**************************************************************************
 //**************************************************************************
 
-void UpdatedLagrangianUJElement::InitializeSolutionStep( ProcessInfo& rCurrentProcessInfo)
+void UpdatedLagrangianUJElement::CalculateStabilizationFactor(double& rStabilizationFactor)
 {
   KRATOS_TRY
 
-      LargeDisplacementElement::InitializeSolutionStep( rCurrentProcessInfo );
+  //LMonforte
+  double YoungModulus = 1.0;
+  if( GetProperties().Has(YOUNG_MODULUS) )
+    YoungModulus = GetProperties()[YOUNG_MODULUS];
 
-  // VALE, AQUÍ POSO LES COSES ESTUPIDES QUE JO VULGUI
-  const double& YoungModulus = GetProperties()[YOUNG_MODULUS];
-  if (YoungModulus < 0.00001)
+  if(YoungModulus<1e-5)
   {
-    std::vector<double> Values;
-    mElementStabilizationNumber = 1.0;
-    GetValueOnIntegrationPoints( SHEAR_MODULUS, Values, rCurrentProcessInfo);
-    if ( fabs(Values[0]) > 1e-6)
-      mElementStabilizationNumber = 1.0 / Values[0];
+    double BulkModulus = 0.0;
+    if(GetProperties().Has(BULK_MODULUS)){
+      BulkModulus= GetProperties()[BULK_MODULUS];
+    }
+    else if( GetProperties().Has(YOUNG_MODULUS) && GetProperties().Has(POISSON_RATIO) ){
+      BulkModulus = GetProperties()[YOUNG_MODULUS]/(3*(1-2*GetProperties()[POISSON_RATIO]));
+    }
 
-    GetValueOnIntegrationPoints( BULK_MODULUS, Values, rCurrentProcessInfo);
-    if ( fabs(Values[0]) > 1e-6)
-      mElementStabilizationNumber *= Values[0];
+    double ShearModulus = 0.0;
+    double BulkModulus = 1.0;
+    if(GetProperties().Has(SHEAR_MODULUS)){
+      ShearModulus= GetProperties()[SHEAR_MODULUS];
+    }
+    else if(GetProperties().Has(BULK_MODULUS) && GetProperties().Has(POISSON_RATIO)){
+      ShearModulus= GetProperties()[BULK_MODULUS]*3*(1-2*GetProperties()[POISSON_RATIO])/(2*(1+GetProperties()[POISSON_RATIO]));
+    }
+    else if( GetProperties().Has(YOUNG_MODULUS) && GetProperties().Has(POISSON_RATIO) ){
+      ShearModulus = GetProperties()[YOUNG_MODULUS]/(2*(1+GetProperties()[POISSON_RATIO]));
+    }
+
+    if(fabs(ShearModulus) > 1e-6)
+      rStabilizationFactor = 1.0 / ShearModulus;
+
+    GetValueOnIntegrationPoints(BULK_MODULUS, Values, rCurrentProcessInfo);
+    if(fabs(BulkModulus) > 1e-6)
+      rStabilizationFactor *= BulkModulus;
   }
-
-  this->Set(SolidElement::FINALIZED_STEP, false);
 
   KRATOS_CATCH("");
 }
@@ -342,8 +359,8 @@ void UpdatedLagrangianUJElement::SetValueOnIntegrationPoints( const Variable<dou
 
   if (rVariable == DETERMINANT_F){
 
-    const unsigned int& integration_points_number = mConstitutiveLawVector.size();
-    for ( unsigned int PointNumber = 0;  PointNumber < integration_points_number; PointNumber++ )
+    const SizeType& integration_points_number = mConstitutiveLawVector.size();
+    for ( SizeType PointNumber = 0;  PointNumber < integration_points_number; PointNumber++ )
     {
       mDeterminantF0[PointNumber] = rValues[PointNumber];
     }
@@ -367,26 +384,23 @@ void UpdatedLagrangianUJElement::GetValueOnIntegrationPoints( const Variable<dou
 {
   KRATOS_TRY
 
-      const unsigned int& integration_points_number = mConstitutiveLawVector.size();
+  const SizeType& integration_points_number = mConstitutiveLawVector.size();
   if (rVariable == DETERMINANT_F){
 
     if ( rValues.size() != integration_points_number )
       rValues.resize( integration_points_number );
 
-    for ( unsigned int PointNumber = 0;  PointNumber < integration_points_number; PointNumber++ )
+    for ( SizeType PointNumber = 0;  PointNumber < integration_points_number; PointNumber++ )
     {
       rValues[PointNumber] = mDeterminantF0[PointNumber];
     }
-
   }
   else{
-
     LargeDisplacementElement::GetValueOnIntegrationPoints( rVariable, rValues, rCurrentProcessInfo );
-
   }
 
   KRATOS_CATCH("")
-      }
+}
 
 // ******************************************************************************************
 // Calculate On Integration Points. (VECTOR)
@@ -395,7 +409,7 @@ void UpdatedLagrangianUJElement::CalculateOnIntegrationPoints( const Variable<Ve
 
   KRATOS_TRY
 
-      const unsigned int& integration_points_number = GetGeometry().IntegrationPointsNumber( mThisIntegrationMethod );
+      const SizeType& integration_points_number = GetGeometry().IntegrationPointsNumber( mThisIntegrationMethod );
 
   if ( rOutput.size() != integration_points_number )
     rOutput.resize( integration_points_number );
@@ -415,7 +429,7 @@ void UpdatedLagrangianUJElement::CalculateOnIntegrationPoints( const Variable<Ve
     ConstitutiveLawOptions.Set(ConstitutiveLaw::COMPUTE_STRESS);
 
     //reading integration points
-    for ( unsigned int PointNumber = 0; PointNumber < mConstitutiveLawVector.size(); PointNumber++ )
+    for ( SizeType PointNumber = 0; PointNumber < mConstitutiveLawVector.size(); PointNumber++ )
     {
       //compute element kinematics B, F, DN_DX ...
       this->CalculateKinematics(Variables,PointNumber);
@@ -472,30 +486,30 @@ void UpdatedLagrangianUJElement::CalculateOnIntegrationPoints( const Variable<Ve
     }
 
     // GEOMETRY PARAMETERS
-    const unsigned int& integration_points_number = mConstitutiveLawVector.size();
-    const unsigned int& dimension       = GetGeometry().WorkingSpaceDimension();
-    const unsigned int& number_of_nodes = GetGeometry().size();
+    const SizeType& integration_points_number = mConstitutiveLawVector.size();
+    const SizeType& dimension       = GetGeometry().WorkingSpaceDimension();
+    const SizeType& number_of_nodes = GetGeometry().size();
 
     // Get DN_DX
     ElementDataType Variables;
     this->InitializeElementData( Variables, rCurrentProcessInfo);
 
     Matrix K = ZeroMatrix( dimension, dimension);
-    for (unsigned int i = 0; i < dimension; i++)
+    for (SizeType i = 0; i < dimension; i++)
       K(i,i) = Permeability;  // this is only one of the two cases.
 
-    for (unsigned int PointNumber = 0; PointNumber < integration_points_number; PointNumber++)
+    for (SizeType PointNumber = 0; PointNumber < integration_points_number; PointNumber++)
     {
       this->CalculateKinematics(Variables, PointNumber);
 
       Vector GradP = ZeroVector( dimension );
 
-      for (unsigned int i = 0; i < number_of_nodes; i++) {
+      for (SizeType i = 0; i < number_of_nodes; i++) {
         if ( GetGeometry()[i].HasDofFor( WATER_PRESSURE ) == false) {
           return;
         }
         const double & rWaterPressure = GetGeometry()[i].FastGetSolutionStepValue( WATER_PRESSURE );
-        for (unsigned int iDim = 0; iDim < dimension; iDim++) {
+        for (SizeType iDim = 0; iDim < dimension; iDim++) {
           GradP(iDim) += Variables.DN_DX(i, iDim) * rWaterPressure;
         }
       }
@@ -507,7 +521,7 @@ void UpdatedLagrangianUJElement::CalculateOnIntegrationPoints( const Variable<Ve
       GradP  = prod( K, GradP);
       // Manual resize
       Vector ResizedVector = ZeroVector(3);
-      for (unsigned int i = 0; i < dimension; i++) {
+      for (SizeType i = 0; i < dimension; i++) {
         ResizedVector(i) = GradP(i);
       }
       rOutput[PointNumber] = ResizedVector;
@@ -544,7 +558,7 @@ void UpdatedLagrangianUJElement::CalculateOnIntegrationPoints(const Variable<Mat
         ConstitutiveLawOptions.Set(ConstitutiveLaw::COMPUTE_STRESS);
 
         //reading integration points
-        for ( unsigned int PointNumber = 0; PointNumber < mConstitutiveLawVector.size(); PointNumber++ )
+        for ( SizeType PointNumber = 0; PointNumber < mConstitutiveLawVector.size(); PointNumber++ )
         {
           //compute element kinematics B, F, DN_DX ...
           this->CalculateKinematics(Variables,PointNumber);
@@ -591,24 +605,24 @@ void UpdatedLagrangianUJElement::CalculateOnIntegrationPoints(const Variable<Mat
 
         if ( GetGeometry()[0].HasDofFor( WATER_PRESSURE) )
         {
-          const unsigned int number_of_nodes = GetGeometry().size();
+          const SizeType number_of_nodes = GetGeometry().size();
           //create and initialize element variables:
           ElementDataType Variables;
           this->InitializeElementData(Variables,rCurrentProcessInfo);
 
           //reading integration points
-          for ( unsigned int PointNumber = 0; PointNumber < mConstitutiveLawVector.size(); PointNumber++ )
+          for ( SizeType PointNumber = 0; PointNumber < mConstitutiveLawVector.size(); PointNumber++ )
           {
             //compute element kinematics B, F, DN_DX ...
             this->CalculateKinematics(Variables,PointNumber);
 
             double WaterPressure = 0;
-            for (unsigned int i = 0; i < number_of_nodes; i++)
+            for (SizeType i = 0; i < number_of_nodes; i++)
             {
               WaterPressure += GetGeometry()[i].GetSolutionStepValue( WATER_PRESSURE) * Variables.N[i];
             }
 
-            for (unsigned int i = 0; i < 3; i++)
+            for (SizeType i = 0; i < 3; i++)
               rOutput[PointNumber](i,i) += WaterPressure;
 
           }
@@ -629,12 +643,12 @@ void UpdatedLagrangianUJElement::CalculateOnIntegrationPoints(const Variable<dou
   KRATOS_TRY
 
       if ( rVariable == DETERMINANT_F) {
-        const unsigned int& integration_points_number = mConstitutiveLawVector.size();
+        const SizeType& integration_points_number = mConstitutiveLawVector.size();
 
         if (rOutput.size() != integration_points_number)
           rOutput.resize( integration_points_number) ;
 
-        for ( unsigned int PointNumber = 0; PointNumber < integration_points_number; PointNumber++ )
+        for ( SizeType PointNumber = 0; PointNumber < integration_points_number; PointNumber++ )
         {
           rOutput[PointNumber] = mDeterminantF0[PointNumber];
         }
@@ -643,7 +657,7 @@ void UpdatedLagrangianUJElement::CalculateOnIntegrationPoints(const Variable<dou
       else if ( rVariable == POROSITY)
       {
 
-        const unsigned int& integration_points_number = mConstitutiveLawVector.size();
+        const SizeType& integration_points_number = mConstitutiveLawVector.size();
         const double InitialPorosity  = GetProperties()[INITIAL_POROSITY];
 
         if ( rOutput.size() != mConstitutiveLawVector.size() )
@@ -655,7 +669,7 @@ void UpdatedLagrangianUJElement::CalculateOnIntegrationPoints(const Variable<dou
         if (rOutput.size() != integration_points_number)
           rOutput.resize( integration_points_number) ;
 
-        for ( unsigned int PointNumber = 0; PointNumber < integration_points_number; PointNumber++ )
+        for ( SizeType PointNumber = 0; PointNumber < integration_points_number; PointNumber++ )
         {
           rOutput[PointNumber] = 1.0 - (1.0 - InitialPorosity) / DetF0[PointNumber] ;
         }
@@ -664,9 +678,9 @@ void UpdatedLagrangianUJElement::CalculateOnIntegrationPoints(const Variable<dou
 
         GetValueOnIntegrationPoints( POROSITY, rOutput, rCurrentProcessInfo);
 
-        const unsigned int& integration_points_number = mConstitutiveLawVector.size();
+        const SizeType& integration_points_number = mConstitutiveLawVector.size();
 
-        for ( unsigned int PointNumber = 0; PointNumber < integration_points_number; PointNumber++ )
+        for ( SizeType PointNumber = 0; PointNumber < integration_points_number; PointNumber++ )
         {
           rOutput[PointNumber] = rOutput[PointNumber] / (1.0 - rOutput[PointNumber]) ;
         }
@@ -674,7 +688,7 @@ void UpdatedLagrangianUJElement::CalculateOnIntegrationPoints(const Variable<dou
       }
       else if ( rVariable == PERMEABILITY)
       {
-        const unsigned int& integration_points_number = mConstitutiveLawVector.size();
+        const SizeType& integration_points_number = mConstitutiveLawVector.size();
 
         if ( rOutput.size() != mConstitutiveLawVector.size() )
           rOutput.resize( mConstitutiveLawVector.size() );
@@ -683,7 +697,7 @@ void UpdatedLagrangianUJElement::CalculateOnIntegrationPoints(const Variable<dou
         bool Kozeny = GetProperties()[KOZENY_CARMAN];
         if ( Kozeny == false)
         {
-          for ( unsigned int PointNumber = 0; PointNumber < integration_points_number; PointNumber++ )
+          for ( SizeType PointNumber = 0; PointNumber < integration_points_number; PointNumber++ )
           {
             rOutput[PointNumber] = Permeability ;
           }
@@ -697,7 +711,7 @@ void UpdatedLagrangianUJElement::CalculateOnIntegrationPoints(const Variable<dou
 
         double Constant = Permeability * ( 1.0 + initialVoidRatio) / pow( initialVoidRatio, 3.0);
 
-        for ( unsigned int PointNumber = 0; PointNumber < integration_points_number; PointNumber++ )
+        for ( SizeType PointNumber = 0; PointNumber < integration_points_number; PointNumber++ )
         {
           double voidRatio = Porosity[PointNumber] / ( 1.0 - Porosity[PointNumber]);
           rOutput[PointNumber] = Constant * pow( voidRatio, 3.0) / (1.0 + voidRatio);
@@ -957,8 +971,9 @@ void UpdatedLagrangianUJElement::CalculateAndAddInternalForces(VectorType& rRigh
 {
   KRATOS_TRY
 
-  const unsigned int number_of_nodes = GetGeometry().PointsNumber();
-  unsigned int dimension = GetGeometry().WorkingSpaceDimension();
+  const SizeType number_of_nodes = GetGeometry().PointsNumber();
+  const SizeType dimension = GetGeometry().WorkingSpaceDimension();
+  const SizeType node_dofs = this->GetNodeDofsSize();
 
   VectorType Fh=rRightHandSideVector;
 
@@ -966,12 +981,12 @@ void UpdatedLagrangianUJElement::CalculateAndAddInternalForces(VectorType& rRigh
 
   Vector InternalForces = rIntegrationWeight * prod( trans( rVariables.B ), StressVector );
 
-  for ( unsigned int i = 0; i < number_of_nodes; i++ )
+  for ( SizeType i = 0; i < number_of_nodes; i++ )
   {
-    unsigned int indexup = dimension * i + i;
-    unsigned int indexu  = dimension * i;
+    SizeType indexup = node_dofs * i;
+    SizeType indexu  = dimension * i;
 
-    for ( unsigned int j = 0; j < dimension; j++ )
+    for ( SizeType j = 0; j < dimension; j++ )
     {
       rRightHandSideVector[indexup + j] -= InternalForces[indexu + j];
     }
@@ -988,18 +1003,18 @@ void UpdatedLagrangianUJElement::CalculateAndAddJacobianForces(VectorType& rRigh
 {
   KRATOS_TRY
 
-  const unsigned int number_of_nodes = GetGeometry().PointsNumber();
-  unsigned int dimension = GetGeometry().WorkingSpaceDimension();
+  const SizeType number_of_nodes = GetGeometry().PointsNumber();
+  SizeType dimension = GetGeometry().WorkingSpaceDimension();
 
-  unsigned int indexp = dimension;
+  SizeType indexp = dimension;
 
   VectorType Fh=rRightHandSideVector;
 
 
   double consistent;
-  for ( unsigned int i = 0; i < number_of_nodes; i++ )
+  for ( SizeType i = 0; i < number_of_nodes; i++ )
   {
-    for ( unsigned int j = 0; j < number_of_nodes; j++ )
+    for ( SizeType j = 0; j < number_of_nodes; j++ )
     {
       if ( dimension == 2) {
         consistent = 1.0/12.0;
@@ -1035,10 +1050,10 @@ void UpdatedLagrangianUJElement::CalculateAndAddStabilizedJacobian(VectorType& r
 {
   KRATOS_TRY
 
-  const unsigned int number_of_nodes = GetGeometry().PointsNumber();
-  unsigned int dimension = GetGeometry().WorkingSpaceDimension();
+  const SizeType number_of_nodes = GetGeometry().PointsNumber();
+  SizeType dimension = GetGeometry().WorkingSpaceDimension();
 
-  unsigned int indexp = dimension;
+  SizeType indexp = dimension;
 
   //use of this variable for the complete parameter: (deffault: 4)
   double AlphaStabilization  = 4.0;
@@ -1064,10 +1079,13 @@ void UpdatedLagrangianUJElement::CalculateAndAddStabilizedJacobian(VectorType& r
 
   AlphaStabilization *= BulkModulus;
 
+  double ElementStabilizationFactor = 1.0;
+  this->CalculateStabilizationFactor(ElementStabilizationFactor);
+
   if (YoungModulus < 0.00001)
   {
     AlphaStabilization = 4.0 * StabilizationFactor ;
-    AlphaStabilization *= mElementStabilizationNumber;
+    AlphaStabilization *= ElementStabilizationFactor;
   }
 
   if ( dimension == 2) {
@@ -1080,9 +1098,9 @@ void UpdatedLagrangianUJElement::CalculateAndAddStabilizedJacobian(VectorType& r
 
   double consistent = 1;
 
-  for ( unsigned int i = 0; i < number_of_nodes; i++ )
+  for ( SizeType i = 0; i < number_of_nodes; i++ )
   {
-    for ( unsigned int j = 0; j < number_of_nodes; j++ )
+    for ( SizeType j = 0; j < number_of_nodes; j++ )
     {
 
       consistent=(-1.0)*AlphaStabilization;
@@ -1115,13 +1133,13 @@ void UpdatedLagrangianUJElement::CalculateAndAddKuum(MatrixType& rLeftHandSideMa
   KRATOS_TRY
 
   //assemble into rk the material uu contribution:
-  const unsigned int number_of_nodes = GetGeometry().PointsNumber();
-  unsigned int dimension = GetGeometry().WorkingSpaceDimension();
+  const SizeType number_of_nodes = GetGeometry().PointsNumber();
+  SizeType dimension = GetGeometry().WorkingSpaceDimension();
   double dimension_double = double(dimension);
 
   Matrix ConstitutiveMatrix = rVariables.ConstitutiveMatrix;
 
-  unsigned int voigtsize = 3;
+  SizeType voigtsize = 3;
   if (dimension == 3)
     voigtsize = 6;
 
@@ -1129,12 +1147,12 @@ void UpdatedLagrangianUJElement::CalculateAndAddKuum(MatrixType& rLeftHandSideMa
   noalias( DeviatoricTensor) = ZeroMatrix(voigtsize,voigtsize);
   Vector Identity(voigtsize);
   noalias( Identity) = ZeroVector(voigtsize);
-  for (unsigned int i = 0; i < voigtsize ; ++i) {
+  for (SizeType i = 0; i < voigtsize ; ++i) {
     DeviatoricTensor(i,i) = 1.0;
   }
-  for (unsigned int i = 0; i < dimension; i++) {
+  for (SizeType i = 0; i < dimension; i++) {
     Identity(i) = 1.0;
-    for (unsigned int j = 0; j < dimension; j++) {
+    for (SizeType j = 0; j < dimension; j++) {
       DeviatoricTensor( i,j) -= 1.0/dimension_double;
     }
   }
@@ -1145,29 +1163,29 @@ void UpdatedLagrangianUJElement::CalculateAndAddKuum(MatrixType& rLeftHandSideMa
   Matrix AuxMatrix(voigtsize,voigtsize);
   noalias( AuxMatrix ) = ZeroMatrix(voigtsize,voigtsize);
 
-  for (unsigned int i = 0; i < voigtsize; i++) {
-    for (unsigned int j = 0; j < voigtsize; j++) {
+  for (SizeType i = 0; i < voigtsize; i++) {
+    for (SizeType j = 0; j < voigtsize; j++) {
       ConstitutiveMatrix(i,j)  += (1 -  2/dimension_double) * rVariables.StressVector(i) * Identity(j);
       AuxMatrix(i,j) += rVariables.StressVector(i) * Identity(j);
     }
   }
 
-  const unsigned int MatSize = dimension*number_of_nodes;
+  const SizeType MatSize = dimension*number_of_nodes;
   MatrixType Kuu(MatSize,MatSize);
 
   noalias( Kuu ) = prod( trans( rVariables.B ),  rIntegrationWeight * Matrix( prod( ConstitutiveMatrix, rVariables.B ) ) );
 
 
-  unsigned int indexi = 0;
-  unsigned int indexj  = 0;
-  for ( unsigned int i = 0; i < number_of_nodes; i++ )
+  SizeType indexi = 0;
+  SizeType indexj  = 0;
+  for ( SizeType i = 0; i < number_of_nodes; i++ )
   {
-    for ( unsigned int idim = 0; idim < dimension ; idim ++)
+    for ( SizeType idim = 0; idim < dimension ; idim ++)
     {
       indexj=0;
-      for ( unsigned int j = 0; j < number_of_nodes; j++ )
+      for ( SizeType j = 0; j < number_of_nodes; j++ )
       {
-        for ( unsigned int jdim = 0; jdim < dimension ; jdim ++)
+        for ( SizeType jdim = 0; jdim < dimension ; jdim ++)
         {
           rLeftHandSideMatrix(indexi+i,indexj+j)+=Kuu(indexi,indexj);
           indexj++;
@@ -1191,12 +1209,12 @@ void UpdatedLagrangianUJElement::CalculateAndAddKuJ(MatrixType& rLeftHandSideMat
 
   KRATOS_TRY
 
-  const unsigned int number_of_nodes = GetGeometry().size();
-  const unsigned int dimension = GetGeometry().WorkingSpaceDimension();
+  const SizeType number_of_nodes = GetGeometry().size();
+  const SizeType dimension = GetGeometry().WorkingSpaceDimension();
   double dimension_double = double(dimension);
 
   Matrix ConstitutiveMatrix = rVariables.ConstitutiveMatrix;
-  unsigned int voigtsize = 3;
+  SizeType voigtsize = 3;
   if (dimension == 3)
     voigtsize = 6;
 
@@ -1204,7 +1222,7 @@ void UpdatedLagrangianUJElement::CalculateAndAddKuJ(MatrixType& rLeftHandSideMat
   // Trying to do it new
   Vector Identity(voigtsize);
   noalias( Identity) = ZeroVector(voigtsize);
-  for (unsigned int i = 0; i < dimension; i++)
+  for (SizeType i = 0; i < dimension; i++)
     Identity(i) = 1.0;
 
   Vector ConstVector(voigtsize);
@@ -1215,7 +1233,7 @@ void UpdatedLagrangianUJElement::CalculateAndAddKuJ(MatrixType& rLeftHandSideMat
 
   double ElementJacobian = 0.0;
 
-  for ( unsigned int i = 0; i <  number_of_nodes ; i++)
+  for ( SizeType i = 0; i <  number_of_nodes ; i++)
     ElementJacobian += GetGeometry()[i].GetSolutionStepValue( JACOBIAN ) * rVariables.N[i] ;
 
   ConstVector /= ElementJacobian;
@@ -1223,12 +1241,12 @@ void UpdatedLagrangianUJElement::CalculateAndAddKuJ(MatrixType& rLeftHandSideMat
   Vector KuJ(number_of_nodes*dimension);
   noalias( KuJ ) = prod( trans( rVariables.B), (ConstVector) );
 
-  const unsigned int MatSize = dimension*number_of_nodes;
+  const SizeType MatSize = dimension*number_of_nodes;
   Matrix SecondMatrix(MatSize,MatSize);
   noalias(  SecondMatrix ) = ZeroMatrix( dimension*number_of_nodes, number_of_nodes);
 
-  for (unsigned int i = 0; i < dimension*number_of_nodes; i++) {
-    for (unsigned int j = 0; j < number_of_nodes; j++) {
+  for (SizeType i = 0; i < dimension*number_of_nodes; i++) {
+    for (SizeType j = 0; j < number_of_nodes; j++) {
       SecondMatrix(i,j) =KuJ(i) * rVariables.N[j];
     }
   }
@@ -1236,9 +1254,9 @@ void UpdatedLagrangianUJElement::CalculateAndAddKuJ(MatrixType& rLeftHandSideMat
 
 
   // add the matrix in its place
-  for (unsigned int i = 0; i < number_of_nodes; i++) {
-    for (unsigned int idim = 0; idim < dimension; idim++) {
-      for (unsigned int j = 0; j < number_of_nodes; j++) {
+  for (SizeType i = 0; i < number_of_nodes; i++) {
+    for (SizeType idim = 0; idim < dimension; idim++) {
+      for (SizeType j = 0; j < number_of_nodes; j++) {
         rLeftHandSideMatrix(i*(dimension+1) + idim, (dimension+1)*(j+1) -1 ) += SecondMatrix( i*(dimension) + idim, j);
       }
     }
@@ -1259,8 +1277,8 @@ void UpdatedLagrangianUJElement::CalculateAndAddKuug(MatrixType& rLeftHandSideMa
 {
   KRATOS_TRY
 
-  const unsigned int number_of_nodes = GetGeometry().size();
-  const unsigned int dimension = GetGeometry().WorkingSpaceDimension();
+  const SizeType number_of_nodes = GetGeometry().size();
+  const SizeType dimension = GetGeometry().WorkingSpaceDimension();
 
   int size = number_of_nodes * dimension;
 
@@ -1275,16 +1293,16 @@ void UpdatedLagrangianUJElement::CalculateAndAddKuug(MatrixType& rLeftHandSideMa
   // MatrixType Kh=rLeftHandSideMatrix;
 
   //assemble into rLeftHandSideMatrix the geometric uu contribution:
-  unsigned int indexi = 0;
-  unsigned int indexj = 0;
-  for ( unsigned int i = 0; i < number_of_nodes; i++ )
+  SizeType indexi = 0;
+  SizeType indexj = 0;
+  for ( SizeType i = 0; i < number_of_nodes; i++ )
   {
-    for ( unsigned int idim = 0; idim < dimension ; idim ++)
+    for ( SizeType idim = 0; idim < dimension ; idim ++)
     {
       indexj=0;
-      for ( unsigned int j = 0; j < number_of_nodes; j++ )
+      for ( SizeType j = 0; j < number_of_nodes; j++ )
       {
-        for ( unsigned int jdim = 0; jdim < dimension ; jdim ++)
+        for ( SizeType jdim = 0; jdim < dimension ; jdim ++)
         {
           rLeftHandSideMatrix(indexi+i,indexj+j)+=Kuu(indexi,indexj);
           indexj++;
@@ -1310,21 +1328,21 @@ void UpdatedLagrangianUJElement::CalculateAndAddKJu(MatrixType& rLeftHandSideMat
 {
   KRATOS_TRY
 
-  const unsigned int number_of_nodes = GetGeometry().size();
-  const unsigned int dimension = GetGeometry().WorkingSpaceDimension();
+  const SizeType number_of_nodes = GetGeometry().size();
+  const SizeType dimension = GetGeometry().WorkingSpaceDimension();
 
   MatrixType Kh=rLeftHandSideMatrix;
 
   //contributions to stiffness matrix calculated on the reference configuration
-  unsigned int indexp = dimension;
+  SizeType indexp = dimension;
 
 
-  for (unsigned int i = 0; i < number_of_nodes; i++)
+  for (SizeType i = 0; i < number_of_nodes; i++)
   {
-    for (unsigned int j = 0; j < number_of_nodes; j++)
+    for (SizeType j = 0; j < number_of_nodes; j++)
     {
       int indexup = dimension*j + j;
-      for (unsigned int k = 0; k < dimension; k++)
+      for (SizeType k = 0; k < dimension; k++)
       {
         rLeftHandSideMatrix(indexp, indexup + k) += rVariables.N[i] * rVariables.DN_DX( j, k) * rIntegrationWeight ;
       }
@@ -1345,21 +1363,21 @@ void UpdatedLagrangianUJElement::CalculateAndAddKJJ(MatrixType& rLeftHandSideMat
 {
   KRATOS_TRY
 
-  const unsigned int number_of_nodes = GetGeometry().size();
-  const unsigned int dimension = GetGeometry().WorkingSpaceDimension();
+  const SizeType number_of_nodes = GetGeometry().size();
+  const SizeType dimension = GetGeometry().WorkingSpaceDimension();
 
   Matrix TotalF = prod( rVariables.F, rVariables.F0);
 
   MatrixType Kh=rLeftHandSideMatrix;
 
   //contributions to stiffness matrix calculated on the reference configuration
-  unsigned int indexpi = dimension;
+  SizeType indexpi = dimension;
   double consistent;
 
-  for ( unsigned int i = 0; i < number_of_nodes; i++ )
+  for ( SizeType i = 0; i < number_of_nodes; i++ )
   {
-    unsigned int indexpj = dimension;
-    for ( unsigned int j = 0; j < number_of_nodes; j++ )
+    SizeType indexpj = dimension;
+    for ( SizeType j = 0; j < number_of_nodes; j++ )
     {
       if ( dimension == 2) {
         consistent = 1.0/12.0;
@@ -1392,13 +1410,13 @@ void UpdatedLagrangianUJElement::CalculateAndAddKJJStab(MatrixType& rLeftHandSid
 
   //repasar
 
-  const unsigned int number_of_nodes = GetGeometry().size();
-  const unsigned int dimension = GetGeometry().WorkingSpaceDimension();
+  const SizeType number_of_nodes = GetGeometry().size();
+  const SizeType dimension = GetGeometry().WorkingSpaceDimension();
 
   // MatrixType Kh=rLeftHandSideMatrix;
 
   //contributions to stiffness matrix calculated on the reference configuration
-  unsigned int indexpi = dimension;
+  SizeType indexpi = dimension;
   double consistent = 1.0;
 
   //use of this variable for the complete parameter: (deffault: 4)
@@ -1424,10 +1442,13 @@ void UpdatedLagrangianUJElement::CalculateAndAddKJJStab(MatrixType& rLeftHandSid
 
   AlphaStabilization *= BulkModulus;  // TIMES THE BULK MODULUS BECAUSE I HAVE ALL THE EQUATION MULTIPLIED BY THE BULK MODULUS
 
+  double ElementStabilizationFactor = 1.0;
+  this->CalculateStabilizationFactor(ElementStabilizationFactor);
+
   if (YoungModulus < 0.00001)
   {
     AlphaStabilization = 4.0 * StabilizationFactor ;
-    AlphaStabilization *= mElementStabilizationNumber;
+    AlphaStabilization *= ElementStabilizationFactor;
   }
 
   if ( dimension == 2) {
@@ -1437,10 +1458,10 @@ void UpdatedLagrangianUJElement::CalculateAndAddKJJStab(MatrixType& rLeftHandSid
     AlphaStabilization /= 80.0;
   }
 
-  for ( unsigned int i = 0; i < number_of_nodes; i++ )
+  for ( SizeType i = 0; i < number_of_nodes; i++ )
   {
-    unsigned int indexpj = dimension;
-    for ( unsigned int j = 0; j < number_of_nodes; j++ )
+    SizeType indexpj = dimension;
+    for ( SizeType j = 0; j < number_of_nodes; j++ )
     {
       consistent=(-1.0)*AlphaStabilization;
       if(i==j) {
