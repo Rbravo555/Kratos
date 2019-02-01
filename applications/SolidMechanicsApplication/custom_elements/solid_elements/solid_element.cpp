@@ -127,7 +127,7 @@ Element::Pointer SolidElement::Clone( IndexType NewId, NodesArrayType const& rTh
     NewElement.SetData(this->GetData());
     NewElement.SetFlags(this->GetFlags());
 
-    return Kratos::make_shared< SolidElement >(NewElement);
+    return Kratos::make_shared<SolidElement>(NewElement);
 }
 
 

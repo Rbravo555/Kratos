@@ -35,7 +35,7 @@ namespace Kratos
 ///@name Kratos Classes
 ///@{
 
-/// Spatial Lagrangian U-P Element for 3D and 2D geometries. Linear Triangles and Tetrahedra
+/// Updated Lagrangian U-P Element for 3D and 2D geometries. Linear Triangles and Tetrahedra
 
 /**
  * Implements a Large Displacement Lagrangian definition for structural analysis.
@@ -151,11 +151,9 @@ public:
      */
     //int Check(const ProcessInfo& rCurrentProcessInfo);
 
-
     ///@}
     ///@name Access
     ///@{
-
     ///@}
     ///@name Inquiry
     ///@{
@@ -187,14 +185,12 @@ protected:
     ///@}
     ///@name Protected Operators
     ///@{
-    UpdatedLagrangianUPElement() : LargeDisplacementUPElement()
-    {
-    }
+
+    UpdatedLagrangianUPElement() : LargeDisplacementUPElement() {}
 
     ///@}
     ///@name Protected Operations
     ///@{
-
 
     /**
      * Calculation and addition of the matrices of the LHS
