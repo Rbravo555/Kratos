@@ -188,17 +188,17 @@ void LargeDisplacementUPElement::GetValuesVector( Vector& rValues, int Step )
     for ( SizeType i = 0; i < number_of_nodes; i++ )
     {
         SizeType index = i * dimension + i;
-        rValues[index]     = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_X, Step );
-        rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_Y, Step );
+        rValues[index]     = GetGeometry()[i].FastGetSolutionStepValue( DISPLACEMENT_X, Step );
+        rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue( DISPLACEMENT_Y, Step );
 
         if ( dimension == 3 )
         {
-            rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_Z, Step );
-            rValues[index + 3] = GetGeometry()[i].GetSolutionStepValue( PRESSURE, Step );
+            rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( DISPLACEMENT_Z, Step );
+            rValues[index + 3] = GetGeometry()[i].FastGetSolutionStepValue( PRESSURE, Step );
         }
         else
         {
-            rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( PRESSURE, Step );
+            rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( PRESSURE, Step );
         }
 
     }
@@ -220,11 +220,11 @@ void LargeDisplacementUPElement::GetFirstDerivativesVector( Vector& rValues, int
     for ( SizeType i = 0; i < number_of_nodes; i++ )
     {
         SizeType index = i * dimension + i;
-        rValues[index]     = GetGeometry()[i].GetSolutionStepValue( VELOCITY_X, Step );
-        rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( VELOCITY_Y, Step );
+        rValues[index]     = GetGeometry()[i].FastGetSolutionStepValue( VELOCITY_X, Step );
+        rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue( VELOCITY_Y, Step );
         if ( dimension == 3 )
         {
-            rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( VELOCITY_Z, Step );
+            rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( VELOCITY_Z, Step );
             rValues[index + 3] = 0;
         }
         else
@@ -249,12 +249,12 @@ void LargeDisplacementUPElement::GetSecondDerivativesVector( Vector& rValues, in
     for ( SizeType i = 0; i < number_of_nodes; i++ )
     {
         SizeType index = i * dimension + i;
-        rValues[index]     = GetGeometry()[i].GetSolutionStepValue( ACCELERATION_X, Step );
-        rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( ACCELERATION_Y, Step );
+        rValues[index]     = GetGeometry()[i].FastGetSolutionStepValue( ACCELERATION_X, Step );
+        rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue( ACCELERATION_Y, Step );
 
         if ( dimension == 3 )
         {
-            rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( ACCELERATION_Z, Step );
+            rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( ACCELERATION_Z, Step );
             rValues[index + 3] = 0;
         }
         else

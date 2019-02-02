@@ -26,15 +26,13 @@ UpdatedLagrangianUJElement::UpdatedLagrangianUJElement()
 {
 }
 
-
 //******************************CONSTRUCTOR*******************************************
 //************************************************************************************
 
-UpdatedLagrangianUJElement::UpdatedLagrangianUJElement(IndexType NewId, GeometryType::Pointer pGeometry, PropertiesType::Pointer pProperties)
-    : LargeDisplacementElement(NewId, pGeometry, pProperties)
+UpdatedLagrangianUJElement::UpdatedLagrangianUJElement(IndexType NewId, GeometryType::Pointer pGeometry)
+    : LargeDisplacementElement(NewId, pGeometry)
 {
 }
-
 
 //******************************CONSTRUCTOR*******************************************
 //************************************************************************************
@@ -60,7 +58,7 @@ UpdatedLagrangianUJElement::UpdatedLagrangianUJElement(UpdatedLagrangianUJElemen
 //*******************************ASSIGMENT OPERATOR***********************************
 //************************************************************************************
 
-UpdatedLagrangianUJElement&  UpdatedLagrangianUJElement::operator=(UpdatedLagrangianUJElement const& rOther)
+UpdatedLagrangianUJElement& UpdatedLagrangianUJElement::operator=(UpdatedLagrangianUJElement const& rOther)
 {
   LargeDisplacementElement::operator=(rOther);
 
@@ -87,7 +85,7 @@ UpdatedLagrangianUJElement&  UpdatedLagrangianUJElement::operator=(UpdatedLagran
 
 Element::Pointer UpdatedLagrangianUJElement::Create(IndexType NewId, NodesArrayType const& rThisNodes, PropertiesType::Pointer pProperties) const
 {
-  return Kratos::make_shared< UpdatedLagrangianUJElement >(NewId, GetGeometry().Create(rThisNodes), pProperties);
+  return Kratos::make_shared<UpdatedLagrangianUJElement>(NewId, GetGeometry().Create(rThisNodes), pProperties);
 }
 
 
@@ -113,8 +111,6 @@ Element::Pointer UpdatedLagrangianUJElement::Clone(IndexType NewId, NodesArrayTy
     NewElement.mConstitutiveLawVector[i] = mConstitutiveLawVector[i]->Clone();
   }
 
-  //-----------//
-
   if(NewElement.mDeformationGradientF0.size() != mDeformationGradientF0.size())
     NewElement.mDeformationGradientF0.resize(mDeformationGradientF0.size());
 
@@ -124,7 +120,7 @@ Element::Pointer UpdatedLagrangianUJElement::Clone(IndexType NewId, NodesArrayTy
   for(SizeType i=0; i<mDeformationGradientJ0.size(); ++i)
   {
     NewElement.mDeformationGradientF0[i] = mDeformationGradientF0[i];
-    NewElement.mDeformationGradientJ[i] = mDeformationGradientJ0[i];
+    NewElement.mDeformationGradientJ0[i] = mDeformationGradientJ0[i];
   }
 
   NewElement.mDeterminantF0 = mDeterminantF0;
@@ -174,7 +170,7 @@ void UpdatedLagrangianUJElement::EquationIdVector(EquationIdVectorType& rResult,
   const SizeType number_of_nodes = GetGeometry().size();
   const SizeType dimension = GetGeometry().WorkingSpaceDimension();
   const SizeType dofs_size = this->GetDofsSize();
-  const SizeType node_dofs = this->GetNodalDofsSize();
+  const SizeType node_dofs = this->GetNodeDofsSize();
 
   if(rResult.size() != dofs_size)
     rResult.resize(dofs_size, false);
@@ -194,20 +190,18 @@ void UpdatedLagrangianUJElement::EquationIdVector(EquationIdVectorType& rResult,
     {
       rResult[index + 2] = GetGeometry()[i].GetDof(JACOBIAN).EquationId();
     }
-
   }
-
 }
 
 //*********************************DISPLACEMENT***************************************
 //************************************************************************************
 
-void LargeDisplacementUJElement::GetValuesVector(Vector& rValues, int Step)
+void UpdatedLagrangianUJElement::GetValuesVector(Vector& rValues, int Step)
 {
   const SizeType number_of_nodes = GetGeometry().size();
   const SizeType dimension = GetGeometry().WorkingSpaceDimension();
   const SizeType dofs_size = this->GetDofsSize();
-  const SizeType node_dofs = this->GetNodalDofsSize();
+  const SizeType node_dofs = this->GetNodeDofsSize();
 
   if(rValues.size() != dofs_size)
     rValues.resize(dofs_size, false);
@@ -215,19 +209,17 @@ void LargeDisplacementUJElement::GetValuesVector(Vector& rValues, int Step)
   for(SizeType i=0; i<number_of_nodes; ++i)
   {
     SizeType index = node_dofs*i;
-    rValues[index]     = GetGeometry()[i].GetSolutionStepValue(DISPLACEMENT_X, Step);
-    rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue(DISPLACEMENT_Y, Step);
-
+    rValues[index]     = GetGeometry()[i].FastGetSolutionStepValue(DISPLACEMENT_X, Step);
+    rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue(DISPLACEMENT_Y, Step);
     if(dimension == 3)
     {
-      rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue(DISPLACEMENT_Z, Step);
-      rValues[index + 3] = GetGeometry()[i].GetSolutionStepValue(JACOBIAN, Step);
+      rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue(DISPLACEMENT_Z, Step);
+      rValues[index + 3] = GetGeometry()[i].FastGetSolutionStepValue(JACOBIAN, Step);
     }
     else
     {
-      rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue(JACOBIAN, Step);
+      rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue(JACOBIAN, Step);
     }
-
   }
 }
 
@@ -235,12 +227,12 @@ void LargeDisplacementUJElement::GetValuesVector(Vector& rValues, int Step)
 //************************************VELOCITY****************************************
 //************************************************************************************
 
-void LargeDisplacementUJElement::GetFirstDerivativesVector(Vector& rValues, int Step)
+void UpdatedLagrangianUJElement::GetFirstDerivativesVector(Vector& rValues, int Step)
 {
   const SizeType number_of_nodes = GetGeometry().size();
   const SizeType dimension = GetGeometry().WorkingSpaceDimension();
   const SizeType dofs_size = this->GetDofsSize();
-  const SizeType node_dofs = this->GetNodalDofsSize();
+  const SizeType node_dofs = this->GetNodeDofsSize();
 
   if(rValues.size() != dofs_size)
     rValues.resize(dofs_size, false);
@@ -248,11 +240,11 @@ void LargeDisplacementUJElement::GetFirstDerivativesVector(Vector& rValues, int 
   for(SizeType i=0; i<number_of_nodes; ++i)
   {
     SizeType index = node_dofs*i;
-    rValues[index]     = GetGeometry()[i].GetSolutionStepValue(VELOCITY_X, Step);
-    rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue(VELOCITY_Y, Step);
+    rValues[index]     = GetGeometry()[i].FastGetSolutionStepValue(VELOCITY_X, Step);
+    rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue(VELOCITY_Y, Step);
     if(dimension == 3)
     {
-      rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue(VELOCITY_Z, Step);
+      rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue(VELOCITY_Z, Step);
       rValues[index + 3] = 0;
     }
     else
@@ -265,12 +257,12 @@ void LargeDisplacementUJElement::GetFirstDerivativesVector(Vector& rValues, int 
 //*********************************ACCELERATION***************************************
 //************************************************************************************
 
-void LargeDisplacementUJElement::GetSecondDerivativesVector(Vector& rValues, int Step)
+void UpdatedLagrangianUJElement::GetSecondDerivativesVector(Vector& rValues, int Step)
 {
   const SizeType number_of_nodes = GetGeometry().size();
   const SizeType dimension = GetGeometry().WorkingSpaceDimension();
   const SizeType dofs_size = this->GetDofsSize();
-  const SizeType node_dofs = this->GetNodalDofsSize();
+  const SizeType node_dofs = this->GetNodeDofsSize();
 
   if(rValues.size() != dofs_size)
     rValues.resize(dofs_size, false);
@@ -278,12 +270,11 @@ void LargeDisplacementUJElement::GetSecondDerivativesVector(Vector& rValues, int
   for(SizeType i=0; i<number_of_nodes; ++i)
   {
     SizeType index = node_dofs*i;
-    rValues[index]     = GetGeometry()[i].GetSolutionStepValue(ACCELERATION_X, Step);
-    rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue(ACCELERATION_Y, Step);
-
+    rValues[index]     = GetGeometry()[i].FastGetSolutionStepValue(ACCELERATION_X, Step);
+    rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue(ACCELERATION_Y, Step);
     if(dimension == 3)
     {
-      rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue(ACCELERATION_Z, Step);
+      rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue(ACCELERATION_Z, Step);
       rValues[index + 3] = 0;
     }
     else
@@ -291,7 +282,6 @@ void LargeDisplacementUJElement::GetSecondDerivativesVector(Vector& rValues, int
       rValues[index + 2] = 0;
     }
   }
-
 }
 
 //**************************************************************************
@@ -305,17 +295,17 @@ UpdatedLagrangianUJElement::SizeType UpdatedLagrangianUJElement::GetNodeDofsSize
 //**************************************************************************
 //**************************************************************************
 
-void UpdatedLagrangianUJElement::CalculateStabilizationParameter(double& rStabilizationParameter)
+void UpdatedLagrangianUJElement::CalculateStabilizationParameter(double& rStabilizationParameter, const ProcessInfo& rCurrentProcessInfo)
 {
   KRATOS_TRY
 
   const SizeType dimension = GetGeometry().WorkingSpaceDimension();
 
-  //use of this variable for the complete parameter:(deffault: 4)
+  //use of this variable for the complete parameter: (deffault: 4)
   rStabilizationParameter = 4.0;
 
   //stabilization coefficient
-  double  = 0.20;
+  double StabilizationFactor = 0.20;
   if(GetProperties().Has(STABILIZATION_FACTOR_J)){
     StabilizationFactor = GetProperties()[STABILIZATION_FACTOR_J];
   }
@@ -334,10 +324,12 @@ void UpdatedLagrangianUJElement::CalculateStabilizationParameter(double& rStabil
   rStabilizationParameter /= LameMu;
   rStabilizationParameter *= BulkModulus;
 
-  if(dimension == 2) {
+  if(dimension == 2)
+  {
     rStabilizationParameter /= 18.0;
   }
-  else {
+  else
+  {
     rStabilizationParameter /= 80.0;
   }
 
@@ -351,23 +343,19 @@ void UpdatedLagrangianUJElement::SetValueOnIntegrationPoints(const Variable<doub
                                                               std::vector<double>& rValues,
                                                               const ProcessInfo& rCurrentProcessInfo)
 {
-
-  if(rVariable == DETERMINANT_F){
-
+  if(rVariable == DETERMINANT_F)
+  {
     const SizeType integration_points_number = mConstitutiveLawVector.size();
-    for(SizeType PointNumber = 0;  PointNumber<integration_points_number; ++PointNumber)
+    for(SizeType PointNumber=0; PointNumber<integration_points_number; ++PointNumber)
     {
       mDeterminantF0[PointNumber] = rValues[PointNumber];
     }
 
   }
-  else{
-
+  else
+  {
     LargeDisplacementElement::SetValueOnIntegrationPoints(rVariable, rValues, rCurrentProcessInfo);
-
   }
-
-
 }
 
 
@@ -377,25 +365,21 @@ void UpdatedLagrangianUJElement::GetValueOnIntegrationPoints(const Variable<doub
                                                               std::vector<double>& rValues,
                                                               const ProcessInfo& rCurrentProcessInfo)
 {
-  KRATOS_TRY
-
-  const SizeType integration_points_number = mConstitutiveLawVector.size();
-
   if(rVariable == DETERMINANT_F)
   {
+    const SizeType integration_points_number = mConstitutiveLawVector.size();
     if(rValues.size() != integration_points_number)
       rValues.resize(integration_points_number);
 
-    for(SizeType PointNumber=0;  PointNumber<integration_points_number; ++PointNumber)
+    for(SizeType PointNumber=0; PointNumber<integration_points_number; ++PointNumber)
     {
       rValues[PointNumber] = mDeterminantF0[PointNumber];
     }
   }
-  else{
+  else
+  {
     LargeDisplacementElement::GetValueOnIntegrationPoints(rVariable, rValues, rCurrentProcessInfo);
   }
-
-  KRATOS_CATCH("")
 }
 
 //**********************************GET VECTOR VALUE**********************************
@@ -407,7 +391,8 @@ void UpdatedLagrangianUJElement::GetValueOnIntegrationPoints(const Variable<Vect
   {
     this->CalculateOnIntegrationPoints(rVariable, rValues, rCurrentProcessInfo);
   }
-  else{
+  else
+  {
     LargeDisplacementElement::GetValueOnIntegrationPoints(rVariable, rValues, rCurrentProcessInfo);
   }
 }
@@ -417,13 +402,16 @@ void UpdatedLagrangianUJElement::GetValueOnIntegrationPoints(const Variable<Vect
 
 void UpdatedLagrangianUJElement::GetValueOnIntegrationPoints(const Variable<Matrix>& rVariable, std::vector<Matrix>& rValue, const ProcessInfo& rCurrentProcessInfo)
 {
-  if(rVariable == CAUCHY_STRESS_TENSOR) {
+  if(rVariable == CAUCHY_STRESS_TENSOR)
+  {
     this->CalculateOnIntegrationPoints(rVariable, rValue, rCurrentProcessInfo);
   }
-  else if(rVariable == TOTAL_CAUCHY_STRESS) {
+  else if(rVariable == TOTAL_CAUCHY_STRESS)
+  {
     this->CalculateOnIntegrationPoints(rVariable, rValue, rCurrentProcessInfo);
   }
-  else{
+  else
+  {
     LargeDisplacementElement::GetValueOnIntegrationPoints(rVariable, rValue, rCurrentProcessInfo);
   }
 }
@@ -442,7 +430,7 @@ void UpdatedLagrangianUJElement::CalculateOnIntegrationPoints(const Variable<dou
     if(rOutput.size() != integration_points_number)
       rOutput.resize(integration_points_number, false);
 
-    for(SizeType PointNumber = 0; PointNumber<integration_points_number; ++PointNumber)
+    for(SizeType PointNumber=0; PointNumber<integration_points_number; ++PointNumber)
     {
       rOutput[PointNumber] = mDeterminantF0[PointNumber];
     }
@@ -461,7 +449,7 @@ void UpdatedLagrangianUJElement::CalculateOnIntegrationPoints(const Variable<dou
     if(rOutput.size() != integration_points_number)
       rOutput.resize(integration_points_number);
 
-    for(SizeType PointNumber = 0; PointNumber<integration_points_number; ++PointNumber)
+    for(SizeType PointNumber=0; PointNumber<integration_points_number; ++PointNumber)
     {
       rOutput[PointNumber] = 1.0 -(1.0 - InitialPorosity) / DetF0[PointNumber];
     }
@@ -474,7 +462,7 @@ void UpdatedLagrangianUJElement::CalculateOnIntegrationPoints(const Variable<dou
 
     for(SizeType PointNumber=0; PointNumber<integration_points_number; ++PointNumber)
     {
-      rOutput[PointNumber] = rOutput[PointNumber]/ 1.0 - rOutput[PointNumber]);
+      rOutput[PointNumber] = rOutput[PointNumber] / (1.0 - rOutput[PointNumber]);
     }
   }
   else if(rVariable == PERMEABILITY)
@@ -488,7 +476,7 @@ void UpdatedLagrangianUJElement::CalculateOnIntegrationPoints(const Variable<dou
     bool Kozeny = GetProperties()[KOZENY_CARMAN];
     if(Kozeny == false)
     {
-      for(SizeType PointNumber = 0; PointNumber<integration_points_number; ++PointNumber)
+      for(SizeType PointNumber=0; PointNumber<integration_points_number; ++PointNumber)
       {
         rOutput[PointNumber] = Permeability;
       }
@@ -544,7 +532,6 @@ void UpdatedLagrangianUJElement::CalculateOnIntegrationPoints(const Variable<Vec
     //set constitutive law flags:
     Flags &ConstitutiveLawOptions=Values.GetOptions();
 
-    ConstitutiveLawOptions.Set(ConstitutiveLaw::USE_ELEMENT_PROVIDED_STRAIN);
     ConstitutiveLawOptions.Set(ConstitutiveLaw::COMPUTE_STRESS);
 
     //reading integration points
@@ -641,7 +628,8 @@ void UpdatedLagrangianUJElement::CalculateOnIntegrationPoints(const Variable<Vec
       }
     }
   }
-  else {
+  else
+  {
     LargeDisplacementElement::CalculateOnIntegrationPoints(rVariable, rOutput, rCurrentProcessInfo);
   }
 
@@ -668,7 +656,6 @@ void UpdatedLagrangianUJElement::CalculateOnIntegrationPoints(const Variable<Mat
     //set constitutive law flags:
     Flags &ConstitutiveLawOptions=Values.GetOptions();
 
-    ConstitutiveLawOptions.Set(ConstitutiveLaw::USE_ELEMENT_PROVIDED_STRAIN);
     ConstitutiveLawOptions.Set(ConstitutiveLaw::COMPUTE_STRESS);
 
     //reading integration points
@@ -717,7 +704,7 @@ void UpdatedLagrangianUJElement::CalculateOnIntegrationPoints(const Variable<Mat
         double WaterPressure = 0;
         for(SizeType i=0; i<number_of_nodes; ++i)
         {
-          WaterPressure += GetGeometry()[i].GetSolutionStepValue(WATER_PRESSURE) * Variables.N[i];
+          WaterPressure += GetGeometry()[i].FastGetSolutionStepValue(WATER_PRESSURE) * Variables.N[i];
         }
 
         for(SizeType i=0; i<3; ++i)
@@ -725,7 +712,8 @@ void UpdatedLagrangianUJElement::CalculateOnIntegrationPoints(const Variable<Mat
       }
     }
   }
-  else {
+  else
+  {
     LargeDisplacementElement::CalculateOnIntegrationPoints(rVariable, rOutput, rCurrentProcessInfo);
   }
 
@@ -748,16 +736,16 @@ void UpdatedLagrangianUJElement::Initialize()
 
   //Resize historic deformation gradient
   if(mDeformationGradientF0.size() != integration_points_number)
-    mDeformationGradientF0.resize(integration_points_number, false);
+    mDeformationGradientF0.resize(integration_points_number);
 
   if(mDeterminantF0.size() != integration_points_number)
-    mDeterminantF0.resize(integration_points_number, false);
+    mDeterminantF0.resize(integration_points_number);
 
   if(mDeformationGradientJ0.size() != integration_points_number)
-    mDeformationGradientJ0.resize(integration_points_number, false);
+    mDeformationGradientJ0.resize(integration_points_number);
 
   if(mDeterminantJ0.size() != integration_points_number)
-    mDeterminantJ0.resize(integration_points_number, false);
+    mDeterminantJ0.resize(integration_points_number);
 
   for(SizeType PointNumber=0; PointNumber<integration_points_number; ++PointNumber)
   {
@@ -771,7 +759,7 @@ void UpdatedLagrangianUJElement::Initialize()
   const SizeType number_of_nodes = GetGeometry().size();
   for(SizeType i=0; i<number_of_nodes; ++i) {
     GetGeometry()[i].SetLock();
-    GetGeometry()[i].FastGetSolutionStepValue(JACOBIAN) = 1.0
+    GetGeometry()[i].FastGetSolutionStepValue(JACOBIAN) = 1.0;
     GetGeometry()[i].FastGetSolutionStepValue(JACOBIAN,1) = 1.0;
     GetGeometry()[i].UnSetLock();
   }
@@ -936,8 +924,8 @@ void UpdatedLagrangianUJElement::CalculateAndAddRHS(LocalSystemComponents& rLoca
   rVariables.detF0 /= rVariables.detF;
 }
 
-//************************** INTERNAL FORCES    *******************************
-//************************************** Idem but with Total Stress ***********
+//************************************************************************************
+//************************************************************************************
 
 void UpdatedLagrangianUJElement::CalculateAndAddInternalForces(VectorType& rRightHandSideVector,
                                                                ElementDataType & rVariables,
@@ -984,7 +972,6 @@ void UpdatedLagrangianUJElement::CalculateAndAddJacobianForces(VectorType& rRigh
 
   VectorType Fh=rRightHandSideVector;
 
-
   double consistent;
   for(SizeType i=0; i<number_of_nodes; ++i)
   {
@@ -998,17 +985,11 @@ void UpdatedLagrangianUJElement::CalculateAndAddJacobianForces(VectorType& rRigh
       }
       if(i == j)
         consistent *= 2.0;
-
-      const double& rNodalJacobian =(GetGeometry()[j].GetSolutionStepValue(JACOBIAN));
-
-      rRightHandSideVector[indexp] +=   consistent  * rNodalJacobian * rIntegrationWeight / Variables.detF0;
-
+      const double& rNodalJacobian = GetGeometry()[j].FastGetSolutionStepValue(JACOBIAN);
+      rRightHandSideVector[indexp] += consistent * rNodalJacobian * rIntegrationWeight / rVariables.detF0;
     }
-
     rRightHandSideVector[indexp] -= rVariables.N[i] * rIntegrationWeight;
-
-    indexp +=(dimension + 1);
-
+    indexp += (dimension + 1);
   }
 
   KRATOS_CATCH("")
@@ -1027,7 +1008,7 @@ void UpdatedLagrangianUJElement::CalculateAndAddStabilizedJacobian(VectorType& r
   const SizeType dimension = GetGeometry().WorkingSpaceDimension();
 
   double AlphaStabilization;
-  this->CalculateStabilizationParameter(AlphaStabilization);
+  this->CalculateStabilizationParameter(AlphaStabilization, rVariables.GetProcessInfo());
 
   double consistent = 1;
 
@@ -1054,7 +1035,6 @@ void UpdatedLagrangianUJElement::CalculateAndAddStabilizedJacobian(VectorType& r
 
 //************************************************************************************
 //************************************************************************************
-//It includes the pw geometric stiffness
 
 void UpdatedLagrangianUJElement::CalculateAndAddKuum(MatrixType& rLeftHandSideMatrix,
                                                      ElementDataType& rVariables,
@@ -1108,12 +1088,12 @@ void UpdatedLagrangianUJElement::CalculateAndAddKuum(MatrixType& rLeftHandSideMa
   SizeType indexj  = 0;
   for(SizeType i=0; i<number_of_nodes; ++i)
   {
-    for(SizeType idim=0; idim<dimension; idim ++)
+    for(SizeType idim=0; idim<dimension; ++idim)
     {
       indexj=0;
       for(SizeType j=0; j<number_of_nodes; ++j)
       {
-        for(SizeType jdim=0; jdim<dimension; jdim ++)
+        for(SizeType jdim=0; jdim<dimension; ++jdim)
         {
           rLeftHandSideMatrix(indexi+i,indexj+j)+=Kuu(indexi,indexj);
           ++indexj;
@@ -1126,78 +1106,7 @@ void UpdatedLagrangianUJElement::CalculateAndAddKuum(MatrixType& rLeftHandSideMa
   KRATOS_CATCH("")
 }
 
-//************************************************************************************
-//************************************************************************************
-
-void UpdatedLagrangianUJElement::CalculateAndAddKuJ(MatrixType& rLeftHandSideMatrix,
-                                                    ElementDataType& rVariables,
-                                                    double& rIntegrationWeight)
-{
-  KRATOS_TRY
-
-  const SizeType number_of_nodes = GetGeometry().size();
-  const SizeType dimension = GetGeometry().WorkingSpaceDimension();
-  double dimension_double = double(dimension);
-
-  Matrix ConstitutiveMatrix = rVariables.ConstitutiveMatrix;
-  SizeType voigtsize = 3;
-  if(dimension == 3)
-    voigtsize = 6;
-
-  // Trying to do it new
-  Vector Identity(voigtsize);
-  noalias(Identity) = ZeroVector(voigtsize);
-  for(SizeType i=0; i<dimension; ++i)
-    Identity(i) = 1.0;
-
-  Vector ConstVector(voigtsize);
-  noalias(ConstVector) = prod(ConstitutiveMatrix, Identity);
-  ConstVector /= dimension_double;
-
-  ConstVector += (2.0/dimension_double-1.0) * rVariables.StressVector;
-
-  double ElementJacobian = 0.0;
-
-  for(SizeType i=0; i< number_of_nodes; ++i)
-    ElementJacobian += GetGeometry()[i].GetSolutionStepValue(JACOBIAN) * rVariables.N[i];
-
-  ConstVector /= ElementJacobian;
-
-  Vector KuJ(number_of_nodes*dimension);
-  noalias(KuJ) = prod(trans(rVariables.B),(ConstVector));
-
-  const SizeType MatSize = dimension*number_of_nodes;
-  Matrix SecondMatrix(MatSize,MatSize);
-  noalias( SecondMatrix) = ZeroMatrix(dimension*number_of_nodes, number_of_nodes);
-
-  for(SizeType i=0; i<dimension*number_of_nodes; ++i)
-  {
-    for(SizeType j=0; j<number_of_nodes; ++j)
-    {
-      SecondMatrix(i,j) = KuJ(i) * rVariables.N[j];
-    }
-  }
-
-  SecondMatrix *= rIntegrationWeight;
-
-  // add the matrix in its place
-  for(SizeType i=0; i<number_of_nodes; ++i)
-  {
-    for(SizeType idim=0; idim<dimension; idim++)
-    {
-      for(SizeType j=0; j<number_of_nodes; ++j)
-      {
-        rLeftHandSideMatrix(i*(dimension+1) + idim,(dimension+1)*(j+1) -1) += SecondMatrix(i*(dimension) + idim, j);
-      }
-    }
-  }
-
-  KRATOS_CATCH("")
-}
-
-
-
-//******************* Kuug ********************************************************
+//*********************************************************************************
 //*********************************************************************************
 
 void UpdatedLagrangianUJElement::CalculateAndAddKuug(MatrixType& rLeftHandSideMatrix,
@@ -1248,10 +1157,79 @@ void UpdatedLagrangianUJElement::CalculateAndAddKuug(MatrixType& rLeftHandSideMa
 //************************************************************************************
 //************************************************************************************
 
+void UpdatedLagrangianUJElement::CalculateAndAddKuJ(MatrixType& rLeftHandSideMatrix,
+                                                    ElementDataType& rVariables,
+                                                    double& rIntegrationWeight)
+{
+  KRATOS_TRY
+
+  const SizeType number_of_nodes = GetGeometry().size();
+  const SizeType dimension = GetGeometry().WorkingSpaceDimension();
+  double dimension_double = double(dimension);
+
+  Matrix ConstitutiveMatrix = rVariables.ConstitutiveMatrix;
+  SizeType voigtsize = 3;
+  if(dimension == 3)
+    voigtsize = 6;
+
+  // Trying to do it new
+  Vector Identity(voigtsize);
+  noalias(Identity) = ZeroVector(voigtsize);
+  for(SizeType i=0; i<dimension; ++i)
+    Identity(i) = 1.0;
+
+  Vector ConstVector(voigtsize);
+  noalias(ConstVector) = prod(ConstitutiveMatrix, Identity);
+  ConstVector /= dimension_double;
+
+  ConstVector += (2.0/dimension_double-1.0) * rVariables.StressVector;
+
+  double ElementJacobian = 0.0;
+
+  for(SizeType i=0; i< number_of_nodes; ++i)
+    ElementJacobian += GetGeometry()[i].FastGetSolutionStepValue(JACOBIAN) * rVariables.N[i];
+
+  ConstVector /= ElementJacobian;
+
+  Vector KuJ(number_of_nodes*dimension);
+  noalias(KuJ) = prod(trans(rVariables.B),(ConstVector));
+
+  const SizeType MatSize = dimension*number_of_nodes;
+  Matrix SecondMatrix(MatSize,MatSize);
+  noalias( SecondMatrix) = ZeroMatrix(dimension*number_of_nodes, number_of_nodes);
+
+  for(SizeType i=0; i<dimension*number_of_nodes; ++i)
+  {
+    for(SizeType j=0; j<number_of_nodes; ++j)
+    {
+      SecondMatrix(i,j) = KuJ(i) * rVariables.N[j];
+    }
+  }
+
+  SecondMatrix *= rIntegrationWeight;
+
+  // add the matrix in its place
+  for(SizeType i=0; i<number_of_nodes; ++i)
+  {
+    for(SizeType idim=0; idim<dimension; idim++)
+    {
+      for(SizeType j=0; j<number_of_nodes; ++j)
+      {
+        rLeftHandSideMatrix(i*(dimension+1) + idim,(dimension+1)*(j+1) -1) += SecondMatrix(i*(dimension) + idim, j);
+      }
+    }
+  }
+
+  KRATOS_CATCH("")
+}
+
+
+//************************************************************************************
+//************************************************************************************
+
 void UpdatedLagrangianUJElement::CalculateAndAddKJu(MatrixType& rLeftHandSideMatrix,
                                                     ElementDataType& rVariables,
                                                     double& rIntegrationWeight)
-
 {
   KRATOS_TRY
 
@@ -1331,7 +1309,7 @@ void UpdatedLagrangianUJElement::CalculateAndAddKJJ(MatrixType& rLeftHandSideMat
 //************************************************************************************
 
 void UpdatedLagrangianUJElement::CalculateAndAddKJJStab(MatrixType& rLeftHandSideMatrix,
-                                                        ElementDataType & rVariables,
+                                                        ElementDataType& rVariables,
                                                         double& rIntegrationWeight)
 {
   KRATOS_TRY
@@ -1346,7 +1324,7 @@ void UpdatedLagrangianUJElement::CalculateAndAddKJJStab(MatrixType& rLeftHandSid
   double consistent = 1.0;
 
   double AlphaStabilization;
-  this->CalculateStabilizationParameter(AlphaStabilization);
+  this->CalculateStabilizationParameter(AlphaStabilization, rVariables.GetProcessInfo());
 
   for(SizeType i=0; i<number_of_nodes; ++i)
   {
@@ -1559,7 +1537,6 @@ void UpdatedLagrangianUJElement::GetHistoricalVariables(ElementDataType& rVariab
   rVariables.detH = mDeterminantJ0[rPointNumber];
   rVariables.H    = mDeformationGradientJ0[rPointNumber];
 
-
   KRATOS_CATCH("")
 }
 
@@ -1577,7 +1554,6 @@ double& UpdatedLagrangianUJElement::CalculateVolumeChange(double& rVolumeChange,
   KRATOS_CATCH("")
 }
 
-
 //************************************************************************************
 //************************************************************************************
 
@@ -1586,9 +1562,6 @@ void UpdatedLagrangianUJElement::SetElementData(ElementDataType& rVariables,
                                                 const int & rPointNumber)
 {
   KRATOS_TRY
-
-  //LM is needed ?
-  //rValues.GetOptions().Set(ConstitutiveLaw::USE_ELEMENT_PROVIDED_STRAIN, true);
 
   //set previous step for output print purposes
   if(this->Is(SolidElement::FINALIZED_STEP)){
@@ -1624,7 +1597,7 @@ void UpdatedLagrangianUJElement::SetElementData(ElementDataType& rVariables,
 
   double detF0;
   Matrix invF0;
-  MathUtils<double>::InvertMatrix(rVaribales.F0, invF0, detF0);
+  MathUtils<double>::InvertMatrix(rVariables.F0, invF0, detF0);
 
   if(!this->Is(SolidElement::FINALIZED_STEP)){
     detJ = 0;
@@ -1645,7 +1618,6 @@ void UpdatedLagrangianUJElement::SetElementData(ElementDataType& rVariables,
 
   KRATOS_CATCH("")
 }
-
 
 //************************************************************************************
 //************************************************************************************

@@ -151,11 +151,6 @@ public:
    */
   void Initialize() override;
 
-  /*
-   * Called at the beginning of each solution step
-   */
-  void InitializeSolutionStep( ProcessInfo& rCurrentProcessInfo) override;
-
   /**
    * Sets on rElementalDofList the degrees of freedom of the considered element geometry
    */
@@ -180,11 +175,6 @@ public:
    * Sets on rValues the nodal accelerations
    */
   void GetSecondDerivativesVector(Vector& rValues, int Step = 0) override;
-
-  /**
-   * Called at the end of eahc solution step
-   */
-  void FinalizeSolutionStep(ProcessInfo& rCurrentProcessInfo) override;
 
   //************* COMPUTING  METHODS
 
@@ -252,51 +242,16 @@ protected:
   ///@{
 
   /// Empty constructor needed for serialization
-  UpdatedLagrangianUJElement() : LargeDisplacementElement() {}
+  UpdatedLagrangianUJElement();
 
   ///@}
   ///@name Protected Operations
   ///@{
 
   /**
-   * Get element size from the dofs
+   * Get dof size of a node
    */
-
-  SizeType GetDofsSize() override;
-
-
-  /**
-   * Calculate Element Kinematics
-   */
-  void CalculateKinematics(ElementDataType& rVariables,
-                           const double& rPointNumber) override;
-
-  /**
-   * Calculates the elemental contributions
-   * \f$ K^e = w\,B^T\,D\,B \f$ and
-   * \f$ r^e \f$
-   */
-
-  void CalculateElementalSystem(LocalSystemComponents& rLocalSystem,
-                                ProcessInfo& rCurrentProcessInfo) override;
-
-
-  /**
-   * Calculation and addition of the matrices of the LHS
-   */
-
-  void CalculateAndAddLHS(LocalSystemComponents& rLocalSystem,
-                          ElementDataType& rVariables,
-                          double& rIntegrationWeight) override;
-
-  /**
-   * Calculation and addition of the vectors of the RHS
-   */
-
-  void CalculateAndAddRHS(LocalSystemComponents& rLocalSystem,
-                          ElementDataType& rVariables,
-                          Vector& rVolumeForce,
-                          double& rIntegrationWeight) override;
+  SizeType GetNodeDofsSize() override;
 
   /**
    * Initialize Element General Variables
@@ -310,7 +265,47 @@ protected:
   void FinalizeStepVariables(ElementDataType & rVariables,
                              const double& rPointNumber) override;
 
+  /**
+   * Calculate Element Kinematics
+   */
+  void CalculateKinematics(ElementDataType& rVariables,
+                           const double& rPointNumber) override;
 
+  /**
+   * Calculation and addition of the matrices of the LHS
+   */
+  void CalculateAndAddLHS(LocalSystemComponents& rLocalSystem,
+                          ElementDataType& rVariables,
+                          double& rIntegrationWeight) override;
+
+  /**
+   * Calculation and addition of the vectors of the RHS
+   */
+  void CalculateAndAddRHS(LocalSystemComponents& rLocalSystem,
+                          ElementDataType& rVariables,
+                          Vector& rVolumeForce,
+                          double& rIntegrationWeight) override;
+
+  /**
+   * Calculation of the Internal Forces due to sigma. Fi = B * sigma
+   */
+  void CalculateAndAddInternalForces(VectorType& rRightHandSideVector,
+                                     ElementDataType & rVariables,
+                                     double& rIntegrationWeight) override;
+
+  /**
+   * Calculation of the Internal Forces due to Pressure-Balance
+   */
+  virtual void CalculateAndAddJacobianForces(VectorType& rRightHandSideVector,
+                                             ElementDataType & rVariables,
+                                             double& rIntegrationWeight);
+
+  /**
+   * Calculation of the Internal Forces due to Pressure-Balance
+   */
+  virtual void CalculateAndAddStabilizedJacobian(VectorType& rRightHandSideVector,
+                                                 ElementDataType & rVariables,
+                                                 double& rIntegrationWeight);
 
   /**
    * Calculation of the Material Stiffness Matrix. Kuum = BT * D * B
@@ -329,9 +324,9 @@ protected:
   /**
    * Calculation of the Kup matrix
    */
-  virtual void CalculateAndAddKuJ (MatrixType& rK,
-                                   ElementDataType & rVariables,
-                                   double& rIntegrationWeight);
+  virtual void CalculateAndAddKuJ(MatrixType& rK,
+                                  ElementDataType & rVariables,
+                                  double& rIntegrationWeight);
 
   /**
    * Calculation of the Kpu matrix
@@ -347,41 +342,11 @@ protected:
                                   ElementDataType & rVariables,
                                   double& rIntegrationWeight);
 
-
   /**
    * Calculation of the Kpp Stabilization Term matrix
    */
   virtual void CalculateAndAddKJJStab(MatrixType& rK, ElementDataType & rVariables,
                                       double& rIntegrationWeight);
-  /**
-   * Calculation of the External Forces Vector. Fe = N * t + N * b
-   */
-  void CalculateAndAddExternalForces(VectorType& rRightHandSideVector,
-                                     ElementDataType& rVariables,
-                                     Vector& rVolumeForce,
-                                     double& rIntegrationWeight) override;
-
-  /**
-   * Calculation of the Internal Forces due to Pressure-Balance
-   */
-  virtual void CalculateAndAddJacobianForces(VectorType& rRightHandSideVector,
-                                             ElementDataType & rVariables,
-                                             double& rIntegrationWeight);
-
-  /**
-   * Calculation of the Internal Forces due to Pressure-Balance
-   */
-  virtual void CalculateAndAddStabilizedJacobian(VectorType& rRightHandSideVector,
-                                                 ElementDataType & rVariables,
-                                                 double& rIntegrationWeight);
-
-  /**
-   * Calculation of the Internal Forces due to sigma. Fi = B * sigma
-   */
-  void CalculateAndAddInternalForces(VectorType& rRightHandSideVector,
-                                     ElementDataType & rVariables,
-                                     double& rIntegrationWeight) override;
-
 
   /**
    * Get the Historical Deformation Gradient to calculate after finalize the step
@@ -390,10 +355,23 @@ protected:
                               const double& rPointNumber) override;
 
   /**
+   * Get Stabilization Parameter
+   */
+  virtual void CalculateStabilizationParameter(double& rStabilizationParameter, const ProcessInfo& rCurrentProcessInfo);
+
+  /**
    * Calculation of the Volume Change of the Element
    */
   double& CalculateVolumeChange(double& rVolumeChange,
                                 ElementDataType& rVariables) override;
+
+
+  /**
+   * Set Variables of the Element to the Parameters of the Constitutive Law
+   */
+  void SetElementData(ElementDataType& rVariables,
+                      ConstitutiveLaw::Parameters& rValues,
+                      const int & rPointNumber) override;
   ///@}
   ///@name Protected  Access
   ///@{
@@ -412,26 +390,20 @@ private:
   ///@}
   ///@name Member Variables
   ///@{
-
-
   ///@}
   ///@name Private Operators
   ///@{
-
-
   ///@}
   ///@name Private Operations
   ///@{
-
-
   ///@}
   ///@name Private  Access
   ///@{
   ///@}
-
   ///@}
   ///@name Serialization
   ///@{
+
   friend class Serializer;
 
   // A private default constructor necessary for serialization
@@ -439,7 +411,6 @@ private:
   void save(Serializer& rSerializer) const override;
 
   void load(Serializer& rSerializer) override;
-
 
   ///@name Private Inquiry
   ///@{

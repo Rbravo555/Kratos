@@ -182,16 +182,16 @@ void BeamPointRigidContactCondition::GetValuesVector(Vector& rValues, int Step)
     for (unsigned int i = 0; i < number_of_nodes; i++) //TODO: fix this. Apparentñy, it would not work in 2D!! MA
     {
         unsigned int index = i * (dimension * (dimension-1));
-        rValues[index]     = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_X, Step );
-        rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_Y, Step );
+        rValues[index]     = GetGeometry()[i].FastGetSolutionStepValue( DISPLACEMENT_X, Step );
+        rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue( DISPLACEMENT_Y, Step );
 
         if ( dimension == 3 ){
-            rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_Z, Step );
-	    rValues[index + 3] = GetGeometry()[i].GetSolutionStepValue( ROTATION_X, Step );
-	    rValues[index + 4] = GetGeometry()[i].GetSolutionStepValue( ROTATION_Y, Step );
+            rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( DISPLACEMENT_Z, Step );
+	    rValues[index + 3] = GetGeometry()[i].FastGetSolutionStepValue( ROTATION_X, Step );
+	    rValues[index + 4] = GetGeometry()[i].FastGetSolutionStepValue( ROTATION_Y, Step );
 	}
 
-	rValues[index + 5] = GetGeometry()[i].GetSolutionStepValue( ROTATION_Z, Step );
+	rValues[index + 5] = GetGeometry()[i].FastGetSolutionStepValue( ROTATION_Z, Step );
     }
 
     KRATOS_CATCH( "" )
@@ -213,16 +213,16 @@ void BeamPointRigidContactCondition::GetFirstDerivativesVector( Vector& rValues,
     for ( unsigned int i = 0; i < number_of_nodes; i++ ) //TODO: fix this. Apparentñy, it would not work in 2D!! MA
     {
         unsigned int index = i * dimension;
-        rValues[index]     = GetGeometry()[i].GetSolutionStepValue( VELOCITY_X, Step );
-        rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( VELOCITY_Y, Step );
+        rValues[index]     = GetGeometry()[i].FastGetSolutionStepValue( VELOCITY_X, Step );
+        rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue( VELOCITY_Y, Step );
 
         if ( dimension == 3 ){
-            rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( VELOCITY_Z, Step );
-	    rValues[index + 3] = GetGeometry()[i].GetSolutionStepValue( ANGULAR_VELOCITY_X, Step );
-	    rValues[index + 4] = GetGeometry()[i].GetSolutionStepValue( ANGULAR_VELOCITY_Y, Step );
+            rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( VELOCITY_Z, Step );
+	    rValues[index + 3] = GetGeometry()[i].FastGetSolutionStepValue( ANGULAR_VELOCITY_X, Step );
+	    rValues[index + 4] = GetGeometry()[i].FastGetSolutionStepValue( ANGULAR_VELOCITY_Y, Step );
 	}
 
-	rValues[index + 5] = GetGeometry()[i].GetSolutionStepValue( ANGULAR_VELOCITY_Z, Step );
+	rValues[index + 5] = GetGeometry()[i].FastGetSolutionStepValue( ANGULAR_VELOCITY_Z, Step );
 
     }
 
@@ -246,17 +246,17 @@ void BeamPointRigidContactCondition::GetSecondDerivativesVector( Vector& rValues
     for ( unsigned int i = 0; i < number_of_nodes; i++ ) //TODO: fix this. Apparentñy, it would not work in 2D!! MA
     {
         unsigned int index = i * (dimension * (dimension-1));
-        rValues[index]     = GetGeometry()[i].GetSolutionStepValue( ACCELERATION_X, Step );
-        rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( ACCELERATION_Y, Step );
+        rValues[index]     = GetGeometry()[i].FastGetSolutionStepValue( ACCELERATION_X, Step );
+        rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue( ACCELERATION_Y, Step );
 
         if ( dimension == 3 ){
-	  rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( ACCELERATION_Z, Step );
-	  rValues[index + 3] = GetGeometry()[i].GetSolutionStepValue( ANGULAR_ACCELERATION_X, Step );
-	  rValues[index + 4] = GetGeometry()[i].GetSolutionStepValue( ANGULAR_ACCELERATION_Y, Step );
+	  rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( ACCELERATION_Z, Step );
+	  rValues[index + 3] = GetGeometry()[i].FastGetSolutionStepValue( ANGULAR_ACCELERATION_X, Step );
+	  rValues[index + 4] = GetGeometry()[i].FastGetSolutionStepValue( ANGULAR_ACCELERATION_Y, Step );
 
 	}
 
-	rValues[index + 5] = GetGeometry()[i].GetSolutionStepValue( ANGULAR_ACCELERATION_Z, Step );
+	rValues[index + 5] = GetGeometry()[i].FastGetSolutionStepValue( ANGULAR_ACCELERATION_Z, Step );
 
     }
     KRATOS_CATCH( "" )

@@ -304,6 +304,13 @@ KratosSolidMechanicsApplication::KratosSolidMechanicsApplication()
           0, Kratos::make_shared< Tetrahedra3D4<Node<3> > >(
                  Element::GeometryType::PointsArrayType(4))),
 
+      mUpdatedLagrangianUJElement2D3N(
+          0, Kratos::make_shared< Triangle2D3<Node<3> > >(
+                 Element::GeometryType::PointsArrayType(3))),
+      mUpdatedLagrangianUJElement3D4N(
+          0, Kratos::make_shared< Tetrahedra3D4<Node<3> > >(
+                 Element::GeometryType::PointsArrayType(4))),
+
       mSmallDisplacementBeamElement3D2N(
           0, Kratos::make_shared< Line3D2<Node<3> > >(
                  Element::GeometryType::PointsArrayType(2))),
@@ -635,6 +642,17 @@ void KratosSolidMechanicsApplication::Register() {
     KRATOS_REGISTER_VARIABLE(HEAT_CONDUCTIVITY_A)
     KRATOS_REGISTER_VARIABLE(HEAT_CONDUCTIVITY_B)
 
+    //pfem solid variables
+    KRATOS_REGISTER_VARIABLE(KOZENY_CARMAN)
+    KRATOS_REGISTER_VARIABLE(JACOBIAN)
+    KRATOS_REGISTER_VARIABLE(REACTION_JACOBIAN)
+    KRATOS_REGISTER_VARIABLE(WATER_BULK_MODULUS)
+    KRATOS_REGISTER_VARIABLE(PERMEABILITY)
+    KRATOS_REGISTER_VARIABLE(INITIAL_POROSITY)
+    KRATOS_REGISTER_VARIABLE(VOID_RATIO)
+    KRATOS_REGISTER_VARIABLE(STABILIZATION_FACTOR_J)
+    KRATOS_REGISTER_VARIABLE(TOTAL_CAUCHY_STRESS)
+    KRATOS_REGISTER_VARIABLE(DARCY_FLOW)
 
     //Register Elements
 
@@ -812,6 +830,11 @@ void KratosSolidMechanicsApplication::Register() {
         mAxisymUpdatedLagrangianUPElement2D3N)
     KRATOS_REGISTER_ELEMENT(
         "UpdatedLagrangianUPElement3D4N", mUpdatedLagrangianUPElement3D4N)
+
+    KRATOS_REGISTER_ELEMENT(
+        "UpdatedLagrangianUJElement2D3N", mUpdatedLagrangianUJElement2D3N)
+    KRATOS_REGISTER_ELEMENT(
+        "UpdatedLagrangianUJElement3D4N", mUpdatedLagrangianUJElement3D4N)
 
     //Register beams
     KRATOS_REGISTER_ELEMENT(

@@ -161,10 +161,10 @@ void TranslatoryRigidBodyElement::GetValuesVector(Vector& rValues, int Step)
     for ( unsigned int i = 0; i < number_of_nodes; i++ )
     {
       int index = i * ( dimension );
-      rValues[index]     = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_X, Step );
-      rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_Y, Step );
+      rValues[index]     = GetGeometry()[i].FastGetSolutionStepValue( DISPLACEMENT_X, Step );
+      rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue( DISPLACEMENT_Y, Step );
       if( dimension ==3 )
-	rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_Z, Step );
+	rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( DISPLACEMENT_Z, Step );
     }
 
     KRATOS_CATCH( "" )
@@ -188,10 +188,10 @@ void TranslatoryRigidBodyElement::GetFirstDerivativesVector(Vector& rValues, int
     for ( unsigned int i = 0; i < number_of_nodes; i++ )
     {
       int index = i * ( dimension );
-      rValues[index]     = GetGeometry()[i].GetSolutionStepValue( VELOCITY_X, Step );
-      rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( VELOCITY_Y, Step );
+      rValues[index]     = GetGeometry()[i].FastGetSolutionStepValue( VELOCITY_X, Step );
+      rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue( VELOCITY_Y, Step );
       if( dimension ==3 )
-	rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( VELOCITY_Z, Step );
+	rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( VELOCITY_Z, Step );
     }
 
 
@@ -214,10 +214,10 @@ void TranslatoryRigidBodyElement::GetSecondDerivativesVector(Vector& rValues, in
     for ( unsigned int i = 0; i < number_of_nodes; i++ )
     {
       int index = i * ( dimension );
-      rValues[index]     = GetGeometry()[i].GetSolutionStepValue( ACCELERATION_X, Step );
-      rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( ACCELERATION_Y, Step );
+      rValues[index]     = GetGeometry()[i].FastGetSolutionStepValue( ACCELERATION_X, Step );
+      rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue( ACCELERATION_Y, Step );
       if( dimension ==3 )
-	rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( ACCELERATION_Z, Step );
+	rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( ACCELERATION_Z, Step );
     }
 
 

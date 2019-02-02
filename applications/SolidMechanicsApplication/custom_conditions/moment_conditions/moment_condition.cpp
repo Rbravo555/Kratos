@@ -185,16 +185,16 @@ namespace Kratos
     if ( dimension == 2 ){
       for (SizeType i = 0; i < number_of_nodes; i++)
 	{
-	  rValues[i]     = GetGeometry()[i].GetSolutionStepValue( ROTATION_Z, Step );
+	  rValues[i]     = GetGeometry()[i].FastGetSolutionStepValue( ROTATION_Z, Step );
 	}
     }
     else{
       for (SizeType i = 0; i < number_of_nodes; i++)
 	{
 	  index = i * dimension;
-	  rValues[index]     = GetGeometry()[i].GetSolutionStepValue( ROTATION_X, Step );
-	  rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( ROTATION_Y, Step );
-	  rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( ROTATION_Z, Step );
+	  rValues[index]     = GetGeometry()[i].FastGetSolutionStepValue( ROTATION_X, Step );
+	  rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue( ROTATION_Y, Step );
+	  rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( ROTATION_Z, Step );
 	}
     }
 
@@ -219,16 +219,16 @@ namespace Kratos
     if ( dimension == 2 ){
       for (SizeType i = 0; i < number_of_nodes; i++)
 	{
-	  rValues[i]     = GetGeometry()[i].GetSolutionStepValue( ANGULAR_VELOCITY_Z, Step );
+	  rValues[i]     = GetGeometry()[i].FastGetSolutionStepValue( ANGULAR_VELOCITY_Z, Step );
 	}
     }
     else{
       for (SizeType i = 0; i < number_of_nodes; i++)
 	{
 	  index = i * dimension;
-	  rValues[index]     = GetGeometry()[i].GetSolutionStepValue( ANGULAR_VELOCITY_X, Step );
-	  rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( ANGULAR_VELOCITY_Y, Step );
-	  rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( ANGULAR_VELOCITY_Z, Step );
+	  rValues[index]     = GetGeometry()[i].FastGetSolutionStepValue( ANGULAR_VELOCITY_X, Step );
+	  rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue( ANGULAR_VELOCITY_Y, Step );
+	  rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( ANGULAR_VELOCITY_Z, Step );
 	}
     }
 
@@ -253,16 +253,16 @@ namespace Kratos
     if ( dimension == 2 ){
       for (SizeType i = 0; i < number_of_nodes; i++)
 	{
-	  rValues[i]     = GetGeometry()[i].GetSolutionStepValue( ANGULAR_ACCELERATION_Z, Step );
+	  rValues[i]     = GetGeometry()[i].FastGetSolutionStepValue( ANGULAR_ACCELERATION_Z, Step );
 	}
     }
     else{
       for (SizeType i = 0; i < number_of_nodes; i++)
 	{
 	  index = i * dimension;
-	  rValues[index]     = GetGeometry()[i].GetSolutionStepValue( ANGULAR_ACCELERATION_X, Step );
-	  rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( ANGULAR_ACCELERATION_Y, Step );
-	  rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( ANGULAR_ACCELERATION_Z, Step );
+	  rValues[index]     = GetGeometry()[i].FastGetSolutionStepValue( ANGULAR_ACCELERATION_X, Step );
+	  rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue( ANGULAR_ACCELERATION_Y, Step );
+	  rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( ANGULAR_ACCELERATION_Z, Step );
 	}
     }
 

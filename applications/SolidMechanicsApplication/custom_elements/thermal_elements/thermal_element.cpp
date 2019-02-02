@@ -133,7 +133,7 @@ void ThermalElement::GetValuesVector( Vector& rValues, int Step )
 
     for ( unsigned int i = 0; i < number_of_nodes; i++ )
     {
-        rValues[i] = GetGeometry()[i].GetSolutionStepValue( TEMPERATURE, Step );
+        rValues[i] = GetGeometry()[i].FastGetSolutionStepValue( TEMPERATURE, Step );
     }
 }
 
