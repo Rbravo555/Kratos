@@ -57,6 +57,7 @@
 // Plasticity models
 #include "custom_models/plasticity_models/von_mises_linear_elastic_plasticity_model.hpp"
 #include "custom_models/plasticity_models/von_mises_neo_hookean_plasticity_model.hpp"
+#include "custom_models/plasticity_models/von_mises_neo_hookean_thermo_plasticity_model.hpp"
 #include "custom_models/plasticity_models/simo_J2_plasticity_model.hpp"
 #include "custom_models/plasticity_models/simo_J2_thermo_plasticity_model.hpp"
 #include "custom_models/plasticity_models/johnson_cook_J2_thermo_plasticity_model.hpp"
@@ -251,6 +252,11 @@ void  AddCustomConstitutiveLawsToPython(pybind11::module& m)
 
   py::class_< VonMisesNeoHookeanPlasticityModel, typename VonMisesNeoHookeanPlasticityModel::Pointer, ConstitutiveModelBaseType >
       (m, "VonMisesNeoHookeanPlasticityModel")
+      .def( py::init<>() )
+      ;
+
+  py::class_< VonMisesNeoHookeanThermoPlasticityModel, typename VonMisesNeoHookeanThermoPlasticityModel::Pointer, ConstitutiveModelBaseType >
+      (m, "VonMisesNeoHookeanThermoPlasticityModel")
       .def( py::init<>() )
       ;
 
