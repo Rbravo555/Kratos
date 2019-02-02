@@ -750,14 +750,17 @@ void UpdatedLagrangianUJElement::Initialize()
   for(SizeType PointNumber=0; PointNumber<integration_points_number; ++PointNumber)
   {
     mDeterminantF0[PointNumber] = 1;
+    mDeformationGradientF0[PointNumber].resize(dimension, dimension, false);
     noalias(mDeformationGradientF0[PointNumber]) = IdentityMatrix(dimension);
     mDeterminantJ0[PointNumber] = 1;
+    mDeformationGradientJ0[PointNumber].resize(dimension, dimension, false);
     noalias(mDeformationGradientJ0[PointNumber]) = IdentityMatrix(dimension);
   }
 
   //ATTENTION initialize nodal variables(parallelism)
   const SizeType number_of_nodes = GetGeometry().size();
-  for(SizeType i=0; i<number_of_nodes; ++i) {
+  for(SizeType i=0; i<number_of_nodes; ++i)
+  {
     GetGeometry()[i].SetLock();
     GetGeometry()[i].FastGetSolutionStepValue(JACOBIAN) = 1.0;
     GetGeometry()[i].FastGetSolutionStepValue(JACOBIAN,1) = 1.0;
@@ -1195,8 +1198,8 @@ void UpdatedLagrangianUJElement::CalculateAndAddKuJ(MatrixType& rLeftHandSideMat
   noalias(KuJ) = prod(trans(rVariables.B),(ConstVector));
 
   const SizeType MatSize = dimension*number_of_nodes;
-  Matrix SecondMatrix(MatSize,MatSize);
-  noalias( SecondMatrix) = ZeroMatrix(dimension*number_of_nodes, number_of_nodes);
+  Matrix SecondMatrix(MatSize, number_of_nodes);
+  noalias(SecondMatrix) = ZeroMatrix(MatSize, number_of_nodes);
 
   for(SizeType i=0; i<dimension*number_of_nodes; ++i)
   {
@@ -1607,8 +1610,8 @@ void UpdatedLagrangianUJElement::SetElementData(ElementDataType& rVariables,
 
   invF0 /= pow(detJ/rVariables.detF0, power);
 
-  Matrix F;
-  noalias(F)= prod(rVariables.H, invF0);
+  Matrix F(dimension, dimension);
+  noalias(F) = prod(rVariables.H, invF0);
   noalias(rVariables.H) = prod(F, mDeformationGradientJ0[rPointNumber]);
   //calculate nodal deformation gradient
 
