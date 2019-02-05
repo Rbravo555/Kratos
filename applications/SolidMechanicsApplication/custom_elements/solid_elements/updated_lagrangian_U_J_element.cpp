@@ -552,9 +552,6 @@ void UpdatedLagrangianUJElement::CalculateOnIntegrationPoints(const Variable<Vec
       if(rVariable == PK2_STRESS_VECTOR)
         Variables.StressMeasure = ConstitutiveLaw::StressMeasure_PK2;
 
-      //set general variables to constitutivelaw parameters
-      this->SetElementData(Variables,Values,PointNumber);
-
       //calculate material response
       this->CalculateMaterialResponse(Variables,Values,PointNumber);
 
@@ -670,9 +667,6 @@ void UpdatedLagrangianUJElement::CalculateOnIntegrationPoints(const Variable<Mat
       }
 
       Variables.StressMeasure = ConstitutiveLaw::StressMeasure_Cauchy;
-
-      //set general variables to constitutivelaw parameters
-      this->SetElementData(Variables,Values,PointNumber);
 
       //calculate material response
       this->CalculateMaterialResponse(Variables,Values,PointNumber);
@@ -1616,7 +1610,7 @@ void UpdatedLagrangianUJElement::SetElementData(ElementDataType& rVariables,
   //calculate nodal deformation gradient
 
   //set deformation gradient
-  rValues.SetDeterminantF(rVariables.detJ);
+  rValues.SetDeterminantF(rVariables.detH);
   rValues.SetDeformationGradientF(rVariables.H);
 
   KRATOS_CATCH("")
