@@ -17,10 +17,8 @@
 // Project includes
 #include "custom_solvers/solution_strategies/solution_strategy.hpp"
 
-//default builder and solver
-#include "solving_strategies/builder_and_solvers/residualbased_block_builder_and_solver.h"
 //default convergence criterion
-#include "solving_strategies/convergencecriterias/convergence_criteria.h"
+#include "custom_solvers/convergence_criteria/convergence_criterion.hpp"
 
 #include "solvers_application_variables.h"
 
@@ -71,7 +69,7 @@ class SegregatedStrategy : public SolutionStrategy<TSparseSpace, TDenseSpace, TL
   typedef typename std::vector<BasePointerType>                  StrategiesContainerType;
   typedef typename StrategiesContainerType::iterator     StrategiesContainerIteratorType;
 
-  typedef ConvergenceCriteria<TSparseSpace, TDenseSpace>        ConvergenceCriterionType;
+  typedef ConvergenceCriterion<TSparseSpace, TDenseSpace>       ConvergenceCriterionType;
   typedef typename BaseType::BuilderAndSolverType                   BuilderAndSolverType;
   typedef typename BaseType::SchemeType                                       SchemeType;
 

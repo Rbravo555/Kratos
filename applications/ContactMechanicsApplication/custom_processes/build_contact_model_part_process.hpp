@@ -16,7 +16,6 @@
 #include <iostream>
 
 // External includes
-#include <boost/timer.hpp>
 
 // Project includes
 #include "includes/model_part.h"
@@ -248,7 +247,7 @@ namespace Kratos
     {
 
       KRATOS_TRY
-     
+
       //check if the construction is needed
       unsigned int count_nodes = 0;
       unsigned int count_conditions = 0;
@@ -257,7 +256,7 @@ namespace Kratos
 	{
           //std::cout<<" ModelParts "<<*n_mp<<std::endl;
  	  ModelPart& i_mp = mrModelPart.GetSubModelPart(*n_mp);
-              
+
 	  for(ModelPart::NodesContainerType::iterator i_node = i_mp.NodesBegin() ; i_node != i_mp.NodesEnd() ; i_node++)
 	    {
 	      if( i_node->Is(BOUNDARY) )
