@@ -2,27 +2,11 @@
 
 _KRATOS Multiphysics_ ("Kratos") is a framework for building parallel, multi-disciplinary simulation software, aiming at modularity, extensibility, and high performance. Kratos is written in C++, and counts with an extensive Python interface. More in [Overview](https://github.com/KratosMultiphysics/Kratos/wiki/Overview)
 
-**Kratos** is **free** under BSD-4 [license](https://github.com/KratosMultiphysics/Kratos/wiki/Licence) and can be used even in comercial softwares as it is. Many of its main applications are also free and BSD-4 licensed but each derived application can have its own propietary license.
+Kratos is __multiplatform__ and available for __Windows, Linux__ (several distros) and __macOS__, for  __OpenMP__ and __MPI__ parallelization.
 
-[release-image]: https://img.shields.io/badge/release-6.0-green.svg?style=flat
-[releases]: https://github.com/KratosMultiphysics/Kratos/releases
+Kratos is free under BSD-4 [license](https://github.com/KratosMultiphysics/Kratos/wiki/Licence) and can be used even in comercial softwares as it is. Many of its main applications are also free and BSD-4 licensed but each derived application can have its own propietary license.
 
-[license-image]: https://img.shields.io/badge/license-BSD-green.svg?style=flat
-[license]: https://github.com/KratosMultiphysics/Kratos/blob/master/kratos/license.txt
-
-[kratos-master-status]: https://travis-ci.org/KratosMultiphysics/Kratos.svg?branch=master
-[travis-branches]: https://travis-ci.org/KratosMultiphysics/Kratos/branches
-
-[appveyor-image]: https://ci.appveyor.com/api/projects/status/f9p57hci9ufkqkf5/branch/master?svg=true
-[appveyor-master]: https://ci.appveyor.com/project/KratosMultiphysics/kratos
-
-
-# Main Features
-**Kratos** is __multiplatform__ and available for __Windows, Linux__ (several distros) and __macOS__.
-
-**Kratos** is __OpenMP__ and __MPI__ parallel and scalable up to thousands of cores.
-
-**Kratos** provides a core which defines the common framework and several application which work like plug-ins that can be extended in diverse fields.
+Kratos provides a core which defines the common framework and several application which work like plug-ins that can be extended in diverse fields.
 
 Its main applications are:
 - [DEM](applications/DEMApplication) for cohesive and non cohesive spheric and non spheric particles simultion
