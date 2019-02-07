@@ -1,6 +1,4 @@
-<p align=center><img height="72.125%" width="72.125%" src="https://raw.githubusercontent.com/KratosMultiphysics/Documentation/master/Wiki_files/Home/kratos.png"></p>
-
-[![Release][release-image]][releases] [![License][license-image]][license] [![Master][kratos-master-status]][travis-branches] [![appveyor-image]][appveyor-master]
+<p align=center><img height="36.100%" width="36.100%" src="https://raw.githubusercontent.com/KratosMultiphysics/Documentation/master/Wiki_files/Home/kratos.png"></p>
 
 _KRATOS Multiphysics_ ("Kratos") is a framework for building parallel, multi-disciplinary simulation software, aiming at modularity, extensibility, and high performance. Kratos is written in C++, and counts with an extensive Python interface. More in [Overview](https://github.com/KratosMultiphysics/Kratos/wiki/Overview)
 
@@ -94,4 +92,3 @@ In Kratos Core:
 In applications
 - [Trilinos](https://trilinos.org/) for MPI linear algebra and solvers used in trilinos application
 - [METIS](http://glaros.dtc.umn.edu/gkhome/views/metis) for partitioning in metis application
-
