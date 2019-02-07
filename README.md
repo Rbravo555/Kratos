@@ -28,16 +28,13 @@ _KRATOS Multiphysics_ ("Kratos") is a framework for building parallel, multi-dis
 
 # Contributions
 
-In Kratos Core:
-- [CIMNE](http://www.cimne.com) Fluid Dynamics
-- [TUM](https://www.st.bgu.tum.de/) Lehrstuhl für Statik
-- [Boost](http://www.boost.org/) for ublas
-- [pybind11](https://github.com/pybind/pybind11) for exposing C++ to python
-- [GidPost](https://www.gidhome.com/gid-plus/tools/476/gidpost/) providing output to [GiD](https://www.gidhome.com/)
-- [AMGCL](https://github.com/ddemidov/amgcl) for its highly scalable multigrid solver
-- [JSON](https://github.com/nlohmann/json) JSON for Modern C++
-- [ZLib](https://zlib.net/) The compression library
-
-In applications
-- [Trilinos](https://trilinos.org/) for MPI linear algebra and solvers used in trilinos application
-- [METIS](http://glaros.dtc.umn.edu/gkhome/views/metis) for partitioning in metis application
+- [CIMNE](http://www.cimne.com)
+- [TUM](https://www.st.bgu.tum.de/)
+- [Boost](http://www.boost.org/)
+- [pybind11](https://github.com/pybind/pybind11)
+- [GidPost](https://www.gidhome.com/gid-plus/tools/476/gidpost/)
+- [AMGCL](https://github.com/ddemidov/amgcl)
+- [JSON](https://github.com/nlohmann/json)
+- [ZLib](https://zlib.net/)
+- [Trilinos](https://trilinos.org/)
+- [METIS](http://glaros.dtc.umn.edu/gkhome/views/metis)
