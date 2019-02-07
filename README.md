@@ -8,15 +8,6 @@ Kratos is free under BSD-4 [license](https://github.com/KratosMultiphysics/Krato
 
 Kratos provides a core which defines the common framework and several application which work like plug-ins that can be extended in diverse fields.
 
-# Contributions
+## Contributions
 
-- [CIMNE](http://www.cimne.com)
-- [TUM](https://www.st.bgu.tum.de/)
-- [Boost](http://www.boost.org/)
-- [pybind11](https://github.com/pybind/pybind11)
-- [GidPost](https://www.gidhome.com/gid-plus/tools/476/gidpost/)
-- [AMGCL](https://github.com/ddemidov/amgcl)
-- [JSON](https://github.com/nlohmann/json)
-- [ZLib](https://zlib.net/)
-- [Trilinos](https://trilinos.org/)
-- [METIS](http://glaros.dtc.umn.edu/gkhome/views/metis)
+[CIMNE](http://www.cimne.com) - [TUM](https://www.st.bgu.tum.de/) - [Boost](http://www.boost.org/) - [pybind11](https://github.com/pybind/pybind11) - [GidPost](https://www.gidhome.com/gid-plus/tools/476/gidpost/) - [AMGCL](https://github.com/ddemidov/amgcl) - [JSON](https://github.com/nlohmann/json) - [ZLib](https://zlib.net/) - [Trilinos](https://trilinos.org/) - [METIS](http://glaros.dtc.umn.edu/gkhome/views/metis)
