@@ -14,13 +14,18 @@ class Necking_2D_Test(TF.TestFactory):
     file_name = "material_tests/necking_2D/necking_2D"
     file_parameters = None
 
+class Necking_2D_UJ_Test(TF.TestFactory):
+    file_name = "material_tests/necking_2D/necking_2D_UJ"
+    file_parameters = None
+
 def SetTestSuite(suites):
     night_suite = suites['nightly']
 
     night_suite.addTests(
         KratosUnittest.TestLoader().loadTestsFromTestCases([
             SmallStrains_IsotropicDamage_SimoJu_Test,
-            Necking_2D_Test
+            Necking_2D_Test,
+            Necking_2D_UJ_Test
         ])
     )
 
