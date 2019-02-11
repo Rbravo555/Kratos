@@ -37,10 +37,11 @@ class AssignFreeSurfacePressureProcess(KratosMultiphysics.Process):
         self.model_part = self.model[self.settings["model_part_name"].GetString()]
 
     def ExecuteInitializeSolutionStep(self):
-        for i in self.model_part.Nodes:
-            i.Free(KratosMultiphysics.PRESSURE)
+        # for i in self.model_part.Nodes:
+        #     i.Free(KratosMultiphysics.PRESSURE)
             # if i.Is(KratosMultiphysics.FREE_SURFACE) or (i.Is(KratosMultiphysics.RIGID) and i.IsNot(KratosMultiphysics.FLUID)):
-            if (i.Is(KratosMultiphysics.RIGID) and i.IsNot(KratosMultiphysics.FLUID)):
-                i.Fix(KratosMultiphysics.PRESSURE)
-                i.SetSolutionStepValue(KratosMultiphysics.PRESSURE,0.0)
-                i.SetSolutionStepValue(KratosMultiphysics.PRESSURE,1,0.0)
+            # if (i.Is(KratosMultiphysics.RIGID) and i.IsNot(KratosMultiphysics.FLUID)):
+            #     i.Fix(KratosMultiphysics.PRESSURE)
+            #     i.SetSolutionStepValue(KratosMultiphysics.PRESSURE,0.0)
+            #     i.SetSolutionStepValue(KratosMultiphysics.PRESSURE,1,0.0)
+        pass
