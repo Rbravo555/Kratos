@@ -11,23 +11,25 @@ include(pybind11Tools)
 ## to avoid problems with the define linkage block. By default we will compile the lib
 if(NOT DEFINED ${INCLUDE_TRIANGLE})
   set(INCLUDE_TRIANGLE ON)
-  set(TRIANGLE_INSTALL_DIR ${CMAKE_SOURCE_DIR}/external_libraries/triangle/)
+  set(TRIANGLE_DIR "${CMAKE_SOURCE_DIR}/external_libraries/triangle")
 endif(NOT DEFINED ${INCLUDE_TRIANGLE})
 
 if(NOT DEFINED ${INCLUDE_TETGEN})
   set(INCLUDE_TETGEN ON)
-  set(TETGEN_INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external_modules/tetgen/)
+  set(TETGEN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external_libraries/tetgen")
 endif(NOT DEFINED ${INCLUDE_TETGEN})
 
 set(MESHER_LIBRARIES "")
 if(${INCLUDE_TRIANGLE} MATCHES ON)
-  include_directories(${TRIANGLE_INSTALL_DIR})
+  include_directories(${TRIANGLE_DIR})
   list(APPEND MESHER_LIBRARIES triangle)
 endif(${INCLUDE_TRIANGLE} MATCHES ON)
 
 
 if(${INCLUDE_TETGEN} MATCHES ON)
-  include_directories(${TETGEN_INSTALL_DIR})
+  set(EXTERNAL_LIBRARIES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external_libraries")
+  INCLUDE("${CMAKE_CURRENT_SOURCE_DIR}/custom_cmake/Tetgen.cmake")
+  include_directories(${TETGEN_DIR})
   add_definitions(-DINCLUDE_TETGEN)
   add_definitions(-DTETLIBRARY)
   add_definitions(-DTETGEN150)
@@ -39,17 +41,17 @@ if(${INCLUDE_TETGEN} MATCHES ON)
   else(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     add_definitions(-DLINUX)
   endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-  set(TETGEN_SOURCES ${TETGEN_INSTALL_DIR}/tetgen.cxx)
-  set(UNOPTIMIZED_PREDICATES ${TETGEN_INSTALL_DIR}/predicates.cxx)
+  set(TETGEN_SOURCES ${TETGEN_DIR}/tetgen.cxx)
+  set(UNOPTIMIZED_PREDICATES ${TETGEN_DIR}/predicates.cxx)
   SET_SOURCE_FILES_PROPERTIES(${UNOPTIMIZED_PREDICATES} PROPERTIES COMPILE_FLAGS -O0)
   SET_SOURCE_FILES_PROPERTIES(${TETGEN_SOURCES} PROPERTIES COMPILE_FLAGS ${CMAKE_CXX_FLAGS})
   add_library(tetgen STATIC ${TETGEN_SOURCES} ${UNOPTIMIZED_PREDICATES})
   list(APPEND MESHER_LIBRARIES tetgen)
 endif(${INCLUDE_TETGEN} MATCHES ON)
 
-if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   list(APPEND MESHER_LIBRARIES m)
-endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+endif(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 ## Generate variables with the sources
 set( KRATOS_DELAUNAY_MESHING_APPLICATION_CORE
@@ -79,8 +81,6 @@ set( KRATOS_DELAUNAY_MESHING_APPLICATION_PYTHON_INTERFACE
 	${CMAKE_CURRENT_SOURCE_DIR}/custom_python/add_custom_meshers_to_python.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/custom_python/add_custom_bounding_to_python.cpp
 )
-
-message(STATUS "MESHER_LIBRARIES : ${MESHER_LIBRARIES}")
 
 add_library(KratosDelaunayMeshingCore SHARED ${KRATOS_DELAUNAY_MESHING_APPLICATION_CORE})
 target_link_libraries(KratosDelaunayMeshingCore PUBLIC KratosCore ${MESHER_LIBRARIES})

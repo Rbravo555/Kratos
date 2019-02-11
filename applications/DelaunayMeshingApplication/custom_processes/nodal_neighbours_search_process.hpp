@@ -261,7 +261,6 @@ class NodalNeighboursSearchProcess
       nElements.reserve(mAverageElements);
 
       //set fixed nodes as Nodes<3>::STRUCTURE  to not be removed in the meshing
-      Node<3>::DofsContainerType& node_dofs = i_node.GetDofs();
       for(const auto& i_dof : i_node.GetDofs())
       {
         if(i_dof.IsFixed())
@@ -441,6 +440,7 @@ class NodalNeighboursSearchProcess
 
       for(auto& i_nelem : nElements)
       {
+
         Element::GeometryType& rGeometry = i_nelem.GetGeometry();
 
         for (unsigned int nd=0; nd<rGeometry.size(); ++nd)
