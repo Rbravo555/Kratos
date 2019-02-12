@@ -65,7 +65,7 @@ class ModelManager(object):
 
     #
     def ExecuteBeforeSolutionLoop(self):
-        pass
+        self._update_composite_solving_parts()
     #
     def ExecuteInitializeSolutionStep(self):
         if self._update_solving_parts():
@@ -141,11 +141,11 @@ class ModelManager(object):
 
             print( self.main_model_part )
 
-            self._build_composite_solving_parts()
-
         else:
             raise Exception("Other input options are not yet implemented.")
 
+        # build composite solving parts
+        self._build_composite_solving_parts()
 
         dofs = self.main_model_part.NumberOfNodes() * self.main_model_part.ProcessInfo[KratosMultiphysics.SPACE_DIMENSION]
         #print (self._class_prefix()+" Finished importing model part")
@@ -232,11 +232,10 @@ class ModelManager(object):
         self._build_solving_model_part()
 
         # Build composite solving model parts
-        self._build_composite_solving_parts()
-        self._update_composite_solving_parts()
+        # self._build_composite_solving_parts()
 
         # Build output model part
-        #self._create_sub_model_part(self.settings["output_model_part"].GetString())
+        # self._create_sub_model_part(self.settings["output_model_part"].GetString())
 
     #
     def _build_bodies(self):
