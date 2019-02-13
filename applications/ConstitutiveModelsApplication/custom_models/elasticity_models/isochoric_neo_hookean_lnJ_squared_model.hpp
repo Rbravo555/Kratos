@@ -228,7 +228,7 @@ namespace Kratos
       const MaterialDataType& rMaterial = rVariables.GetMaterialParameters();
 
       //energy function "U(J) = (K/2)*(lnJ)²"
-      rVolumetricDensityFunction += rMaterial.GetBulkModulus() * 0.5 * pow(std::log(rVariables.Strain.Invariants.J),2);
+      rVolumetricDensityFunction += rMaterial.GetBulkModulus() * 0.5 * pow(std::log(rVariables.Strain.Invariants.J), 2);
 
       KRATOS_CATCH(" ")
     }

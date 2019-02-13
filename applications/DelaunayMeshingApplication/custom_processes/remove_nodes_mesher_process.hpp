@@ -182,13 +182,12 @@ class RemoveNodesMesherProcess
       if(any_node_removed_on_error || any_node_removed_on_distance)
         any_node_removed = true;
 
-               std::cout << " any_node_removed " << any_node_removed << std::endl;
       if(any_convex_condition_removed || any_condition_removed)
         any_condition_removed = true;
 
 
       if(any_node_removed || any_condition_removed){
-        std::cout<<" Removed Nodes: ( error "<<any_node_removed_on_error<<" distance "<<any_node_removed_on_distance<<" conv_cond "<<any_convex_condition_removed<<" cond "<< any_condition_removed<<")"<<std::endl;
+        std::cout<<" Removed Nodes: true=1 false=0 (error: "<<any_node_removed_on_error<<" distance: "<<any_node_removed_on_distance<<" conv_cond: "<<any_convex_condition_removed<<" cond: "<< any_condition_removed<<")"<<std::endl;
         this->CleanRemovedNodes(mrModelPart);
       }
 
@@ -334,9 +333,9 @@ class RemoveNodesMesherProcess
         if( i_node->Is(BOUNDARY) ) {
           if( mEchoLevel > 0 )
             std::cout<<"   BOUNDARY NODE RELEASED "<<i_node->Id()<<std::endl;
-		std::cout << " Removing Boundary " << i_node->Id() << " :: " << i_node->X() << " , " << i_node->Y() << std::endl; 
+		std::cout << " Removing Boundary Node: " << i_node->Id() << " :: " << i_node->X() << " , " << i_node->Y() << " , " << i_node->Z() << std::endl;
   	} else {
-		std::cout << " Removing NONboundary " << i_node->Id() << " :: " << i_node->X() << " , " << i_node->Y() << std::endl; 
+		std::cout << " Removing Inside Node: " << i_node->Id() << " :: " << i_node->X() << " , " << i_node->Y() << " , " << i_node->Z() << std::endl;
 	}
       }
     }
@@ -355,6 +354,8 @@ class RemoveNodesMesherProcess
   {
     KRATOS_TRY
 
+    if( mEchoLevel > 0 )
+      std::cout<<" Distance criterion: (critical_radius:"<<mrRemesh.Refine->CriticalRadius<<")"<<std::endl;
 
     //***SIZES :::: parameters do define the tolerance in mesh size:
     double size_for_distance_inside       = 1.0 * mrRemesh.Refine->CriticalRadius; //compared with element radius
@@ -384,16 +385,13 @@ class RemoveNodesMesherProcess
     std::vector<Node<3>::Pointer> neighbours         (num_neighbours);
     std::vector<double>           neighbour_distances(num_neighbours);
 
-
     //radius means the distance, if the distance between two nodes is closer to radius -> mark for removing
     double radius=0;
     Node<3> work_point(0,0.0,0.0,0.0);
     unsigned int n_points_in_radius;
 
-
     for(auto& i_node : rModelPart.Nodes())
     {
-
       bool on_contact_tip = false;
       bool contact_active = false;
 
@@ -414,7 +412,7 @@ class RemoveNodesMesherProcess
         work_point[1]=i_node.Y();
         work_point[2]=i_node.Z();
 
-        n_points_in_radius = nodes_tree.SearchInRadius(work_point, radius, neighbours.begin(),neighbour_distances.begin(), num_neighbours);
+        n_points_in_radius = nodes_tree.SearchInRadius(work_point, radius, neighbours.begin(), neighbour_distances.begin(), num_neighbours);
 
         if (n_points_in_radius>1)
         {
@@ -465,7 +463,6 @@ class RemoveNodesMesherProcess
                   counter += 1;
                 }
               }
-
 
               k++;
             }

@@ -423,7 +423,48 @@ void UpdatedLagrangianUJElement::CalculateOnIntegrationPoints(const Variable<dou
 {
   KRATOS_TRY
 
-  if(rVariable == DETERMINANT_F)
+  if(rVariable == PRESSURE)
+  {
+    const SizeType dimension = GetGeometry().WorkingSpaceDimension();
+
+    //create and initialize element variables:
+    ElementDataType Variables;
+    this->InitializeElementData(Variables,rCurrentProcessInfo);
+
+    //create constitutive law parameters:
+    ConstitutiveLaw::Parameters Values(GetGeometry(),GetProperties(),rCurrentProcessInfo);
+
+    //set constitutive law flags:
+    Flags &ConstitutiveLawOptions=Values.GetOptions();
+
+    ConstitutiveLawOptions.Set(ConstitutiveLaw::COMPUTE_STRESS);
+
+    //reading integration points
+    for(SizeType PointNumber=0; PointNumber<mConstitutiveLawVector.size(); ++PointNumber)
+    {
+      //compute element kinematics B, F, DN_DX ...
+      this->CalculateKinematics(Variables,PointNumber);
+
+      //to take in account previous step writing
+      if(this->Is(SolidElement::FINALIZED_STEP)){
+        this->GetHistoricalVariables(Variables,PointNumber);
+      }
+
+      //set stress measure
+      if(rVariable == CAUCHY_STRESS_VECTOR)
+        Variables.StressMeasure = ConstitutiveLaw::StressMeasure_Cauchy;
+
+      //calculate material response
+      this->CalculateMaterialResponse(Variables,Values,PointNumber);
+
+      for(SizeType i=0; i<dimension; ++i)
+        rOutput[PointNumber] += Variables.StressVector[i];
+
+      rOutput[PointNumber] /= double(dimension);
+    }
+
+  }
+  else if(rVariable == DETERMINANT_F)
   {
     const SizeType integration_points_number = mConstitutiveLawVector.size();
 

@@ -92,6 +92,10 @@ class RefineElementsInEdgesMesherProcess
     if( ( mrRemesh.Refine->RefiningOptions.Is(MesherUtilities::REFINE_ADD_NODES) ||
         mrRemesh.Refine->RefiningOptions.Is(MesherUtilities::REFINE_INSERT_NODES) ) )
     {
+      if( mEchoLevel > 0 ){
+	std::cout<<" [ SELECT EDGE ELEMENTS TO REFINE : "<<std::endl;
+	//std::cout<<"   refine selection "<<std::endl;
+      }
 
       //1.- Select Elements to split (edge elements with all nodes as boundary-free surface)
       ModelPart::ElementsContainerType   BoundaryEdgedElements;
@@ -109,6 +113,12 @@ class RefineElementsInEdgesMesherProcess
 
       //4.- Insert new nodes to model part
       this->SetNodesToModelPart(mrModelPart, ListOfNewNodes);
+
+      if( mEchoLevel > 0 ){
+        std::cout<<"   Visited Elements: "<<BoundaryEdgedElements.size()<<" new nodes "<<ListOfNewNodes.size()<<std::endl;
+        std::cout<<"   SELECT EDGE ELEMENTS TO REFINE ]; "<<std::endl;
+      }
+
     }
 
     KRATOS_CATCH(" ")
@@ -183,6 +193,7 @@ class RefineElementsInEdgesMesherProcess
     KRATOS_TRY
 
     bool is_full_boundary = false;
+    bool is_corner_node = false;
     ModelPart::ElementsContainerType& rElements = rModelPart.Elements();
     for(auto i_elem(rElements.begin()); i_elem != rElements.end(); ++i_elem)
     {
@@ -198,7 +209,18 @@ class RefineElementsInEdgesMesherProcess
       }
 
       if( is_full_boundary ){
-        rBoundaryEdgedElements.push_back(*i_elem.base());
+        is_corner_node = true;
+        if(rModelPart.GetProcessInfo()[SPACE_DIMENSION] == 3){
+          is_corner_node = false;
+          for(unsigned int i=0; i<rGeometry.size(); ++i)
+          {
+            if(rGeometry[i].GetValue(NEIGHBOUR_ELEMENTS).size() == 1)
+              is_corner_node = true;
+          }
+        }
+        if( is_corner_node ){
+          rBoundaryEdgedElements.push_back(*i_elem.base());
+        }
       }
 
     }

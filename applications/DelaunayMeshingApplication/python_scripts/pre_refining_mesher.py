@@ -65,7 +65,6 @@ class PreRefiningMesher(mesher.Mesher):
         self.MeshingParameters.SetTessellationFlags(mesher_flags)
         self.MeshingParameters.SetTessellationInfo(mesher_info)
 
-
     #
     def SetPreMeshingProcesses(self):
 
@@ -91,9 +90,14 @@ class PreRefiningMesher(mesher.Mesher):
     def SetPostMeshingProcesses(self):
 
         # The order set is the order of execution:
-
+        meshing_options = self.MeshingParameters.GetOptions()
         refining_parameters = self.MeshingParameters.GetRefiningParameters()
         refining_options = refining_parameters.GetRefiningOptions()
+
+        if( meshing_options.Is(KratosDelaunay.MesherUtilities.CONSTRAINED) ):
+            #generate new particles
+            generate_particles  = KratosDelaunay.GenerateNewNodes(self.model_part, self.MeshingParameters, self.echo_level)
+            self.mesher.SetPostMeshingProcess(generate_particles)
 
         #select mesh elements
         select_mesh_elements  = KratosDelaunay.SelectElements(self.model_part, self.MeshingParameters, self.echo_level)
@@ -120,16 +124,16 @@ class PreRefiningMesher(mesher.Mesher):
 
         execution_options = KratosMultiphysics.Flags()
 
+        inserted_nodes = self.MeshingParameters.GetInfoParameters().GetInsertedNodes()
+
         # set for the post_refining process
-        if( refining_options.Is(KratosDelaunay.MesherUtilities.REFINE_INSERT_NODES) ):
+        if( refining_options.Is(KratosDelaunay.MesherUtilities.REFINE_INSERT_NODES) or inserted_nodes>0 ):
             execution_options.Set(KratosDelaunay.MesherUtilities.INITIALIZE_MESHER_INPUT, True)
             execution_options.Set(KratosDelaunay.MesherUtilities.TRANSFER_KRATOS_NODES_TO_MESHER, True)
             meshing_options = self.MeshingParameters.GetOptions()
             if( meshing_options.Is(KratosDelaunay.MesherUtilities.CONSTRAINED) ):
                 execution_options.Set(KratosDelaunay.MesherUtilities.TRANSFER_KRATOS_FACES_TO_MESHER, True)
-
-
-        if( refining_options.Is(KratosDelaunay.MesherUtilities.REFINE_ADD_NODES) ):
+        elif( refining_options.Is(KratosDelaunay.MesherUtilities.REFINE_ADD_NODES) ):
             execution_options.Set(KratosDelaunay.MesherUtilities.INITIALIZE_MESHER_INPUT, False)
 
         execution_options.Set(KratosDelaunay.MesherUtilities.FINALIZE_MESHER_INPUT,  True)

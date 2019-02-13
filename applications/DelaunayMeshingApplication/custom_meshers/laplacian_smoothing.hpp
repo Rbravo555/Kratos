@@ -163,7 +163,7 @@ namespace Kratos
 
       ModelPart::NodesContainerType::iterator nodes_begin = rModelPart.NodesBegin();
 
-      while ( iters<smoothing_iters && converged==false ){
+      while ( iters<=smoothing_iters && converged==false ){
 
 	//std::cout<<" Iter "<< iters <<std::endl;
 
@@ -635,7 +635,7 @@ namespace Kratos
 
       ModelPart::NodesContainerType::iterator nodes_begin = rModelPart.NodesBegin();
 
-      while ( iters<smoothing_iters && converged==false ){
+      while ( iters<=smoothing_iters && converged==false ){
 
 	//std::cout<<" Iter "<< iters <<std::endl;
 
@@ -670,6 +670,7 @@ namespace Kratos
 		P[1] = (nodes_begin+in)->Y();
 		P[2] = (nodes_begin+in)->Z();
 
+                array_1d<double, 3>&  Normal= (nodes_begin+in)->FastGetSolutionStepValue(NORMAL);
 
 		//std::cout<<" Initial Position: "<<P<<std::endl;
 		Length = 0;
@@ -683,6 +684,9 @@ namespace Kratos
 
 
 		    D = P-Q;
+
+                    // project in the node normal direction
+                    D -= inner_prod(D,Normal)*D;
 
 		    Length =sqrt(D[0]*D[0]+D[1]*D[1]+D[2]*D[2]);
 
@@ -714,9 +718,7 @@ namespace Kratos
 		else
 		  D.clear();
 
-
 		P += D;
-
 
 		(nodes_begin+in)->X() = P[0];
 		(nodes_begin+in)->Y() = P[1];

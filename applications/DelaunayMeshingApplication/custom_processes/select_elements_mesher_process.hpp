@@ -175,7 +175,7 @@ class SelectElementsMesherProcess
           if( (unsigned int)OutElementList[id] >= mrRemesh.NodalPreIds.size() ){
             if(mrRemesh.Options.Is(MesherUtilities::CONTACT_SEARCH))
               wrong_added_node = true;
-            std::cout<<" ERROR: something is wrong: node out of bounds "<<std::endl;
+            std::cout<<" ERROR: something is wrong: node added by the mesher"<<std::endl;
             break;
           }
 
@@ -1096,6 +1096,10 @@ class SelectElementsMesherProcess
             accepted = true;
           else
             accepted = false;
+
+          //do not release sliver elements in solid domains in constrained tessellation
+          if( mrRemesh.Options.Is(MesherUtilities::CONSTRAINED) )
+            accepted = true;
 
           ++number_of_slivers;
         }
