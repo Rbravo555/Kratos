@@ -132,8 +132,11 @@ void KratosConstitutiveModelsApplication::Register() {
 
   //plasticity models
   Serializer::Register( "VonMisesLinearElasticPlasticityModel", mVonMisesLinearElasticPlasticityModel );
+  Serializer::Register( "VonMisesNeoHookeanLinearPlasticityModel", mVonMisesNeoHookeanLinearPlasticityModel );
+
   Serializer::Register( "VonMisesNeoHookeanPlasticityModel", mVonMisesNeoHookeanPlasticityModel );
   Serializer::Register( "VonMisesNeoHookeanThermoPlasticityModel", mVonMisesNeoHookeanThermoPlasticityModel );
+  Serializer::Register( "SimoJ2LinearPlasticityModel", mSimoJ2LinearPlasticityModel );
   Serializer::Register( "SimoJ2PlasticityModel", mSimoJ2PlasticityModel );
   Serializer::Register( "CamClayModel", mCamClayModel );
   Serializer::Register( "NonlocalCamClayModel", mNonlocalCamClayModel );

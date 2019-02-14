@@ -577,9 +577,9 @@ namespace Kratos
 
 	    //Set the position of boundary laplacian (Reset the flag)
 	    if ( i_node->Is(BOUNDARY) && i_node->IsNot(TO_ERASE) && i_node->Is(INSIDE) )
-	      {
-		i_node->Set(INSIDE, false); //LMV.
-	      }
+            {
+              i_node->Set(INSIDE, false); //LMV.
+            }
 
 	  }
 
@@ -655,82 +655,87 @@ namespace Kratos
 	NewMaxLength  = 0;
 
 	for(unsigned int in = 0; in<rNodes.size(); ++in)
-	  {
-	    unsigned int NumberOfNeighbours = NeigbourNodesList[in+1].size();
+        {
+          unsigned int NumberOfNeighbours = NeigbourNodesList[in+1].size();
 
-	    if(rNodes[in+1].Is(BOUNDARY) && rNodes[in+1].IsNot(TO_ERASE) && rNodes[in+1].IsNot(BOUNDARY) &&
-	       rNodes[in+1].Is(INSIDE) && NumberOfNeighbours>1 )
-	      {
-		TotalDistance.clear();
-		TotalWeight = 0;
-		Weight = 0;
+          //if(rNodes[in+1].Is(BOUNDARY) && rNodes[in+1].IsNot(TO_ERASE) && rNodes[in+1].Is(INSIDE) && NumberOfNeighbours>1)
+          if(rNodes[in+1].Is(BOUNDARY) && rNodes[in+1].IsNot(TO_ERASE) && NumberOfNeighbours>1)
+          {
+            TotalDistance.clear();
+            TotalWeight = 0;
+            Weight = 0;
 
-		//point position
-		P[0] = (nodes_begin+in)->X();
-		P[1] = (nodes_begin+in)->Y();
-		P[2] = (nodes_begin+in)->Z();
+            //point position
+            P[0] = (nodes_begin+in)->X();
+            P[1] = (nodes_begin+in)->Y();
+            P[2] = (nodes_begin+in)->Z();
 
-                array_1d<double, 3>&  Normal= (nodes_begin+in)->FastGetSolutionStepValue(NORMAL);
+            array_1d<double, 3>&  Normal= (nodes_begin+in)->FastGetSolutionStepValue(NORMAL);
 
-		//std::cout<<" Initial Position: "<<P<<std::endl;
-		Length = 0;
+            //std::cout<<" Initial Position: "<<P<<std::endl;
+            Length = 0;
 
-		for(unsigned int i = 0; i < NumberOfNeighbours; ++i)
-		  {
-		    //neighbour position
-		    Q[0] = (nodes_begin+(NeigbourNodesList[in+1][i]-1))->X();
-		    Q[1] = (nodes_begin+(NeigbourNodesList[in+1][i]-1))->Y();
-		    Q[2] = (nodes_begin+(NeigbourNodesList[in+1][i]-1))->Z();
+            for(unsigned int i = 0; i < NumberOfNeighbours; ++i)
+            {
+              array_1d<double,3>&  SNormal= (nodes_begin+(NeigbourNodesList[in+1][i]-1))->FastGetSolutionStepValue(NORMAL);
 
+              if( inner_prod(SNormal,Normal) == 0.995 ){
 
-		    D = P-Q;
+                //neighbour position
+                Q[0] = (nodes_begin+(NeigbourNodesList[in+1][i]-1))->X();
+                Q[1] = (nodes_begin+(NeigbourNodesList[in+1][i]-1))->Y();
+                Q[2] = (nodes_begin+(NeigbourNodesList[in+1][i]-1))->Z();
 
-                    // project in the node normal direction
-                    D -= inner_prod(D,Normal)*D;
+                D = P-Q;
 
-		    Length =sqrt(D[0]*D[0]+D[1]*D[1]+D[2]*D[2]);
+                // project in the node normal direction
+                D -= inner_prod(D,Normal)*D;
 
-
-		    if( simple ){
-
-		      Weight = 1;
-
-		    }
-		    else{
-
-		      if(Length !=0)
-			Weight = ( 1.0/Length );
-		      else
-			Weight = 0;
-		    }
-
-		    if(NewMaxLength<Length)
-		      NewMaxLength = Length;
-
-		    TotalDistance += (Weight*(Q-P)) ;
-		    TotalWeight   += Weight ;
-
-		  }
+                Length =sqrt(D[0]*D[0]+D[1]*D[1]+D[2]*D[2]);
 
 
-		if(TotalWeight!=0)
-		  D = ( smoothing_factor / TotalWeight ) * TotalDistance;
-		else
-		  D.clear();
+                if( simple ){
 
-		P += D;
+                  Weight = 1;
 
-		(nodes_begin+in)->X() = P[0];
-		(nodes_begin+in)->Y() = P[1];
-		(nodes_begin+in)->Z() = P[2];
+                }
+                else{
+
+                  if(Length !=0)
+                    Weight = ( 1.0/Length );
+                  else
+                    Weight = 0;
+                }
+
+                if(NewMaxLength<Length)
+                  NewMaxLength = Length;
+
+                TotalDistance += (Weight*(Q-P)) ;
+                TotalWeight   += Weight ;
+
+              }
+
+            }
+
+            if(TotalWeight!=0)
+              D = ( smoothing_factor / TotalWeight ) * TotalDistance;
+            else
+              D.clear();
+
+            P += D;
+
+            (nodes_begin+in)->X() = P[0];
+            (nodes_begin+in)->Y() = P[1];
+            (nodes_begin+in)->Z() = P[2];
 
 
-		number_of_nodes +=1;
+            number_of_nodes +=1;
 
-	      }
 
-	    //rNodes[in+1].Set(INSIDE,false); //LMV: Reset the flag after interpolation. Indeed, if the flag is set, only one iteration takes place
-	  }
+          }
+
+          //rNodes[in+1].Set(INSIDE,false); //LMV: Reset the flag after interpolation. Indeed, if the flag is set, only one iteration takes place
+        }
 
 
 	if( (NewMaxLength-MaxLength)/NewMaxLength < convergence_tol ){

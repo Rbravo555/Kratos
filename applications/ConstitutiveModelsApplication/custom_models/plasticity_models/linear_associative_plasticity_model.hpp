@@ -187,8 +187,8 @@ namespace Kratos
       //start
       double DeltaStateFunction = 0;
 
-      double& rEquivalentPlasticStrain     = rVariables.Internal.Variables[0];
-      double& rDeltaGamma                  = rVariables.DeltaInternal.Variables[0];
+      double& rEquivalentPlasticStrain    = rVariables.Internal.Variables[0];
+      double& rDeltaGamma                 = rVariables.DeltaInternal.Variables[0];
 
 
       double StateFunction                = rVariables.TrialStateFunction;
@@ -197,11 +197,12 @@ namespace Kratos
       DeltaStateFunction = this->mYieldSurface.CalculateDeltaStateFunction( rVariables, DeltaStateFunction );
 
       //Calculate DeltaGamma:
-      rDeltaGamma  = StateFunction/DeltaStateFunction;
+      rDeltaGamma = StateFunction/DeltaStateFunction;
 
       //Update Equivalent Plastic Strain:
-      DeltaPlasticStrain        = sqrt(2.0/3.0) * rDeltaGamma;
-      rEquivalentPlasticStrain += DeltaPlasticStrain;
+      rEquivalentPlasticStrain += sqrt(2.0/3.0) * rDeltaGamma;
+
+      return true;
 
       KRATOS_CATCH(" ")
     }
