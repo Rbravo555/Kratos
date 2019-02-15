@@ -688,7 +688,7 @@ namespace Kratos
 
               D = P-Q;
 
-              if( inner_prod(SNormal,Normal) >= 0.98 ){
+              if( inner_prod(SNormal,Normal) >= 0.99 ){
                 DN = D;
                 // project in the node normal direction
                 //DN -= inner_prod(DN,Normal)*DN;
@@ -734,15 +734,11 @@ namespace Kratos
             P += inner_prod(D,TotalDirection)*TotalDirection;
 
             //P += D;
-
             (nodes_begin+in)->X() = P[0];
             (nodes_begin+in)->Y() = P[1];
             (nodes_begin+in)->Z() = P[2];
 
-
             number_of_nodes +=1;
-
-
           }
 
           //rNodes[in+1].Set(INSIDE,false); //LMV: Reset the flag after interpolation. Indeed, if the flag is set, only one iteration takes place
