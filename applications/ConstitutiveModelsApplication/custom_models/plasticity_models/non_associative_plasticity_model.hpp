@@ -132,7 +132,7 @@ namespace Kratos
             ///@name Operations
             ///@{
 
-            
+
             /**
              * Get Values
              */
@@ -172,9 +172,22 @@ namespace Kratos
             /**
              * Set Values
              */
+            void SetValue(const Variable<double>& rVariable,
+                          const double& rValue,
+                          const ProcessInfo& rCurrentProcessInfo) override
+            {
+               KRATOS_TRY
+
+               BaseType::SetValue(rVariable, rValue, rCurrentProcessInfo);
+
+               KRATOS_CATCH("")
+            }
+
+
+
             void SetValue(const Variable<Vector>& rVariable,
-                  const Vector& rValue,
-                  const ProcessInfo& rCurrentProcessInfo) override 
+                          const Vector& rValue,
+                          const ProcessInfo& rCurrentProcessInfo) override
             {
                KRATOS_TRY
 
@@ -462,7 +475,7 @@ namespace Kratos
 
             //***************************************************************************************
             //***************************************************************************************
-            // Correct Yield Surface Drift According to 
+            // Correct Yield Surface Drift According to
             virtual void ReturnStressToYieldSurface( ModelDataType & rValues, PlasticDataType & rVariables)
             {
                KRATOS_TRY
@@ -498,7 +511,7 @@ namespace Kratos
                   MatrixType StressMatrix;
                   this->mElasticityModel.CalculateStressTensor( rValues, StressMatrix);
 
-                  double & rPlasticVolDef = rVariables.Internal.Variables[1]; 
+                  double & rPlasticVolDef = rVariables.Internal.Variables[1];
                   for (unsigned int i = 0; i < 3; i++)
                      rPlasticVolDef += DeltaGamma * DeltaStressYieldCondition(i);
 
@@ -515,7 +528,7 @@ namespace Kratos
             //***************************************************************************************
             //***************************************************************************************
             // Compute Elasto Plastic Matrix
-            virtual void ComputeElastoPlasticTangentMatrix( ModelDataType & rValues, PlasticDataType & rVariables, Matrix & rEPMatrix) 
+            virtual void ComputeElastoPlasticTangentMatrix( ModelDataType & rValues, PlasticDataType & rVariables, Matrix & rEPMatrix)
             {
                KRATOS_TRY
 
@@ -999,7 +1012,7 @@ namespace Kratos
             //********************************************************************
             //********************************************************************
             // UpdateInternalVariables
-            virtual void UpdateInternalVariables(ModelDataType& rValues, PlasticDataType& rVariables, const MatrixType& rStressMatrix) 
+            virtual void UpdateInternalVariables(ModelDataType& rValues, PlasticDataType& rVariables, const MatrixType& rStressMatrix)
             {
                KRATOS_TRY
 
@@ -1008,7 +1021,7 @@ namespace Kratos
                rVariables.Internal.Variables[3] = Precon;
 
                for (unsigned int i = 0; i < 5; i++) {
-                  double & rCurrentPlasticVariable = rVariables.Internal.Variables[i]; 
+                  double & rCurrentPlasticVariable = rVariables.Internal.Variables[i];
                   double & rPreviousPlasticVariable    = mInternal.Variables[i];
 
                   mPreviousInternal.Variables[i] = rPreviousPlasticVariable;
@@ -1025,7 +1038,7 @@ namespace Kratos
                KRATOS_TRY
 
                // evaluate constitutive matrix and plastic flow
-               double & rPlasticVolDef = rVariables.Internal.Variables[1]; 
+               double & rPlasticVolDef = rVariables.Internal.Variables[1];
                double & rPlasticDevDef = rVariables.Internal.Variables[2];
 
                const double & rPlasticMultiplierOld = mPreviousInternal.Variables[0];
@@ -1035,7 +1048,7 @@ namespace Kratos
                if ( DeltaPlasticMultiplier < 0)
                   DeltaPlasticMultiplier = 0;
 
-               
+
                this->mElasticityModel.CalculateStressTensor(rValues,rStressMatrix);
 
                VectorType DeltaStressYieldCondition = this->mYieldSurface.CalculateDeltaStressYieldCondition( rVariables, DeltaStressYieldCondition);

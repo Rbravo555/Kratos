@@ -151,7 +151,7 @@ namespace Kratos
     /**
      * Pure isotropic hardening Theta=1;  pure kinematic hardening Theta= 0; combined isotropic-kinematic 0<Theta<1
      */
-    constexpr static const double mTheta = 1.0;
+    double mTheta = 1.0;
 
 
     ///@}
@@ -187,6 +187,8 @@ namespace Kratos
     ///@name Protected  Access
     ///@{
 
+    /// Constructor.
+    SimoExponentialHardeningRule(const double Theta);
 
     ///@}
     ///@name Protected Inquiry
@@ -271,5 +273,3 @@ namespace Kratos
 }  // namespace Kratos.
 
 #endif // KRATOS_SIMO_EXPONENTIAL_HARDENING_RULE_H_INCLUDED  defined
-
-

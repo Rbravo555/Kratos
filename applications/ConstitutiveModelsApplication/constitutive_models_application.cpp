@@ -122,6 +122,7 @@ void KratosConstitutiveModelsApplication::Register() {
   Serializer::Register( "IsochoricNeoHookeanModel", mIsochoricNeoHookeanModel );
   Serializer::Register( "IsochoricNeoHookeanLnJSquaredModel", mIsochoricNeoHookeanLnJSquaredModel );
   Serializer::Register( "IncompressibleNeoHookeanModel", mIncompressibleNeoHookeanModel );
+  Serializer::Register( "IncompressibleNeoHookeanLnJSquaredModel", mIncompressibleNeoHookeanLnJSquaredModel );
   Serializer::Register( "BorjaModel", mBorjaModel );
   Serializer::Register( "TamagniniModel", mTamagniniModel );
   Serializer::Register( "OgdenModel", mOgdenModel );

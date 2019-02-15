@@ -621,7 +621,7 @@ namespace Kratos
       //MOVE BOUNDARY NODES: LAPLACIAN SMOOTHING:
 
       double convergence_tol =0.001;
-      double smoothing_factor=0.1; //0.1
+      double smoothing_factor=0.25; //0.1
       double smoothing_iters =4; //3,4
       double iters=0;
 
@@ -642,11 +642,12 @@ namespace Kratos
 	array_1d<double,3> P;
 	array_1d<double,3> Q;//neighbour position
 	array_1d<double,3> D;
-
+	array_1d<double,3> DN;
 
 	double TotalWeight = 0;
 	double Weight = 0;
 	array_1d<double,3> TotalDistance;
+        array_1d<double,3> TotalDirection;
 
 
 	//convergence variables
@@ -662,6 +663,7 @@ namespace Kratos
           if(rNodes[in+1].Is(BOUNDARY) && rNodes[in+1].IsNot(TO_ERASE) && NumberOfNeighbours>1)
           {
             TotalDistance.clear();
+            TotalDirection.clear();
             TotalWeight = 0;
             Weight = 0;
 
@@ -679,41 +681,42 @@ namespace Kratos
             {
               array_1d<double,3>&  SNormal= (nodes_begin+(NeigbourNodesList[in+1][i]-1))->FastGetSolutionStepValue(NORMAL);
 
-              if( inner_prod(SNormal,Normal) == 0.995 ){
+              //neighbour position
+              Q[0] = (nodes_begin+(NeigbourNodesList[in+1][i]-1))->X();
+              Q[1] = (nodes_begin+(NeigbourNodesList[in+1][i]-1))->Y();
+              Q[2] = (nodes_begin+(NeigbourNodesList[in+1][i]-1))->Z();
 
-                //neighbour position
-                Q[0] = (nodes_begin+(NeigbourNodesList[in+1][i]-1))->X();
-                Q[1] = (nodes_begin+(NeigbourNodesList[in+1][i]-1))->Y();
-                Q[2] = (nodes_begin+(NeigbourNodesList[in+1][i]-1))->Z();
+              D = P-Q;
 
-                D = P-Q;
-
+              if( inner_prod(SNormal,Normal) >= 0.98 ){
+                DN = D;
                 // project in the node normal direction
-                D -= inner_prod(D,Normal)*D;
+                //DN -= inner_prod(DN,Normal)*DN;
+              }
+              else
+                DN.clear();
 
-                Length =sqrt(D[0]*D[0]+D[1]*D[1]+D[2]*D[2]);
+              Length =sqrt(D[0]*D[0]+D[1]*D[1]+D[2]*D[2]);
 
+              if( simple ){
 
-                if( simple ){
-
-                  Weight = 1;
-
-                }
-                else{
-
-                  if(Length !=0)
-                    Weight = ( 1.0/Length );
-                  else
-                    Weight = 0;
-                }
-
-                if(NewMaxLength<Length)
-                  NewMaxLength = Length;
-
-                TotalDistance += (Weight*(Q-P)) ;
-                TotalWeight   += Weight ;
+                Weight = 1;
 
               }
+              else{
+
+                if(Length !=0)
+                  Weight = ( 1.0/Length );
+                else
+                  Weight = 0;
+              }
+
+              if(NewMaxLength<Length)
+                NewMaxLength = Length;
+
+              TotalDistance  += (Weight*(Q-P)) ;
+              TotalWeight    += Weight ;
+              TotalDirection += DN;
 
             }
 
@@ -722,7 +725,15 @@ namespace Kratos
             else
               D.clear();
 
-            P += D;
+            double norm = norm_2(TotalDirection);
+            if(norm)
+              TotalDirection/=norm;
+            else
+              TotalDirection.clear();
+
+            P += inner_prod(D,TotalDirection)*TotalDirection;
+
+            //P += D;
 
             (nodes_begin+in)->X() = P[0];
             (nodes_begin+in)->Y() = P[1];

@@ -51,7 +51,7 @@ class PostRefiningMesher(mesher.Mesher):
 
             if( refining_options.Is(KratosDelaunay.MesherUtilities.REFINE_ADD_NODES) ):
                 if( meshing_options.Is(KratosDelaunay.MesherUtilities.CONSTRAINED) ):
-                    mesher_flags = "pMYJq1.4arnCBQF"
+                    mesher_flags = "pMYYJq2.4arnCBQF"
                 else:
                     mesher_flags = "YJq1.4arnBQF"
 

@@ -180,7 +180,7 @@ namespace Kratos
 
 
     // calculate return mapping
-    virtual bool CalculateReturnMapping(PlasticDataType& rVariables, MatrixType& rStressMatrix)
+    bool CalculateReturnMapping(PlasticDataType& rVariables, MatrixType& rStressMatrix) override
     {
       KRATOS_TRY
 

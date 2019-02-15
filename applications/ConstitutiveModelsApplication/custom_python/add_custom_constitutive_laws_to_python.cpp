@@ -49,6 +49,7 @@
 #include "custom_models/elasticity_models/isochoric_neo_hookean_model.hpp"
 #include "custom_models/elasticity_models/isochoric_neo_hookean_lnJ_squared_model.hpp"
 #include "custom_models/elasticity_models/incompressible_neo_hookean_model.hpp"
+#include "custom_models/elasticity_models/incompressible_neo_hookean_lnJ_squared_model.hpp"
 #include "custom_models/elasticity_models/borja_model.hpp"
 #include "custom_models/elasticity_models/ogden_model.hpp"
 #include "custom_models/elasticity_models/isochoric_ogden_model.hpp"
@@ -213,6 +214,11 @@ void  AddCustomConstitutiveLawsToPython(pybind11::module& m)
 
   py::class_< IncompressibleNeoHookeanModel, typename IncompressibleNeoHookeanModel::Pointer, ConstitutiveModelBaseType >
       (m, "IncompressibleNeoHookeanModel")
+      .def( py::init<>() )
+      ;
+
+  py::class_< IncompressibleNeoHookeanLnJSquaredModel, typename IncompressibleNeoHookeanLnJSquaredModel::Pointer, ConstitutiveModelBaseType >
+      (m, "IncompressibleNeoHookeanLnJSquaredModel")
       .def( py::init<>() )
       ;
 

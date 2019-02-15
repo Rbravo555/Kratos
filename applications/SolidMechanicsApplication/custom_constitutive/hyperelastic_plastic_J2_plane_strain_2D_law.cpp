@@ -28,7 +28,7 @@ namespace Kratos
 HyperElasticPlasticJ2PlaneStrain2DLaw::HyperElasticPlasticJ2PlaneStrain2DLaw()
     : HyperElasticPlasticPlaneStrain2DLaw()
 {
-  mpHardeningLaw   = HardeningLaw::Pointer( new NonLinearIsotropicKinematicHardeningLaw() );
+  mpHardeningLaw   = HardeningLaw::Pointer( new LinearIsotropicKinematicHardeningLaw() );
   mpYieldCriterion = YieldCriterion::Pointer( new MisesHuberYieldCriterion(mpHardeningLaw) );
   mpFlowRule       = FlowRule::Pointer( new LinearAssociativePlasticFlowRule(mpYieldCriterion) );
 }
