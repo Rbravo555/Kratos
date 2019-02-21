@@ -331,6 +331,7 @@ private:
       std::fill( PointCoordinates.begin(), PointCoordinates.end(), 0.0 );
       std::fill( ElementPointCoordinates.begin(), ElementPointCoordinates.end(), PointCoordinates );
 
+      unsigned int counter = 0;
       for(ModelPart::ElementsContainerType::const_iterator ie = rModelPart.ElementsBegin();
 	ie != rModelPart.ElementsEnd(); ++ie)
 	{
@@ -372,9 +373,12 @@ private:
 		{
 		  double alpha = 1; //1 to interpolate, 0 to leave the original data
 		  DataTransferUtilities.Interpolate( ie->GetGeometry(), ShapeFunctionsN, rVariablesList, *(it_found), alpha );
+                  ++counter;
 		}
 	    }
 	}
+
+      std::cout<<" PROJECT to new nodes [New nodes: "<<list_of_new_nodes.size()<<" Projections:"<<counter<<"]"<<std::endl;
 
       KRATOS_CATCH( "" )
 

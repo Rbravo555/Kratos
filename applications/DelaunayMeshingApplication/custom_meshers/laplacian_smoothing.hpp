@@ -621,7 +621,7 @@ namespace Kratos
       //MOVE BOUNDARY NODES: LAPLACIAN SMOOTHING:
 
       double convergence_tol =0.001;
-      double smoothing_factor=0.25; //0.1
+      double smoothing_factor=0.4; //0.1
       double smoothing_iters =4; //3,4
       double iters=0;
 
@@ -642,12 +642,12 @@ namespace Kratos
 	array_1d<double,3> P;
 	array_1d<double,3> Q;//neighbour position
 	array_1d<double,3> D;
-	array_1d<double,3> DN;
+	//array_1d<double,3> DN;
 
 	double TotalWeight = 0;
 	double Weight = 0;
 	array_1d<double,3> TotalDistance;
-        array_1d<double,3> TotalDirection;
+        //array_1d<double,3> TotalDirection;
 
 
 	//convergence variables
@@ -663,7 +663,7 @@ namespace Kratos
           if(rNodes[in+1].Is(BOUNDARY) && rNodes[in+1].IsNot(TO_ERASE) && NumberOfNeighbours>1)
           {
             TotalDistance.clear();
-            TotalDirection.clear();
+            //TotalDirection.clear();
             TotalWeight = 0;
             Weight = 0;
 
@@ -716,7 +716,7 @@ namespace Kratos
 
               TotalDistance  += (Weight*(Q-P)) ;
               TotalWeight    += Weight ;
-              TotalDirection += DN;
+              //TotalDirection += DN;
 
             }
 
@@ -734,6 +734,8 @@ namespace Kratos
             // P += inner_prod(D,TotalDirection)*TotalDirection;
 
             P += D;
+            //std::cout<<" Final Position: "<<P<<std::endl;
+
             (nodes_begin+in)->X() = P[0];
             (nodes_begin+in)->Y() = P[1];
             (nodes_begin+in)->Z() = P[2];
@@ -1030,7 +1032,7 @@ namespace Kratos
                     }
                   }
                   if(neighb_set==false){
-                    if( this->CheckCoplanar(rNodes[ElementList[el*nds+ipn]], rNodes[ElementList[el*nds+ipn]]) )
+                    if( this->CheckCoplanar(rNodes[ElementList[el*nds+ipn]], rNodes[ElementList[el*nds+jpn]]) )
                       list_of_neighbor_nodes[ElementList[el*nds+ipn]].push_back(ElementList[el*nds+jpn]);
                   }
                 }

@@ -319,6 +319,11 @@ class SelectElementsMesherProcess
       //   std::cout<<" DELETED ELEMENTS "<<std::endl;
       std::cout<<"   SELECT MESH ELEMENTS ("<<mrRemesh.Info->NumberOfElements<<") ]; "<<std::endl;
 
+      if( mrRemesh.Options.Is(MesherUtilities::CONSTRAINED) ){
+        int released_elements = mrRemesh.OutMesh.GetNumberOfElements()-mrRemesh.Info->NumberOfElements;
+        if( released_elements > 0 )
+          std::cout<<"   RELEASED ELEMENTS ("<<released_elements<<") IN CONSTRAINED MESH ]; "<<std::endl;
+      }
     }
 
     KRATOS_CATCH( "" )
