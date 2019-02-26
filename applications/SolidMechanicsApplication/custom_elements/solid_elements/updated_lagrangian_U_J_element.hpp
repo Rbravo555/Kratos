@@ -41,7 +41,7 @@ namespace Kratos
  * This works for Linear Triangles and Tetrahedra.
  */
 
-class KRATOS_API(PFEM_SOLID_MECHANICS_APPLICATION) UpdatedLagrangianUJElement
+class KRATOS_API(SOLID_MECHANICS_APPLICATION) UpdatedLagrangianUJElement
     : public LargeDisplacementElement
 {
 public:
