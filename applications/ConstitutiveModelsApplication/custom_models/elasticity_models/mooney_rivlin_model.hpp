@@ -180,6 +180,7 @@ namespace Kratos
 
     double& GetVolumetricFunction2ndJDerivative(HyperElasticDataType& rVariables, double& rDerivative) override; //ddU/dJdJ
 
+    void GetVolumetricFunctionFactors(HyperElasticDataType& rVariables, Vector& rFactors) override;
 
     virtual double& GetFunction1stI1Derivative(HyperElasticDataType& rVariables, double& rDerivative); //dW/dI1
 

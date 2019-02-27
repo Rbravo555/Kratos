@@ -22,10 +22,9 @@ namespace Kratos
   //************************************************************************************
 
   SimoLinearHardeningRule::SimoLinearHardeningRule()
-    :SimoExponentialHardeningRule()
+    :SimoExponentialHardeningRule(0.0)
   {
   }
-
 
   //*******************************ASSIGMENT OPERATOR***********************************
   //************************************************************************************

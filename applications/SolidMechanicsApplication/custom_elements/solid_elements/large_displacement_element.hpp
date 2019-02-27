@@ -219,6 +219,13 @@ protected:
                              const int & rPointNumber) override;
 
     /**
+     * Check Variables of the Element
+     */
+    void CheckElementData(ElementDataType& rVariables,
+                          const int & rPointNumber) override;
+
+
+    /**
      * Get the Historical Deformation Gradient to calculate after finalize the step
      */
     virtual void GetHistoricalVariables(ElementDataType& rVariables,

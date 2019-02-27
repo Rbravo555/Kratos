@@ -155,13 +155,13 @@ void SmallDisplacementBeamElement3D2N::GetValuesVector(Vector& rValues, int Step
     for ( SizeType i = 0; i < number_of_nodes; i++ )
     {
       int index = i * ( dimension * 2 );
-      rValues[index]     = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_X, Step );
-      rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_Y, Step );
-      rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_Z, Step );
+      rValues[index]     = GetGeometry()[i].FastGetSolutionStepValue( DISPLACEMENT_X, Step );
+      rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue( DISPLACEMENT_Y, Step );
+      rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( DISPLACEMENT_Z, Step );
 
-      rValues[index + 3] = GetGeometry()[i].GetSolutionStepValue( ROTATION_X, Step );
-      rValues[index + 4] = GetGeometry()[i].GetSolutionStepValue( ROTATION_Y, Step );
-      rValues[index + 5] = GetGeometry()[i].GetSolutionStepValue( ROTATION_Z, Step );
+      rValues[index + 3] = GetGeometry()[i].FastGetSolutionStepValue( ROTATION_X, Step );
+      rValues[index + 4] = GetGeometry()[i].FastGetSolutionStepValue( ROTATION_Y, Step );
+      rValues[index + 5] = GetGeometry()[i].FastGetSolutionStepValue( ROTATION_Z, Step );
     }
 
 }
@@ -185,9 +185,9 @@ void SmallDisplacementBeamElement3D2N::GetFirstDerivativesVector(Vector& rValues
     for ( SizeType i = 0; i < number_of_nodes; i++ )
     {
       int index = i * ( dimension * 2 );
-      rValues[index]     = GetGeometry()[i].GetSolutionStepValue( VELOCITY_X, Step );
-      rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( VELOCITY_Y, Step );
-      rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( VELOCITY_Z, Step );
+      rValues[index]     = GetGeometry()[i].FastGetSolutionStepValue( VELOCITY_X, Step );
+      rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue( VELOCITY_Y, Step );
+      rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( VELOCITY_Z, Step );
 
       rValues[index + 3] = 0.0;
       rValues[index + 4] = 0.0;
@@ -215,9 +215,9 @@ void SmallDisplacementBeamElement3D2N::GetSecondDerivativesVector(Vector& rValue
     for ( SizeType i = 0; i < number_of_nodes; i++ )
     {
       int index = i * ( dimension * 2 );
-      rValues[index]     = GetGeometry()[i].GetSolutionStepValue( ACCELERATION_X, Step );
-      rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( ACCELERATION_Y, Step );
-      rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( ACCELERATION_Z, Step );
+      rValues[index]     = GetGeometry()[i].FastGetSolutionStepValue( ACCELERATION_X, Step );
+      rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue( ACCELERATION_Y, Step );
+      rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( ACCELERATION_Z, Step );
 
       rValues[index + 3] = 0.0;
       rValues[index + 4] = 0.0;
@@ -479,13 +479,13 @@ void SmallDisplacementBeamElement3D2N::CalculateAndAddRHS(LocalSystemComponents&
     for ( SizeType i = 0; i < number_of_nodes; i++ )
     {
       int index = i * ( dimension * 2 );
-      LocalVector[index]     = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_X );
-      LocalVector[index + 1] = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_Y );
-      LocalVector[index + 2] = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_Z );
+      LocalVector[index]     = GetGeometry()[i].FastGetSolutionStepValue( DISPLACEMENT_X );
+      LocalVector[index + 1] = GetGeometry()[i].FastGetSolutionStepValue( DISPLACEMENT_Y );
+      LocalVector[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( DISPLACEMENT_Z );
 
-      LocalVector[index + 3] = GetGeometry()[i].GetSolutionStepValue( ROTATION_X );
-      LocalVector[index + 4] = GetGeometry()[i].GetSolutionStepValue( ROTATION_Y );
-      LocalVector[index + 5] = GetGeometry()[i].GetSolutionStepValue( ROTATION_Z );
+      LocalVector[index + 3] = GetGeometry()[i].FastGetSolutionStepValue( ROTATION_X );
+      LocalVector[index + 4] = GetGeometry()[i].FastGetSolutionStepValue( ROTATION_Y );
+      LocalVector[index + 5] = GetGeometry()[i].FastGetSolutionStepValue( ROTATION_Z );
     }
 
     //std::cout<<" LocalVector "<<LocalVector<<std::endl;
@@ -1414,18 +1414,18 @@ void SmallDisplacementBeamElement3D2N::CalculateLocalNodalStress(Vector& Stress,
     KRATOS_TRY
 
     array_1d<double, 12 > CurrentDisplacement;
-    CurrentDisplacement(0)		=   GetGeometry()[0].GetSolutionStepValue(DISPLACEMENT_X);
-    CurrentDisplacement(1)		=   GetGeometry()[0].GetSolutionStepValue(DISPLACEMENT_Y);
-    CurrentDisplacement(2)		=   GetGeometry()[0].GetSolutionStepValue(DISPLACEMENT_Z);
-    CurrentDisplacement(3)		=   GetGeometry()[0].GetSolutionStepValue(ROTATION_X);
-    CurrentDisplacement(4)		=   GetGeometry()[0].GetSolutionStepValue(ROTATION_Y);
-    CurrentDisplacement(5)		=   GetGeometry()[0].GetSolutionStepValue(ROTATION_Z);
-    CurrentDisplacement(6)		=   GetGeometry()[1].GetSolutionStepValue(DISPLACEMENT_X);
-    CurrentDisplacement(7)		=   GetGeometry()[1].GetSolutionStepValue(DISPLACEMENT_Y);
-    CurrentDisplacement(8)		=   GetGeometry()[1].GetSolutionStepValue(DISPLACEMENT_Z);
-    CurrentDisplacement(9)		=   GetGeometry()[1].GetSolutionStepValue(ROTATION_X);
-    CurrentDisplacement(10)	        =   GetGeometry()[1].GetSolutionStepValue(ROTATION_Y);
-    CurrentDisplacement(11)	        =   GetGeometry()[1].GetSolutionStepValue(ROTATION_Z);
+    CurrentDisplacement(0)		=   GetGeometry()[0].FastGetSolutionStepValue(DISPLACEMENT_X);
+    CurrentDisplacement(1)		=   GetGeometry()[0].FastGetSolutionStepValue(DISPLACEMENT_Y);
+    CurrentDisplacement(2)		=   GetGeometry()[0].FastGetSolutionStepValue(DISPLACEMENT_Z);
+    CurrentDisplacement(3)		=   GetGeometry()[0].FastGetSolutionStepValue(ROTATION_X);
+    CurrentDisplacement(4)		=   GetGeometry()[0].FastGetSolutionStepValue(ROTATION_Y);
+    CurrentDisplacement(5)		=   GetGeometry()[0].FastGetSolutionStepValue(ROTATION_Z);
+    CurrentDisplacement(6)		=   GetGeometry()[1].FastGetSolutionStepValue(DISPLACEMENT_X);
+    CurrentDisplacement(7)		=   GetGeometry()[1].FastGetSolutionStepValue(DISPLACEMENT_Y);
+    CurrentDisplacement(8)		=   GetGeometry()[1].FastGetSolutionStepValue(DISPLACEMENT_Z);
+    CurrentDisplacement(9)		=   GetGeometry()[1].FastGetSolutionStepValue(ROTATION_X);
+    CurrentDisplacement(10)	        =   GetGeometry()[1].FastGetSolutionStepValue(ROTATION_Y);
+    CurrentDisplacement(11)	        =   GetGeometry()[1].FastGetSolutionStepValue(ROTATION_Z);
 
     Matrix Rotation = ZeroMatrix(12,12);
     this->CalculateTransformationMatrix(Rotation);
@@ -1538,5 +1538,3 @@ int  SmallDisplacementBeamElement3D2N::Check(const ProcessInfo& rCurrentProcessI
 
 
 } // Namespace Kratos
-
-

@@ -1255,6 +1255,7 @@ namespace Kratos
 	  }
 	else
 	  {
+            //std::cout<<" Sliver (radius) "<<Radius<<" "<<AlphaRadius<<std::endl;
 	    return false;
 	  }
       }

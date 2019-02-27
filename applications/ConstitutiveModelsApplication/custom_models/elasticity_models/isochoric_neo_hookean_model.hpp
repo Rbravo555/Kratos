@@ -549,6 +549,30 @@ namespace Kratos
       KRATOS_CATCH(" ")
     }
 
+    void GetVolumetricFunctionFactors(HyperElasticDataType& rVariables, Vector& rFactors) override
+    {
+      KRATOS_TRY
+
+      if(rFactors.size()!=3)
+        rFactors.resize(3,false);
+
+      //derivative of "Uk(J) = (1/4)*(J²-1) - (1/2)*lnJ"
+      //dUk(J)/dJ = (1/2)*(J-1/J)
+      rFactors[0] = 0.5 * ( rVariables.Strain.Invariants.J * rVariables.Strain.Invariants.J - 1.0 )/rVariables.Strain.Invariants.J;
+
+      //derivative of "dUk(J)/dJ = (1/2)*(J-1/J)"
+      //ddUk(J)/dJdJ = (1/2)*(1+1/J²)
+      rFactors[1] = 0.5 * (rVariables.Strain.Invariants.J * rVariables.Strain.Invariants.J + 1.0 )/(rVariables.Strain.Invariants.J * rVariables.Strain.Invariants.J) ;
+
+
+      //derivative of "ddUk(J)/dJdJ = (1/2)*(1+1/J²)"
+      //dddUk(J)/dJdJdJ = -1/J³
+      rFactors[2] = (-1.0) / (rVariables.Strain.Invariants.J * rVariables.Strain.Invariants.J * rVariables.Strain.Invariants.J);
+
+      this->GetVolumetricFunctionThermalFactors(rVariables,rFactors);
+
+      KRATOS_CATCH(" ")
+    }
 
     ///@}
     ///@name Protected  Access

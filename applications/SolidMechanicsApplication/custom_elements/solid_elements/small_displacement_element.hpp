@@ -188,9 +188,14 @@ protected:
     /**
      * Set Variables of the Element to the Parameters of the Constitutive Law
      */
-   void SetElementData(ElementDataType& rVariables,
-                       ConstitutiveLaw::Parameters& rValues,
-                       const int & rPointNumber) override;
+    void SetElementData(ElementDataType& rVariables,
+                        ConstitutiveLaw::Parameters& rValues,
+                        const int & rPointNumber) override;
+    /**
+     * Check Variables of the Element
+     */
+    void CheckElementData(ElementDataType& rVariables,
+                          const int & rPointNumber) override;
 
     /**
      * Calculate Element Kinematics

@@ -229,17 +229,19 @@ namespace Kratos
 
 
     /**
-     * calculates the linear elastic constitutive matrix in terms of Young's modulus and
+     * Calculates the linear elastic constitutive matrix in terms of Young's modulus and
      * Poisson ratio
      * @param E the Young's modulus
      * @param NU the Poisson ratio
      * @return the linear elastic constitutive matrix
      */
-
-
     virtual void CalculateConstitutiveMatrix(Matrix& rConstitutiveMatrix,
 					     const Properties& rProperties);
 
+    /**
+     * Calculates an internal variable
+     */
+    void CalculateInternalVariables(ModelDataType& rModelValues) override;
 
     ///@}
 

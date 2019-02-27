@@ -1,9 +1,8 @@
 //
 //   Project Name:        KratosSolversApplication $
-//   Created by:          $Author:     JMCarbonell $
-//   Last modified by:    $Co-Author:              $
+//   Developed by:        $Developer:  JMCarbonell $
+//   Maintained by:       $Maintainer:        JMC  $
 //   Date:                $Date:      January 2019 $
-//   Revision:            $Revision:           0.0 $
 //
 //
 
@@ -106,14 +105,16 @@ void KratosSolversApplication::Register()
   //Register Solver Factories
 
 #ifdef INCLUDE_SUPERLU_MT
-  KRATOS_REGISTER_LINEAR_SOLVER("superlu_direct", mSuperLUmtDirectSolverFactory);
-#else
-  KRATOS_REGISTER_LINEAR_SOLVER("superlu_direct", mSuperLUDirectSolverFactory);
-  //KRATOS_REGISTER_LINEAR_SOLVER("super_lu_iterative", mSuperLUIterativeSolverFactory);
+  KRATOS_REGISTER_LINEAR_SOLVER("ks_superlu_direct", mSuperLUmtDirectSolverFactory);
+#endif
+
+#ifdef INCLUDE_SUPERLU
+  KRATOS_REGISTER_LINEAR_SOLVER("ks_superlu_direct", mSuperLUDirectSolverFactory);
+  KRATOS_REGISTER_LINEAR_SOLVER("ks_superlu_iterative", mSuperLUIterativeSolverFactory);
 #endif
 
 #ifdef INCLUDE_FEAST
-  KRATOS_REGISTER_LINEAR_SOLVER("feast_eigen", mFEASTEigenValueSolverFactory);
+  KRATOS_REGISTER_LINEAR_SOLVER("ks_feast_eigen", mFEASTEigenValueSolverFactory);
 #endif
 
 }

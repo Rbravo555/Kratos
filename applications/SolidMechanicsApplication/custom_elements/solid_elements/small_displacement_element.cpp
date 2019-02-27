@@ -125,19 +125,33 @@ void SmallDisplacementElement::SetElementData(ElementDataType& rVariables,
 {
     KRATOS_TRY
 
+    //check inverted element
+    this->CheckElementData(rVariables,rPointNumber);
+
     rValues.SetStrainVector(rVariables.StrainVector);
     rValues.SetStressVector(rVariables.StressVector);
     rValues.SetConstitutiveMatrix(rVariables.ConstitutiveMatrix);
     rValues.SetShapeFunctionsDerivatives(rVariables.DN_DX);
     rValues.SetShapeFunctionsValues(rVariables.N);
-
-    if(rVariables.detJ<0)
-      {
-	KRATOS_ERROR << " (small displacement) ELEMENT INVERTED |J|<0 : " << rVariables.detJ << std::endl;
-      }
-
     rValues.SetDeterminantF(rVariables.detF);
     rValues.SetDeformationGradientF(rVariables.F);
+
+    KRATOS_CATCH( "" )
+}
+
+
+//************************************************************************************
+//************************************************************************************
+
+void SmallDisplacementElement::CheckElementData(ElementDataType& rVariables,
+                                                const int & rPointNumber)
+{
+    KRATOS_TRY
+
+    if(rVariables.detJ<0)
+    {
+      KRATOS_ERROR << " (small displacement) ELEMENT INVERTED |J|<0 : " << rVariables.detJ << std::endl;
+    }
 
     KRATOS_CATCH( "" )
 }

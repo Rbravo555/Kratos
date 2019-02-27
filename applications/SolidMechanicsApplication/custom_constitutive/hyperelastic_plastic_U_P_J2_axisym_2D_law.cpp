@@ -28,7 +28,7 @@ namespace Kratos
 HyperElasticPlasticUPJ2Axisym2DLaw::HyperElasticPlasticUPJ2Axisym2DLaw()
     : HyperElasticPlasticUPAxisym2DLaw()
 {
-  mpHardeningLaw   = HardeningLaw::Pointer( new NonLinearIsotropicKinematicHardeningLaw() );
+  mpHardeningLaw   = HardeningLaw::Pointer( new LinearIsotropicKinematicHardeningLaw() );
   mpYieldCriterion = YieldCriterion::Pointer( new MisesHuberYieldCriterion(mpHardeningLaw) );
   mpFlowRule       = FlowRule::Pointer( new LinearAssociativePlasticFlowRule(mpYieldCriterion) );
 }

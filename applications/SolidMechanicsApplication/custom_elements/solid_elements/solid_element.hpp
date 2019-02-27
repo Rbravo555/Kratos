@@ -107,9 +107,10 @@ protected:
         double  detJ;
         Vector  StrainVector;
         Vector  StressVector;
+        Vector  Factors; //Wildcard ( Volumetric stress factors... )
         Vector  N;
         Matrix  B;
-        Matrix  H;    //Wildcard ( Displacement Gradient, F(0 to n+1), B-bar, Velocity Gradient...)
+        Matrix  H;    //Wildcard ( Displacement Gradient, F(0 to n+1), B-bar, Velocity Gradient... )
         Matrix  F;    //Incremental Deformation Gradient (n to n+1)
         Matrix  F0;   //Historical Deformation Gradient  (0 to n)
         Matrix  DN_DX;
@@ -750,11 +751,23 @@ protected:
                                 const int & rPointNumber);
 
     /**
+     * Check Variables of the Element
+     */
+    virtual void CheckElementData(ElementDataType& rVariables,
+                                  const int & rPointNumber);
+
+    /**
      * Set Parameters for the Constitutive Law and Calculate Material Response
      */
     virtual void CalculateMaterialResponse(ElementDataType& rVariables,
                                            ConstitutiveLaw::Parameters& rValues,
                                            const int & rPointNumber);
+
+    /**
+     * Get dof size of a node
+     */
+    virtual SizeType GetNodeDofsSize();
+
     /**
      * Get element size from the dofs
      */

@@ -149,14 +149,25 @@ namespace Kratos
           * Set Values
           */
          void SetValue(const Variable<double>& rVariable,
-               const double& rValue,
-               const ProcessInfo& rCurrentProcessInfo) override 
+                       const double& rValue,
+                       const ProcessInfo& rCurrentProcessInfo) override
          {
             KRATOS_TRY
 
             if ( rVariable == NONLOCAL_PLASTIC_VOL_DEF) {
                mInternal.Variables[4] = rValue;
             }
+
+            KRATOS_CATCH("")
+         }
+
+         void SetValue(const Variable<Vector>& rVariable,
+                       const Vector& rValue,
+                       const ProcessInfo& rCurrentProcessInfo) override
+         {
+            KRATOS_TRY
+
+            BaseType::SetValue(rVariable, rValue, rCurrentProcessInfo);
 
             KRATOS_CATCH("")
          }

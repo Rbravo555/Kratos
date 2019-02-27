@@ -106,8 +106,11 @@ class Solution(object):
         while self.time < self.end_time:
 
             self.InitializeSolutionStep()
-            if self.SolveSolutionStep():
-                self.FinalizeSolutionStep()
+            #uncomment once adaptive time step ready
+            #if self.SolveSolutionStep():
+            #    self.FinalizeSolutionStep()
+            self.SolveSolutionStep()
+            self.FinalizeSolutionStep()
 
             if self.echo_level >= 0:
                 sys.stdout.flush()

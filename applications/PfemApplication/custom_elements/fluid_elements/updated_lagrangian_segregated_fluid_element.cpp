@@ -289,11 +289,11 @@ void UpdatedLagrangianSegregatedFluidElement::GetValuesVector( Vector& rValues, 
         for ( SizeType i = 0; i < number_of_nodes; i++ )
         {
           index = i * dimension;
-          rValues[index]     = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_X, Step );
-          rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_Y, Step );
+          rValues[index]     = GetGeometry()[i].FastGetSolutionStepValue( DISPLACEMENT_X, Step );
+          rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue( DISPLACEMENT_Y, Step );
 
           if ( dimension == 3 )
-            rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_Z, Step );
+            rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( DISPLACEMENT_Z, Step );
 
         }
         break;
@@ -302,7 +302,7 @@ void UpdatedLagrangianSegregatedFluidElement::GetValuesVector( Vector& rValues, 
       {
         for ( SizeType i = 0; i < number_of_nodes; i++ )
         {
-          rValues[i]     = GetGeometry()[i].GetSolutionStepValue( PRESSURE, Step );
+          rValues[i]     = GetGeometry()[i].FastGetSolutionStepValue( PRESSURE, Step );
         }
         break;
       }
@@ -333,11 +333,11 @@ void UpdatedLagrangianSegregatedFluidElement::GetFirstDerivativesVector( Vector&
         for ( SizeType i = 0; i < number_of_nodes; i++ )
         {
           index = i * dimension;
-          rValues[index]     = GetGeometry()[i].GetSolutionStepValue( VELOCITY_X, Step );
-          rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( VELOCITY_Y, Step );
+          rValues[index]     = GetGeometry()[i].FastGetSolutionStepValue( VELOCITY_X, Step );
+          rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue( VELOCITY_Y, Step );
 
           if ( dimension == 3 )
-            rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( VELOCITY_Z, Step );
+            rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( VELOCITY_Z, Step );
         }
         break;
       }
@@ -345,7 +345,7 @@ void UpdatedLagrangianSegregatedFluidElement::GetFirstDerivativesVector( Vector&
       {
         for ( SizeType i = 0; i < number_of_nodes; i++ )
         {
-          rValues[i]     = GetGeometry()[i].GetSolutionStepValue( PRESSURE_VELOCITY, Step );
+          rValues[i]     = GetGeometry()[i].FastGetSolutionStepValue( PRESSURE_VELOCITY, Step );
         }
         break;
       }
@@ -375,11 +375,11 @@ void UpdatedLagrangianSegregatedFluidElement::GetSecondDerivativesVector( Vector
         for ( SizeType i = 0; i < number_of_nodes; i++ )
         {
           index = i * dimension;
-          rValues[index]     = GetGeometry()[i].GetSolutionStepValue( ACCELERATION_X, Step );
-          rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( ACCELERATION_Y, Step );
+          rValues[index]     = GetGeometry()[i].FastGetSolutionStepValue( ACCELERATION_X, Step );
+          rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue( ACCELERATION_Y, Step );
 
           if ( dimension == 3 )
-            rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( ACCELERATION_Z, Step );
+            rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( ACCELERATION_Z, Step );
         }
         break;
       }
@@ -387,7 +387,7 @@ void UpdatedLagrangianSegregatedFluidElement::GetSecondDerivativesVector( Vector
       {
         for ( SizeType i = 0; i < number_of_nodes; i++ )
         {
-          rValues[i]     = GetGeometry()[i].GetSolutionStepValue( PRESSURE_ACCELERATION, Step );
+          rValues[i]     = GetGeometry()[i].FastGetSolutionStepValue( PRESSURE_ACCELERATION, Step );
         }
         break;
       }

@@ -127,7 +127,7 @@ Element::Pointer SolidElement::Clone( IndexType NewId, NodesArrayType const& rTh
     NewElement.SetData(this->GetData());
     NewElement.SetFlags(this->GetFlags());
 
-    return Kratos::make_shared< SolidElement >(NewElement);
+    return Kratos::make_shared<SolidElement>(NewElement);
 }
 
 
@@ -216,11 +216,11 @@ void SolidElement::GetValuesVector( Vector& rValues, int Step )
     for ( SizeType i = 0; i < number_of_nodes; i++ )
     {
         index = i * dimension;
-        rValues[index]     = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_X, Step );
-        rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_Y, Step );
+        rValues[index]     = GetGeometry()[i].FastGetSolutionStepValue( DISPLACEMENT_X, Step );
+        rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue( DISPLACEMENT_Y, Step );
 
         if ( dimension == 3 )
-            rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_Z, Step );
+            rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( DISPLACEMENT_Z, Step );
 
     }
 }
@@ -242,11 +242,11 @@ void SolidElement::GetFirstDerivativesVector( Vector& rValues, int Step )
     for ( SizeType i = 0; i < number_of_nodes; i++ )
     {
         index = i * dimension;
-        rValues[index]     = GetGeometry()[i].GetSolutionStepValue( VELOCITY_X, Step );
-        rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( VELOCITY_Y, Step );
+        rValues[index]     = GetGeometry()[i].FastGetSolutionStepValue( VELOCITY_X, Step );
+        rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue( VELOCITY_Y, Step );
 
         if ( dimension == 3 )
-            rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( VELOCITY_Z, Step );
+            rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( VELOCITY_Z, Step );
     }
 }
 
@@ -266,11 +266,11 @@ void SolidElement::GetSecondDerivativesVector( Vector& rValues, int Step )
     for ( SizeType i = 0; i < number_of_nodes; i++ )
     {
         index = i * dimension;
-        rValues[index]     = GetGeometry()[i].GetSolutionStepValue( ACCELERATION_X, Step );
-        rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( ACCELERATION_Y, Step );
+        rValues[index]     = GetGeometry()[i].FastGetSolutionStepValue( ACCELERATION_X, Step );
+        rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue( ACCELERATION_Y, Step );
 
         if ( dimension == 3 )
-            rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( ACCELERATION_Z, Step );
+            rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( ACCELERATION_Z, Step );
     }
 
 }
@@ -556,7 +556,7 @@ void SolidElement::InitializeElementData (ElementDataType& rVariables, const Pro
 
     const SizeType number_of_nodes  = GetGeometry().size();
     const SizeType dimension        = GetGeometry().WorkingSpaceDimension();
-    const SizeType voigt_size   = dimension * (dimension +1) * 0.5;
+    const SizeType voigt_size       = dimension * (dimension +1) * 0.5;
 
     rVariables.Initialize(voigt_size,dimension,number_of_nodes);
 
@@ -596,21 +596,22 @@ void SolidElement::TransformElementData(ElementDataType& rVariables, const doubl
   // to be used when different reference configuration is used
 }
 
+
+//************************************************************************************
+//************************************************************************************
+
+SolidElement::SizeType SolidElement::GetNodeDofsSize()
+{
+  return GetGeometry().WorkingSpaceDimension();//usual size for displacement based elements
+}
+
+
 //************************************************************************************
 //************************************************************************************
 
 SolidElement::SizeType SolidElement::GetDofsSize()
 {
-  KRATOS_TRY
-
-  const SizeType dimension        = GetGeometry().WorkingSpaceDimension();
-  const SizeType number_of_nodes = GetGeometry().PointsNumber();
-
-  SizeType size = number_of_nodes * dimension; //usual size for displacement based elements
-
-  return size;
-
-  KRATOS_CATCH("")
+  return (GetGeometry().PointsNumber() * this->GetNodeDofsSize()); //usual size for displacement based elements
 }
 
 
@@ -622,7 +623,6 @@ void SolidElement::InitializeSystemMatrices(MatrixType& rLeftHandSideMatrix,
 					    Flags& rCalculationFlags)
 
 {
-
     //resizing as needed the LHS
     const SizeType MatSize = this->GetDofsSize();
 
@@ -650,12 +650,20 @@ void SolidElement::InitializeSystemMatrices(MatrixType& rLeftHandSideMatrix,
 //************************************************************************************
 
 void SolidElement::SetElementData(ElementDataType& rVariables,
-				       ConstitutiveLaw::Parameters& rValues,
-				       const int & rPointNumber)
+                                  ConstitutiveLaw::Parameters& rValues,
+                                  const int & rPointNumber)
 {
 
 }
 
+//************************************************************************************
+//************************************************************************************
+
+void SolidElement::CheckElementData(ElementDataType& rVariables,
+                                    const int & rPointNumber)
+{
+
+}
 
 //************************************************************************************
 //************************************************************************************
@@ -705,7 +713,7 @@ void SolidElement::CalculateElementalSystem( LocalSystemComponents& rLocalSystem
     Vector VolumeForce(dimension);
     noalias(VolumeForce) = ZeroVector(dimension);
 
-    for ( SizeType PointNumber = 0; PointNumber < integration_points.size(); PointNumber++ )
+    for(SizeType PointNumber = 0; PointNumber < integration_points.size(); ++PointNumber)
     {
         //compute element kinematic variables B, F, DN_DX ...
         this->CalculateKinematics(Variables,PointNumber);
@@ -744,7 +752,6 @@ void SolidElement::CalculateElementalSystem( LocalSystemComponents& rLocalSystem
 
     }
 
-
     KRATOS_CATCH("")
 }
 
@@ -752,8 +759,8 @@ void SolidElement::CalculateElementalSystem( LocalSystemComponents& rLocalSystem
 //************************************************************************************
 //************************************************************************************
 
-void SolidElement::CalculateDynamicSystem( LocalSystemComponents& rLocalSystem,
-					   ProcessInfo& rCurrentProcessInfo)
+void SolidElement::CalculateDynamicSystem(LocalSystemComponents& rLocalSystem,
+					  ProcessInfo& rCurrentProcessInfo)
 {
     KRATOS_TRY
 
@@ -1328,12 +1335,14 @@ void SolidElement::CalculateAndAddExternalForces(VectorType& rRightHandSideVecto
 
 {
     KRATOS_TRY
-    SizeType number_of_nodes = GetGeometry().PointsNumber();
-    const SizeType dimension  = GetGeometry().WorkingSpaceDimension();
+
+    const SizeType number_of_nodes = GetGeometry().PointsNumber();
+    const SizeType dimension = GetGeometry().WorkingSpaceDimension();
+    const SizeType node_dofs = this->GetNodeDofsSize();
 
     for ( SizeType i = 0; i < number_of_nodes; i++ )
     {
-        int index = dimension * i;
+        int index = node_dofs * i;
         for ( SizeType j = 0; j < dimension; j++ )
         {
 	  rRightHandSideVector[index + j] += rIntegrationWeight * rVariables.N[i] * rVolumeForce[j];
@@ -1348,9 +1357,8 @@ void SolidElement::CalculateAndAddExternalForces(VectorType& rRightHandSideVecto
 //************************************************************************************
 
 void SolidElement::CalculateAndAddInternalForces(VectorType& rRightHandSideVector,
-        ElementDataType & rVariables,
-        double& rIntegrationWeight
-                                                            )
+                                                 ElementDataType & rVariables,
+                                                 double& rIntegrationWeight)
 {
     KRATOS_TRY
 
@@ -1917,7 +1925,7 @@ void SolidElement::CalculateDampingMatrix( MatrixType& rDampingMatrix, ProcessIn
     //0.-Initialize the DampingMatrix:
 
     //resizing as needed the LHS
-    const unsigned int MatSize = this->GetDofsSize();
+    const SizeType MatSize = this->GetDofsSize();
 
     if ( rDampingMatrix.size1() != MatSize )
         rDampingMatrix.resize( MatSize, MatSize, false );

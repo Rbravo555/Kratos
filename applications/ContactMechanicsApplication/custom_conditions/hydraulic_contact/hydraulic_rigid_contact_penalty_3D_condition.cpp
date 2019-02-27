@@ -169,11 +169,11 @@ namespace Kratos
       for (unsigned int i = 0; i < number_of_nodes; i++)
       {
          unsigned int index = i * dimension;
-         rValues[index]     = GetGeometry()[i].GetSolutionStepValue( WATER_DISPLACEMENT_X, Step );
-         rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( WATER_DISPLACEMENT_Y, Step );
+         rValues[index]     = GetGeometry()[i].FastGetSolutionStepValue( WATER_DISPLACEMENT_X, Step );
+         rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue( WATER_DISPLACEMENT_Y, Step );
 
          if ( dimension == 3 )
-            rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( WATER_DISPLACEMENT_Z, Step );
+            rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( WATER_DISPLACEMENT_Z, Step );
       }
    }
 
@@ -191,11 +191,11 @@ namespace Kratos
       for ( unsigned int i = 0; i < number_of_nodes; i++ )
       {
          unsigned int index = i * dimension;
-         rValues[index]     = GetGeometry()[i].GetSolutionStepValue( WATER_VELOCITY_X, Step );
-         rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( WATER_VELOCITY_Y, Step );
+         rValues[index]     = GetGeometry()[i].FastGetSolutionStepValue( WATER_VELOCITY_X, Step );
+         rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue( WATER_VELOCITY_Y, Step );
 
          if ( dimension == 3 )
-            rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( WATER_VELOCITY_Z, Step );
+            rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( WATER_VELOCITY_Z, Step );
       }
    }
 
@@ -214,11 +214,11 @@ namespace Kratos
       for ( unsigned int i = 0; i < number_of_nodes; i++ )
       {
          unsigned int index = i * dimension;
-         rValues[index]     = GetGeometry()[i].GetSolutionStepValue( WATER_ACCELERATION_X, Step );
-         rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( WATER_ACCELERATION_Y, Step );
+         rValues[index]     = GetGeometry()[i].FastGetSolutionStepValue( WATER_ACCELERATION_X, Step );
+         rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue( WATER_ACCELERATION_Y, Step );
 
          if ( dimension == 3 )
-            rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( WATER_ACCELERATION_Z, Step );
+            rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( WATER_ACCELERATION_Z, Step );
       }
 
    }

@@ -308,11 +308,11 @@ void LargeDisplacementSegregatedVPElement::GetValuesVector( Vector& rValues, int
           for ( SizeType i = 0; i < number_of_nodes; i++ )
           {
             index = i * dimension;
-            rValues[index]     = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_X, Step );
-            rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_Y, Step );
+            rValues[index]     = GetGeometry()[i].FastGetSolutionStepValue( DISPLACEMENT_X, Step );
+            rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue( DISPLACEMENT_Y, Step );
 
             if ( dimension == 3 )
-              rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_Z, Step );
+              rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( DISPLACEMENT_Z, Step );
 
           }
           break;
@@ -321,7 +321,7 @@ void LargeDisplacementSegregatedVPElement::GetValuesVector( Vector& rValues, int
         {
           for ( SizeType i = 0; i < number_of_nodes; i++ )
           {
-            rValues[i]     = GetGeometry()[i].GetSolutionStepValue( PRESSURE, Step );
+            rValues[i]     = GetGeometry()[i].FastGetSolutionStepValue( PRESSURE, Step );
           }
           break;
         }
@@ -352,11 +352,11 @@ void LargeDisplacementSegregatedVPElement::GetFirstDerivativesVector( Vector& rV
           for ( SizeType i = 0; i < number_of_nodes; i++ )
           {
             index = i * dimension;
-            rValues[index]     = GetGeometry()[i].GetSolutionStepValue( VELOCITY_X, Step );
-            rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( VELOCITY_Y, Step );
+            rValues[index]     = GetGeometry()[i].FastGetSolutionStepValue( VELOCITY_X, Step );
+            rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue( VELOCITY_Y, Step );
 
             if ( dimension == 3 )
-              rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( VELOCITY_Z, Step );
+              rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( VELOCITY_Z, Step );
           }
           break;
         }
@@ -364,7 +364,7 @@ void LargeDisplacementSegregatedVPElement::GetFirstDerivativesVector( Vector& rV
         {
           for ( SizeType i = 0; i < number_of_nodes; i++ )
           {
-            rValues[i]     = GetGeometry()[i].GetSolutionStepValue( PRESSURE_VELOCITY, Step );
+            rValues[i]     = GetGeometry()[i].FastGetSolutionStepValue( PRESSURE_VELOCITY, Step );
           }
           break;
         }
@@ -394,11 +394,11 @@ void LargeDisplacementSegregatedVPElement::GetSecondDerivativesVector( Vector& r
           for ( SizeType i = 0; i < number_of_nodes; i++ )
           {
             index = i * dimension;
-            rValues[index]     = GetGeometry()[i].GetSolutionStepValue( ACCELERATION_X, Step );
-            rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( ACCELERATION_Y, Step );
+            rValues[index]     = GetGeometry()[i].FastGetSolutionStepValue( ACCELERATION_X, Step );
+            rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue( ACCELERATION_Y, Step );
 
             if ( dimension == 3 )
-              rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( ACCELERATION_Z, Step );
+              rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( ACCELERATION_Z, Step );
           }
           break;
         }
@@ -406,7 +406,7 @@ void LargeDisplacementSegregatedVPElement::GetSecondDerivativesVector( Vector& r
         {
           for ( SizeType i = 0; i < number_of_nodes; i++ )
           {
-            rValues[i]     = GetGeometry()[i].GetSolutionStepValue( PRESSURE_ACCELERATION, Step );
+            rValues[i]     = GetGeometry()[i].FastGetSolutionStepValue( PRESSURE_ACCELERATION, Step );
           }
           break;
         }
@@ -634,21 +634,18 @@ void LargeDisplacementSegregatedVPElement::CalculateDampingMatrix( MatrixType& r
 //************************************************************************************
 //************************************************************************************
 
-LargeDisplacementSegregatedVPElement::SizeType LargeDisplacementSegregatedVPElement::GetDofsSize()
+LargeDisplacementSegregatedVPElement::SizeType LargeDisplacementSegregatedVPElement::GetNodeDofsSize()
 {
   KRATOS_TRY
-
-  const SizeType dimension        = GetGeometry().WorkingSpaceDimension();
-  const SizeType number_of_nodes  = GetGeometry().PointsNumber();
 
   SizeType size = 0;
   switch(mStepVariable)
   {
     case VELOCITY_STEP:
-      size = number_of_nodes * dimension; //size for velocity
+      size = GetGeometry().WorkingSpaceDimension(); //size for velocity
       break;
     case PRESSURE_STEP:
-      size = number_of_nodes; //size for pressure
+      size = 1; //size for pressure
       break;
     default:
       KRATOS_ERROR << "Unexpected value for SEGREGATED_STEP index: " << mStepVariable << std::endl;

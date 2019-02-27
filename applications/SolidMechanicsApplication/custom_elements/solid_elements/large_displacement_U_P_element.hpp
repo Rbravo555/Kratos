@@ -246,32 +246,28 @@ protected:
      */
     void CalculateAndAddKuum(MatrixType& rK,
                              ElementDataType & rVariables,
-                             double& rIntegrationWeight
-                             ) override;
+                             double& rIntegrationWeight) override;
 
     /**
      * Calculation of the Geometric Stiffness Matrix. Kuug = BT * S
      */
     void CalculateAndAddKuug(MatrixType& rK,
                              ElementDataType & rVariables,
-                             double& rIntegrationWeight
-                             ) override;
+                             double& rIntegrationWeight) override;
 
     /**
      * Calculation of the Kup matrix
      */
     virtual void CalculateAndAddKup (MatrixType& rK,
                                      ElementDataType & rVariables,
-                                     double& rIntegrationWeight
-                                    );
+                                     double& rIntegrationWeight);
 
     /**
      * Calculation of the Kpu matrix
      */
     virtual void CalculateAndAddKpu(MatrixType& rK,
                                     ElementDataType & rVariables,
-                                    double& rIntegrationWeight
-                                   );
+                                    double& rIntegrationWeight);
 
 
     /**
@@ -279,8 +275,7 @@ protected:
      */
     virtual void CalculateAndAddKpp(MatrixType& rK,
                                     ElementDataType & rVariables,
-                                    double& rIntegrationWeight
-                                   );
+                                    double& rIntegrationWeight);
 
 
     /**
@@ -288,51 +283,43 @@ protected:
      */
     virtual void CalculateAndAddKppStab(MatrixType& rK,
                                         ElementDataType & rVariables,
-                                        double& rIntegrationWeight
-                                       );
-
-
-
-    /**
-     * Calculation of the External Forces Vector. Fe = N * t + N * b
-     */
-    void CalculateAndAddExternalForces(VectorType& rRightHandSideVector,
-                                       ElementDataType& rVariables,
-                                       Vector& rVolumeForce,
-                                       double& rIntegrationWeight
-                                      ) override;
-
+                                        double& rIntegrationWeight);
 
     /**
       * Calculation of the Internal Forces due to sigma. Fi = B * sigma
       */
     void CalculateAndAddInternalForces(VectorType& rRightHandSideVector,
                                        ElementDataType & rVariables,
-                                       double& rIntegrationWeight
-                                      ) override;
+                                       double& rIntegrationWeight) override;
 
 
     /**
      * Calculation of the Internal Forces due to Pressure-Balance
      */
     virtual void CalculateAndAddPressureForces(VectorType& rRightHandSideVector,
-            ElementDataType & rVariables,
-            double& rIntegrationWeight
-                                              );
+                                               ElementDataType & rVariables,
+                                               double& rIntegrationWeight);
 
 
     /**
      * Calculation of the Internal Forces due to Pressure-Balance
      */
     virtual void CalculateAndAddStabilizedPressure(VectorType& rRightHandSideVector,
-            ElementDataType & rVariables,
-            double& rIntegrationWeight);
+                                                   ElementDataType & rVariables,
+                                                   double& rIntegrationWeight);
+
 
     /**
-     * Get element size from the dofs
+     * Set Parameters for the Constitutive Law and Calculate Material Response
      */
-    SizeType GetDofsSize() override;
+    void CalculateMaterialResponse(ElementDataType& rVariables,
+                                   ConstitutiveLaw::Parameters& rValues,
+                                   const int & rPointNumber) override;
 
+    /**
+     * Get dof size of a node
+     */
+    SizeType GetNodeDofsSize() override;
 
     /**
      * Calculation of the constitutive coefficient for pressure of the Element

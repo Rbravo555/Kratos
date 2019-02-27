@@ -120,6 +120,9 @@ namespace Kratos
 
       this->CalculateAndAddVolumetricStressTensor(Variables, rStressMatrix);
 
+      // set requested internal variables
+      this->SetInternalVariables(rValues,Variables);
+
       Variables.State().Set(ConstitutiveModelData::STRESS_COMPUTED);
 
       KRATOS_CATCH(" ")
@@ -158,6 +161,9 @@ namespace Kratos
       //Calculate Constitutive Matrix
       this->CalculateAndAddConstitutiveTensor(Variables,rConstitutiveMatrix);
       //this->CalculateAndAddPerturbedConstitutiveTensor(Variables,rConstitutiveMatrix);
+
+      // set requested internal variables
+      this->SetInternalVariables(rValues,Variables);
 
       KRATOS_CATCH(" ")
     }
@@ -1058,6 +1064,32 @@ namespace Kratos
 
       KRATOS_CATCH(" ")
     };
+
+
+    void GetVolumetricFunctionFactors(HyperElasticDataType& rVariables, Vector& rFactors) override
+    {
+      KRATOS_TRY
+
+      if(rFactors.size()!=3)
+        rFactors.resize(3,false);
+
+      //derivative of "Uk(J) = (1/2)*ln(J)²"
+      //dUk(J)/dJ = (lnJ/J)
+      rFactors[0] = std::log( rVariables.Strain.Invariants.J )/rVariables.Strain.Invariants.J;
+
+      //derivative of "dUk(J)/dJ = (lnJ/J)"
+      //ddUk(J)/dJdJ = (1-lnJ)/J²
+      rFactors[1] = (1.0 -std::log(rVariables.Strain.Invariants.J)) / (rVariables.Strain.Invariants.J * rVariables.Strain.Invariants.J);
+
+      //derivative of "ddUk(J)/dJdJ = (1-lnJ)/J²"
+      //dddUk(J)/dJdJdJ = (2lnJ-3)/J³
+      rFactors[2] = (2.0*std::log(rVariables.Strain.Invariants.J)-3.0) / (rVariables.Strain.Invariants.J * rVariables.Strain.Invariants.J * rVariables.Strain.Invariants.J);
+
+      this->GetVolumetricFunctionThermalFactors(rVariables,rFactors);
+
+      KRATOS_CATCH(" ")
+    };
+
 
 
     ///@}

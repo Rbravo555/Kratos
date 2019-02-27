@@ -228,7 +228,7 @@ namespace Kratos
       const MaterialDataType& rMaterial = rVariables.GetMaterialParameters();
 
       //energy function "U(J) = (K/2)*(lnJ)²"
-      rVolumetricDensityFunction += rMaterial.GetBulkModulus() * 0.5 * pow(std::log(rVariables.Strain.Invariants.J),2);
+      rVolumetricDensityFunction += rMaterial.GetBulkModulus() * 0.5 * pow(std::log(rVariables.Strain.Invariants.J), 2);
 
       KRATOS_CATCH(" ")
     }
@@ -333,6 +333,31 @@ namespace Kratos
       rDerivative = rMaterial.GetBulkModulus() * (1.0 -std::log(rVariables.Strain.Invariants.J)) / (rVariables.Strain.Invariants.J * rVariables.Strain.Invariants.J);
 
       return rDerivative;
+
+      KRATOS_CATCH(" ")
+    }
+
+
+    void GetVolumetricFunctionFactors(HyperElasticDataType& rVariables, Vector& rFactors) override
+    {
+      KRATOS_TRY
+
+      if(rFactors.size()!=3)
+        rFactors.resize(3,false);
+
+      //derivative of "Uk(J) = (1/2)*ln(J)²"
+      //dUk(J)/dJ = (lnJ/J)
+      rFactors[0] = std::log( rVariables.Strain.Invariants.J )/rVariables.Strain.Invariants.J;
+
+      //derivative of "dUk(J)/dJ = (lnJ/J)"
+      //ddUk(J)/dJdJ = (1-lnJ)/J²
+      rFactors[1] = (1.0 -std::log(rVariables.Strain.Invariants.J)) / (rVariables.Strain.Invariants.J * rVariables.Strain.Invariants.J);
+
+      //derivative of "ddUk(J)/dJdJ = (1-lnJ)/J²"
+      //dddUk(J)/dJdJdJ = (2lnJ-3)/J³
+      rFactors[2] = (2.0*std::log(rVariables.Strain.Invariants.J)-3.0) / (rVariables.Strain.Invariants.J * rVariables.Strain.Invariants.J * rVariables.Strain.Invariants.J);
+
+      this->GetVolumetricFunctionThermalFactors(rVariables,rFactors);
 
       KRATOS_CATCH(" ")
     }

@@ -21,13 +21,26 @@ namespace Kratos
   //************************************************************************************
 
   SimoExponentialHardeningRule::SimoExponentialHardeningRule()
-    :HardeningRule()
+    :SimoExponentialHardeningRule(1.0)
+
   {
     //Combined isotropic-kinematic 0<mTheta<1
     //Pure isotropic hardening mTheta=1;
     //Pure kinematic hardening mTheta=0;
   }
 
+  //*******************************CONSTRUCTOR******************************************
+  //************************************************************************************
+
+  SimoExponentialHardeningRule::SimoExponentialHardeningRule(const double Theta)
+    :HardeningRule()
+    ,mTheta(Theta)
+
+  {
+    //Combined isotropic-kinematic 0<mTheta<1
+    //Pure isotropic hardening mTheta=1;
+    //Pure kinematic hardening mTheta=0;
+  }
 
   //*******************************ASSIGMENT OPERATOR***********************************
   //************************************************************************************
@@ -35,6 +48,7 @@ namespace Kratos
   SimoExponentialHardeningRule& SimoExponentialHardeningRule::operator=(SimoExponentialHardeningRule const& rOther)
   {
     HardeningRule::operator=(rOther);
+    mTheta=rOther.mTheta;
     return *this;
   }
 
@@ -43,6 +57,7 @@ namespace Kratos
 
   SimoExponentialHardeningRule::SimoExponentialHardeningRule(SimoExponentialHardeningRule const& rOther)
     :HardeningRule(rOther)
+    ,mTheta(rOther.mTheta)
   {
 
   }

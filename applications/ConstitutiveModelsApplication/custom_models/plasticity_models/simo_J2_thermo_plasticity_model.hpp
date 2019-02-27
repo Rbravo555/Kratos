@@ -166,7 +166,6 @@ namespace Kratos
 	  rValue = this->mInternal.Variables[0];
 	}
 
-
       if (rThisVariable==DELTA_PLASTIC_STRAIN)
 	{
 	  rValue = this->mInternal.Variables[0]-mPreviousInternal.Variables[0];
@@ -176,7 +175,6 @@ namespace Kratos
 	{
 	  rValue = this->mThermalVariables.PlasticDissipation;
 	}
-
 
       if (rThisVariable==DELTA_PLASTIC_DISSIPATION)
 	{

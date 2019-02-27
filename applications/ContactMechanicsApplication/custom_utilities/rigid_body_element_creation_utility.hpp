@@ -174,7 +174,7 @@ public:
       unsigned int RigidBodyNodeId = rModelPart.Nodes().back().Id();
 
       // set node variables
-      NodeCenterOfGravity->GetSolutionStepValue(VOLUME_ACCELERATION) = rModelPart.Nodes().back().GetSolutionStepValue(VOLUME_ACCELERATION);
+      NodeCenterOfGravity->GetSolutionStepValue(VOLUME_ACCELERATION) = rModelPart.Nodes().back().FastGetSolutionStepValue(VOLUME_ACCELERATION);
 
       // set node flags
       NodeCenterOfGravity->Set(MASTER,true);

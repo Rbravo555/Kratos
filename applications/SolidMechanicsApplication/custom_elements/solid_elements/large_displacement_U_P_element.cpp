@@ -148,7 +148,7 @@ void LargeDisplacementUPElement::EquationIdVector( EquationIdVectorType& rResult
 {
     const SizeType number_of_nodes = GetGeometry().size();
     const SizeType dimension = GetGeometry().WorkingSpaceDimension();
-    const SizeType dofs_size = number_of_nodes * dimension + number_of_nodes;
+    const SizeType dofs_size = this->GetDofsSize();
 
     if ( rResult.size() != dofs_size )
         rResult.resize( dofs_size, false );
@@ -188,17 +188,17 @@ void LargeDisplacementUPElement::GetValuesVector( Vector& rValues, int Step )
     for ( SizeType i = 0; i < number_of_nodes; i++ )
     {
         SizeType index = i * dimension + i;
-        rValues[index]     = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_X, Step );
-        rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_Y, Step );
+        rValues[index]     = GetGeometry()[i].FastGetSolutionStepValue( DISPLACEMENT_X, Step );
+        rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue( DISPLACEMENT_Y, Step );
 
         if ( dimension == 3 )
         {
-            rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_Z, Step );
-            rValues[index + 3] = GetGeometry()[i].GetSolutionStepValue( PRESSURE, Step );
+            rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( DISPLACEMENT_Z, Step );
+            rValues[index + 3] = GetGeometry()[i].FastGetSolutionStepValue( PRESSURE, Step );
         }
         else
         {
-            rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( PRESSURE, Step );
+            rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( PRESSURE, Step );
         }
 
     }
@@ -220,11 +220,11 @@ void LargeDisplacementUPElement::GetFirstDerivativesVector( Vector& rValues, int
     for ( SizeType i = 0; i < number_of_nodes; i++ )
     {
         SizeType index = i * dimension + i;
-        rValues[index]     = GetGeometry()[i].GetSolutionStepValue( VELOCITY_X, Step );
-        rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( VELOCITY_Y, Step );
+        rValues[index]     = GetGeometry()[i].FastGetSolutionStepValue( VELOCITY_X, Step );
+        rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue( VELOCITY_Y, Step );
         if ( dimension == 3 )
         {
-            rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( VELOCITY_Z, Step );
+            rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( VELOCITY_Z, Step );
             rValues[index + 3] = 0;
         }
         else
@@ -249,12 +249,12 @@ void LargeDisplacementUPElement::GetSecondDerivativesVector( Vector& rValues, in
     for ( SizeType i = 0; i < number_of_nodes; i++ )
     {
         SizeType index = i * dimension + i;
-        rValues[index]     = GetGeometry()[i].GetSolutionStepValue( ACCELERATION_X, Step );
-        rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( ACCELERATION_Y, Step );
+        rValues[index]     = GetGeometry()[i].FastGetSolutionStepValue( ACCELERATION_X, Step );
+        rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue( ACCELERATION_Y, Step );
 
         if ( dimension == 3 )
         {
-            rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( ACCELERATION_Z, Step );
+            rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( ACCELERATION_Z, Step );
             rValues[index + 3] = 0;
         }
         else
@@ -270,20 +270,41 @@ void LargeDisplacementUPElement::GetSecondDerivativesVector( Vector& rValues, in
 //************************************************************************************
 //************************************************************************************
 
-LargeDisplacementUPElement::SizeType LargeDisplacementUPElement::GetDofsSize()
+LargeDisplacementUPElement::SizeType LargeDisplacementUPElement::GetNodeDofsSize()
 {
-  KRATOS_TRY
-
-  const SizeType dimension        = GetGeometry().WorkingSpaceDimension();
-  const SizeType number_of_nodes  = GetGeometry().PointsNumber();
-
-  SizeType size = number_of_nodes * dimension + number_of_nodes; //usual size for U-P elements
-
-  return size;
-
-  KRATOS_CATCH( "" )
+  return (GetGeometry().WorkingSpaceDimension() + 1); //usual size for U-P elements
 }
 
+
+//************************************************************************************
+//************************************************************************************
+
+void LargeDisplacementUPElement::CalculateMaterialResponse(ElementDataType& rVariables,
+                                                           ConstitutiveLaw::Parameters& rValues,
+                                                           const int & rPointNumber)
+{
+    KRATOS_TRY
+
+    //set general variables to constitutivelaw parameters
+    this->SetElementData(rVariables,rValues,rPointNumber);
+
+    //compute stresses and constitutive parameters
+    mConstitutiveLawVector[rPointNumber]->CalculateMaterialResponse(rValues, rVariables.StressMeasure);
+
+    //compute volumetric factors from the UP law
+    Flags OriginalFlags = rValues.GetOptions();
+    // no calculation of stress or constitutive tensor is needed for computing VOLUMETRIC_STRESS_FACTORS
+    rValues.GetOptions().Set(ConstitutiveLaw::COMPUTE_STRESS, false);
+    rValues.GetOptions().Set(ConstitutiveLaw::COMPUTE_CONSTITUTIVE_TENSOR, false);
+
+    rVariables.Factors = mConstitutiveLawVector[rPointNumber]->CalculateValue(rValues, VOLUMETRIC_STRESS_FACTORS, rVariables.Factors);
+
+    KRATOS_ERROR_IF(!rVariables.Factors.size())<<" VOLUMETIC_STRESS_FACTORS not supplied correctly by the CLW "<<std::endl;
+
+    rValues.SetOptions(OriginalFlags);
+
+    KRATOS_CATCH("")
+}
 
 //************************************************************************************
 //************************************************************************************
@@ -297,22 +318,22 @@ void LargeDisplacementUPElement::CalculateAndAddLHS(LocalSystemComponents& rLoca
     // operation performed: add Km to the rLefsHandSideMatrix
 
     //respect to the current configuration n+1
-    CalculateAndAddKuum( rLeftHandSideMatrix, rVariables, rIntegrationWeight );
+    this->CalculateAndAddKuum( rLeftHandSideMatrix, rVariables, rIntegrationWeight );
 
     // operation performed: add Kg to the rLefsHandSideMatrix
-    CalculateAndAddKuug( rLeftHandSideMatrix, rVariables, rIntegrationWeight );
+    this->CalculateAndAddKuug( rLeftHandSideMatrix, rVariables, rIntegrationWeight );
 
     // operation performed: add Kup to the rLefsHandSideMatrix
-    CalculateAndAddKup( rLeftHandSideMatrix, rVariables, rIntegrationWeight );
+    this->CalculateAndAddKup( rLeftHandSideMatrix, rVariables, rIntegrationWeight );
 
     // operation performed: add Kpu to the rLefsHandSideMatrix
-    CalculateAndAddKpu( rLeftHandSideMatrix, rVariables, rIntegrationWeight );
+    this->CalculateAndAddKpu( rLeftHandSideMatrix, rVariables, rIntegrationWeight );
 
     // operation performed: add Kpp to the rLefsHandSideMatrix
-    CalculateAndAddKpp( rLeftHandSideMatrix, rVariables, rIntegrationWeight );
+    this->CalculateAndAddKpp( rLeftHandSideMatrix, rVariables, rIntegrationWeight );
 
     // operation performed: add Kpp Stab to the rLefsHandSideMatrix
-    CalculateAndAddKppStab( rLeftHandSideMatrix, rVariables, rIntegrationWeight );
+    this->CalculateAndAddKppStab( rLeftHandSideMatrix, rVariables, rIntegrationWeight );
 
     //KRATOS_WATCH( rLeftHandSideMatrix )
 }
@@ -328,52 +349,19 @@ void LargeDisplacementUPElement::CalculateAndAddRHS(LocalSystemComponents& rLoca
     VectorType& rRightHandSideVector = rLocalSystem.GetRightHandSideVector();
 
     // operation performed: rRightHandSideVector += ExtForce*IntegrationWeight
-    CalculateAndAddExternalForces( rRightHandSideVector, rVariables, rVolumeForce, rIntegrationWeight );
+    this->CalculateAndAddExternalForces( rRightHandSideVector, rVariables, rVolumeForce, rIntegrationWeight );
 
     // operation performed: rRightHandSideVector -= IntForce*IntegrationWeight
-    CalculateAndAddInternalForces( rRightHandSideVector, rVariables, rIntegrationWeight);
+    this->CalculateAndAddInternalForces( rRightHandSideVector, rVariables, rIntegrationWeight);
 
     // operation performed: rRightHandSideVector -= PressureForceBalance*IntegrationWeight
-    CalculateAndAddPressureForces( rRightHandSideVector, rVariables, rIntegrationWeight);
+    this->CalculateAndAddPressureForces( rRightHandSideVector, rVariables, rIntegrationWeight);
 
     // operation performed: rRightHandSideVector -= Stabilized Pressure Forces
-    CalculateAndAddStabilizedPressure( rRightHandSideVector, rVariables, rIntegrationWeight);
+    this->CalculateAndAddStabilizedPressure( rRightHandSideVector, rVariables, rIntegrationWeight);
 
     //KRATOS_WATCH( rRightHandSideVector )
 }
-
-
-//************************************************************************************
-//************************************************************************************
-
-void LargeDisplacementUPElement::CalculateAndAddExternalForces(VectorType& rRightHandSideVector,
-        ElementDataType& rVariables,
-        Vector& rVolumeForce,
-        double& rIntegrationWeight)
-
-{
-    KRATOS_TRY
-    SizeType number_of_nodes  = GetGeometry().PointsNumber();
-    const SizeType dimension  = GetGeometry().WorkingSpaceDimension();
-
-    // VectorType Fh=rRightHandSideVector;
-
-    for ( SizeType i = 0; i < number_of_nodes; i++ )
-    {
-        SizeType indexup = dimension * i + i;
-        for ( SizeType j = 0; j < dimension; j++ )
-        {
-	  rRightHandSideVector[indexup + j] += rIntegrationWeight * rVariables.N[i] * rVolumeForce[j];
-        }
-
-    }
-
-    // std::cout<<std::endl;
-    // std::cout<<" Fext "<<rRightHandSideVector-Fh<<std::endl;
-
-    KRATOS_CATCH( "" )
-}
-
 
 //************************************************************************************
 //************************************************************************************
@@ -553,7 +541,8 @@ void LargeDisplacementUPElement::CalculateAndAddPressureForces(VectorType& rRigh
     //double consistent=1;
 
     double Coefficient = 0;
-    Coefficient = this->CalculatePUCoefficient( Coefficient, rVariables );
+    //Coefficient = this->CalculatePUCoefficient( Coefficient, rVariables );
+    Coefficient = rVariables.Factors[0];
 
     for ( SizeType i = 0; i < number_of_nodes; i++ )
     {
@@ -837,8 +826,8 @@ void LargeDisplacementUPElement::CalculateAndAddKpu (MatrixType& rLeftHandSideMa
     SizeType indexp = dimension;
 
     double DeltaCoefficient = 0;
-    DeltaCoefficient = this->CalculatePUDeltaCoefficient( DeltaCoefficient, rVariables );
-
+    //DeltaCoefficient = this->CalculatePUDeltaCoefficient( DeltaCoefficient, rVariables );
+    DeltaCoefficient = rVariables.Factors[1];
 
     for ( SizeType i = 0; i < number_of_nodes; i++ )
     {
@@ -1025,9 +1014,10 @@ void LargeDisplacementUPElement::CalculateMassMatrix( MatrixType& rMassMatrix, P
     KRATOS_TRY
 
     //lumped
-    const SizeType dimension  = GetGeometry().WorkingSpaceDimension();
-    const SizeType number_of_nodes  = GetGeometry().size();
+    const SizeType dimension = GetGeometry().WorkingSpaceDimension();
+    const SizeType number_of_nodes = GetGeometry().size();
     const SizeType MatSize = this->GetDofsSize();
+    const SizeType node_dofs = this->GetNodeDofsSize();
 
     if ( rMassMatrix.size1() != MatSize )
         rMassMatrix.resize( MatSize, MatSize, false );
@@ -1063,11 +1053,11 @@ void LargeDisplacementUPElement::CalculateMassMatrix( MatrixType& rMassMatrix, P
 
       for ( SizeType i = 0; i < number_of_nodes; i++ )
       	{
-      	  SizeType indexupi = dimension * i + i;
+      	  SizeType indexupi = node_dofs * i;
 
       	  for ( SizeType j = 0; j < number_of_nodes; j++ )
       	    {
-      	      SizeType indexupj = dimension * j + j;
+      	      SizeType indexupj = node_dofs * j;
 
       	      for ( SizeType k = 0; k < dimension; k++ )
       		{
@@ -1098,7 +1088,7 @@ void LargeDisplacementUPElement::CalculateMassMatrix( MatrixType& rMassMatrix, P
     // {
     //     double temp = LumpFact[i] * TotalMass;
 
-    //     SizeType indexup = i * dimension + i;
+    //     SizeType indexup = node_dofs * i;
 
     //     for ( SizeType j = 0; j < dimension; j++ )
     //     {
@@ -1117,19 +1107,37 @@ void LargeDisplacementUPElement::CalculateMassMatrix( MatrixType& rMassMatrix, P
 
 void LargeDisplacementUPElement::CalculateDampingMatrix( MatrixType& rDampingMatrix, ProcessInfo& rCurrentProcessInfo )
 {
-    KRATOS_TRY
+  KRATOS_TRY
 
-    //0.-Initialize the DampingMatrix:
-    const SizeType number_of_nodes  = GetGeometry().size();
-    const SizeType dimension        = GetGeometry().WorkingSpaceDimension();
+  //0.-Initialize the DampingMatrix:
+  const SizeType number_of_nodes = GetGeometry().size();
+  const SizeType dimension = GetGeometry().WorkingSpaceDimension();
+  const SizeType MatSize = this->GetDofsSize();
+  const SizeType node_dofs = this->GetNodeDofsSize();
 
-    //resizing as needed the LHS
-    const SizeType MatSize = this->GetDofsSize();
+  if ( rDampingMatrix.size1() != MatSize )
+    rDampingMatrix.resize( MatSize, MatSize, false );
 
-    if ( rDampingMatrix.size1() != MatSize )
-        rDampingMatrix.resize( MatSize, MatSize, false );
+  noalias( rDampingMatrix ) = ZeroMatrix( MatSize, MatSize );
 
-    noalias( rDampingMatrix ) = ZeroMatrix( MatSize, MatSize );
+  //1.-Get Damping Coeffitients (RAYLEIGH_ALPHA, RAYLEIGH_BETA)
+  double alpha = 0;
+  if( GetProperties().Has(RAYLEIGH_ALPHA) ){
+    alpha = GetProperties()[RAYLEIGH_ALPHA];
+  }
+  else if( rCurrentProcessInfo.Has(RAYLEIGH_ALPHA) ){
+    alpha = rCurrentProcessInfo[RAYLEIGH_ALPHA];
+  }
+
+  double beta  = 0;
+  if( GetProperties().Has(RAYLEIGH_BETA) ){
+    beta = GetProperties()[RAYLEIGH_BETA];
+  }
+  else if( rCurrentProcessInfo.Has(RAYLEIGH_BETA) ){
+    beta = rCurrentProcessInfo[RAYLEIGH_BETA];
+  }
+
+  if( alpha != 0 || beta != 0){
 
     //1.-Calculate StiffnessMatrix:
 
@@ -1140,18 +1148,18 @@ void LargeDisplacementUPElement::CalculateDampingMatrix( MatrixType& rDampingMat
     MatrixType StiffnessMatrix  = Matrix();
 
     if ( StiffnessMatrix.size1() != MatSize )
-        StiffnessMatrix.resize( MatSize, MatSize, false );
+      StiffnessMatrix.resize( MatSize, MatSize, false );
 
-    noalias(StiffnessMatrix) = ZeroMatrix( MatSize, MatSize );
+    StiffnessMatrix = ZeroMatrix( MatSize, MatSize );
 
     for ( SizeType i = 0; i < number_of_nodes; i++ )
     {
-        SizeType indexup = i * dimension + i;
+      SizeType indexup = node_dofs * i;
 
-        for ( SizeType j = 0; j < dimension; j++ )
-        {
-	  StiffnessMatrix( indexup+j , indexup+j ) = LHSMatrix( indexup+j , indexup+j );
-        }
+      for ( SizeType j = 0; j < dimension; j++ )
+      {
+        StiffnessMatrix( indexup+j , indexup+j ) = LHSMatrix( indexup+j , indexup+j );
+      }
     }
 
     //2.-Calculate MassMatrix:
@@ -1160,32 +1168,14 @@ void LargeDisplacementUPElement::CalculateDampingMatrix( MatrixType& rDampingMat
 
     this->CalculateMassMatrix ( MassMatrix, rCurrentProcessInfo );
 
-
-    //3.-Get Damping Coeffitients (RAYLEIGH_ALPHA, RAYLEIGH_BETA)
-    double alpha = 0;
-    if( GetProperties().Has(RAYLEIGH_ALPHA) ){
-      alpha = GetProperties()[RAYLEIGH_ALPHA];
-    }
-    else if( rCurrentProcessInfo.Has(RAYLEIGH_ALPHA) ){
-      alpha = rCurrentProcessInfo[RAYLEIGH_ALPHA];
-    }
-
-    double beta  = 0;
-    if( GetProperties().Has(RAYLEIGH_BETA) ){
-      beta = GetProperties()[RAYLEIGH_BETA];
-    }
-    else if( rCurrentProcessInfo.Has(RAYLEIGH_BETA) ){
-      beta = rCurrentProcessInfo[RAYLEIGH_BETA];
-    }
-
-    //4.-Compose the Damping Matrix:
+    //3.-Compose the Damping Matrix:
 
     //Rayleigh Damping Matrix: alpha*M + beta*K
     rDampingMatrix  = alpha * MassMatrix;
     rDampingMatrix += beta  * StiffnessMatrix;
+  }
 
-
-    KRATOS_CATCH( "" )
+  KRATOS_CATCH( "" )
 }
 
 //************************************************************************************

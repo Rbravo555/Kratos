@@ -72,7 +72,7 @@ class MonolithicSolver(object):
                 "max_iteration": 10
             },
             "linear_solver_settings":{
-                "solver_type": "superlu_direct",
+                "solver_type": "ks_superlu_direct",
                 "max_iteration": 500,
                 "tolerance": 1e-9,
                 "scaling": false
@@ -80,6 +80,10 @@ class MonolithicSolver(object):
             "processes": []
         }
         """)
+
+        #check existing default linear solver exit
+        if not hasattr(KratosMultiphysics.SolversApplication, "ks_superlu_direct"):
+            default_settings["linear_solver_settings"]["solver_type"].SetString("SkylineLUFactorizationSolver")
 
         # Linear solver settings can have different number of settings
         if(custom_settings.Has("linear_solver_settings")):
@@ -191,7 +195,7 @@ class MonolithicSolver(object):
 
     def _domain_parts_updated(self):
         update_time = False
-        if not self._is_not_restarted():
+        if self._is_restarted():
             if self.process_info.Has(KratosSolver.RESTART_STEP_TIME):
                 update_time = self._check_previous_time_step(self.process_info[KratosSolver.RESTART_STEP_TIME])
 
@@ -237,6 +241,9 @@ class MonolithicSolver(object):
         else:
             mechanical_solver = self._get_mechanical_solver()
             mechanical_solver.Initialize()
+
+    def _is_restarted(self):
+        return not self._is_not_restarted()
 
     def _is_not_restarted(self):
         if self.process_info.Has(KratosMultiphysics.IS_RESTARTED):
