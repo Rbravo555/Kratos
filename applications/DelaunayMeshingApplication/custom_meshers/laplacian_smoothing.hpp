@@ -290,7 +290,7 @@ namespace Kratos
 
       //*******************************************************************
       //MOVE NODES: BOUNDARY SMOOTHING
-      SetBoundarySmoothing (rModelPart, PreservedElements, pElementsList, NumberOfPoints);
+    //   SetBoundarySmoothing (rModelPart, PreservedElements, pElementsList, NumberOfPoints);
 
 
       //*******************************************************************

@@ -1333,7 +1333,7 @@ Begin Nodes
 End Nodes
 
 
-Begin Elements QSVMS2D3N// GUI group identifier: Fluid
+Begin Elements FIC2D3N// GUI group identifier: Fluid
         1          0       1012       1015        955 
         2          0       1022       1016        967 
         3          0        967       1016        954 

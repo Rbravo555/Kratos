@@ -281,9 +281,11 @@ class SlipCoordinateTransformation
     }
   }
 
-  /// Transform nodal velocities to the rotated coordinates (aligned with each node's normal)
-  virtual void RotateVelocities(ModelPart& rModelPart) const
+  /// Transform nodal variable (e.g. VELOCITY or MESH_VELOCITY) to the rotated coordinates (aligned with each node's normal)
+  virtual void RotateVariable(ModelPart& rModelPart, const std::string VariableName = "VELOCITY") const
   {
+    Variable<array_1d<double,3>> VariableToRotate = KratosComponents< Variable<array_1d<double,3> > >::Get(VariableName);
+
     const SizeType dimension = rModelPart.GetProcessInfo()[SPACE_DIMENSION];
 
     TLocalVectorType Vel(dimension);
@@ -302,7 +304,7 @@ class SlipCoordinateTransformation
           BoundedMatrix<double,3,3> rRot;
           LocalRotationOperatorPure(rRot,*itNode);
 
-          array_1d<double,3>& rVelocity = itNode->FastGetSolutionStepValue(VELOCITY);
+          array_1d<double,3>& rVelocity = itNode->FastGetSolutionStepValue(VariableToRotate);
           for(unsigned int i = 0; i < 3; i++) Vel[i] = rVelocity[i];
           noalias(Tmp) = prod(rRot,Vel);
           for(unsigned int i = 0; i < 3; i++) rVelocity[i] = Tmp[i];
@@ -312,7 +314,7 @@ class SlipCoordinateTransformation
           BoundedMatrix<double,2,2> rRot;
           LocalRotationOperatorPure(rRot,*itNode);
 
-          array_1d<double,3>& rVelocity = itNode->FastGetSolutionStepValue(VELOCITY);
+          array_1d<double,3>& rVelocity = itNode->FastGetSolutionStepValue(VariableToRotate);
           for(unsigned int i = 0; i < 2; i++) Vel[i] = rVelocity[i];
           noalias(Tmp) = prod(rRot,Vel);
           for(unsigned int i = 0; i < 2; i++) rVelocity[i] = Tmp[i];
@@ -321,9 +323,11 @@ class SlipCoordinateTransformation
     }
   }
 
-  /// Transform nodal velocities from the rotated system to the original one
-  virtual void RecoverVelocities(ModelPart& rModelPart) const
+  /// Transform nodal variable (e.g. VELOCITY or MESH_VELOCITY) from the rotated system to the original one
+  virtual void RecoverVariable(ModelPart& rModelPart, const std::string VariableName = "VELOCITY") const
   {
+    Variable<array_1d<double,3>> VariableToRotate = KratosComponents< Variable<array_1d<double,3> > >::Get(VariableName);
+
     const SizeType dimension = rModelPart.GetProcessInfo()[SPACE_DIMENSION];
 
     TLocalVectorType Vel(dimension);
@@ -341,7 +345,7 @@ class SlipCoordinateTransformation
           BoundedMatrix<double,3,3> rRot;
           LocalRotationOperatorPure(rRot,*itNode);
 
-          array_1d<double,3>& rVelocity = itNode->FastGetSolutionStepValue(VELOCITY);
+          array_1d<double,3>& rVelocity = itNode->FastGetSolutionStepValue(VariableToRotate);
           for(unsigned int i = 0; i < 3; i++) Vel[i] = rVelocity[i];
           noalias(Tmp) = prod(trans(rRot),Vel);
           for(unsigned int i = 0; i < 3; i++) rVelocity[i] = Tmp[i];
@@ -351,7 +355,7 @@ class SlipCoordinateTransformation
           BoundedMatrix<double,2,2> rRot;
           LocalRotationOperatorPure(rRot,*itNode);
 
-          array_1d<double,3>& rVelocity = itNode->FastGetSolutionStepValue(VELOCITY);
+          array_1d<double,3>& rVelocity = itNode->FastGetSolutionStepValue(VariableToRotate);
           for(unsigned int i = 0; i < 2; i++) Vel[i] = rVelocity[i];
           noalias(Tmp) = prod(trans(rRot),Vel);
           for(unsigned int i = 0; i < 2; i++) rVelocity[i] = Tmp[i];

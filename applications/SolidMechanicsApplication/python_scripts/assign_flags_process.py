@@ -30,14 +30,15 @@ class AssignFlagsProcess(KratosMultiphysics.Process):
 
     def ExecuteInitialize(self):
 
+        # TODO: When we use this process, a segfault appears, regardless of the flag...
+
         # set model part
         self.model_part = self.model[self.settings["model_part_name"].GetString()]
 
         flags_list = []
         for j in range(0, self.settings["flags_list"].size() ):
-            flags_list.append(KratosMultiphysics.KratosGlobals.GetVariable(self.settings["flags_list"][j].GetString()))
+            flags_list.append(KratosMultiphysics.KratosGlobals.GetFlag(self.settings["flags_list"][j].GetString()))
 
         for i in range(0, self.settings["entity_type_list"].size() ):
             entity_type = self.settings["entity_type_list"][i].GetString()
             KratosSolid.AssignFlagsToEntitiesProcess(self.model_part,entity_type,flags_list).Execute()
-

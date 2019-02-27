@@ -51,7 +51,7 @@
                 "max_iteration": 15
             },
             "linear_solver_settings":{
-                "solver_type": "SuperLUSolver"
+                "solver_type": "ExternalSolversApplication.super_lu"
             },
             "dofs"               : ["VELOCITY","PRESSURE"]
         }
@@ -64,7 +64,7 @@
         "Parameters"    : {
             "model_part_name"       : "pfem_ale_open_cavity_2d",
             "meshing_control_type"  : "step",
-            "meshing_frequency"     : 1.0,
+            "meshing_frequency"     : 1,
             "meshing_before_output" : true,
             "meshing_domains"       : [{
                 "model_part_name"                 : "Body0",
@@ -79,10 +79,10 @@
                     "reconnect"                     : false,
                     "transfer"                      : false,
                     "constrained"                   : false,
-                    "mesh_smoothing"                : false,
+                    "mesh_smoothing"                : true,
                     "variables_smoothing"           : false,
                     "elemental_variables_to_smooth" : ["DETERMINANT_F"],
-                    "reference_element_type"        : "QSVMS2D3N",
+                    "reference_element_type"        : "FIC2D3N",
                     "reference_condition_type"      : "CompositeCondition2D2N"
                 },
                 "spatial_bounding_box"            : {
@@ -134,6 +134,14 @@
         }
     }],
     "constraints_process_list" : [{
+        "python_module" : "assign_flags_process",
+        "kratos_module" : "KratosMultiphysics.SolidMechanicsApplication",
+        "Parameters"    : {
+             "model_part_name": "VELOCITY_Velocity_zero",
+             "entity_type_list": ["Nodes"],
+             "flags_list": ["SLIP"]
+        }
+    },{
         "python_module" : "assign_vector_components_to_nodes_process",
         "kratos_module" : "KratosMultiphysics.SolidMechanicsApplication",
         "help"          : "This process fixes the selected components of a given vector variable",
@@ -195,7 +203,7 @@
             "output_control_type" : "step",
             "output_frequency"    : 1,
             "node_output"         : true,
-            "nodal_flags_results" : ["FREE_SURFACE","INLET","RIGID","FLUID"],
+            "nodal_flags_results" : ["FREE_SURFACE","INLET","RIGID","FLUID","SLIP"],
             "elemental_conditional_flags_results" : [],
             "nodal_results"       : ["DISPLACEMENT","VELOCITY","ACCELERATION","PRESSURE","NORMAL","BODY_FORCE","MESH_VELOCITY"],
             "gauss_point_results" : []
