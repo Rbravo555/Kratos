@@ -378,7 +378,7 @@ double &  HyperElasticUP3DLaw::CalculateVolumetricPressure (const MaterialRespon
     rPressure = 0;
     for ( unsigned int j = 0; j < number_of_nodes; j++ )
     {
-        rPressure += ShapeFunctionsValues[j] * DomainGeometry[j].GetSolutionStepValue(PRESSURE);
+        rPressure += ShapeFunctionsValues[j] * DomainGeometry[j].FastGetSolutionStepValue(PRESSURE);
     }
 
     return rPressure;

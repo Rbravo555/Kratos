@@ -180,7 +180,7 @@ namespace Kratos
   {
     KRATOS_TRY
 
-    KRATOS_ERROR << "calling ConstitutiveModel Finalize base class " << std::endl;
+    KRATOS_ERROR << "calling ConstitutiveModel base class " << std::endl;
 
     KRATOS_CATCH(" ")
   }
@@ -193,7 +193,7 @@ namespace Kratos
   {
     KRATOS_TRY
 
-    KRATOS_ERROR << "calling ConstitutiveModel Finalize base class " << std::endl;
+    KRATOS_ERROR << "calling ConstitutiveModel base class " << std::endl;
 
     KRATOS_CATCH(" ")
   }
@@ -202,7 +202,7 @@ namespace Kratos
   {
     KRATOS_TRY
 
-    KRATOS_ERROR << "calling ConstitutiveModel Finalize base class " << std::endl;
+    KRATOS_ERROR << "calling ConstitutiveModel base class " << std::endl;
 
     KRATOS_CATCH(" ")
   }
@@ -211,7 +211,7 @@ namespace Kratos
   {
     KRATOS_TRY
 
-    KRATOS_ERROR << "calling ConstitutiveModel Finalize base class " << std::endl;
+    KRATOS_ERROR << "calling ConstitutiveModel base class " << std::endl;
 
     KRATOS_CATCH(" ")
   }
@@ -224,7 +224,7 @@ namespace Kratos
   {
     KRATOS_TRY
 
-    KRATOS_ERROR << "calling ConstitutiveModel Finalize base class " << std::endl;
+    KRATOS_ERROR << "calling ConstitutiveModel base class " << std::endl;
 
     KRATOS_CATCH(" ")
   }
@@ -233,7 +233,7 @@ namespace Kratos
   {
     KRATOS_TRY
 
-    KRATOS_ERROR << "calling ConstitutiveModel Finalize base class " << std::endl;
+    KRATOS_ERROR << "calling ConstitutiveModel base class " << std::endl;
 
     KRATOS_CATCH(" ")
   }
@@ -242,7 +242,7 @@ namespace Kratos
   {
     KRATOS_TRY
 
-    KRATOS_ERROR << "calling ConstitutiveModel Finalize base class " << std::endl;
+    KRATOS_ERROR << "calling ConstitutiveModel base class " << std::endl;
 
     KRATOS_CATCH(" ")
   }
@@ -255,7 +255,7 @@ namespace Kratos
   {
     KRATOS_TRY
 
-    KRATOS_ERROR << "calling ConstitutiveModel Finalize base class " << std::endl;
+    KRATOS_ERROR << "calling ConstitutiveModel base class " << std::endl;
 
     KRATOS_CATCH(" ")
   }
@@ -264,7 +264,7 @@ namespace Kratos
   {
     KRATOS_TRY
 
-    KRATOS_ERROR << "calling ConstitutiveModel Finalize base class " << std::endl;
+    KRATOS_ERROR << "calling ConstitutiveModel base class " << std::endl;
 
     KRATOS_CATCH(" ")
   }
@@ -273,11 +273,19 @@ namespace Kratos
   {
     KRATOS_TRY
 
-    KRATOS_ERROR << "calling ConstitutiveModel Finalize base class " << std::endl;
+    KRATOS_ERROR << "calling ConstitutiveModel base class " << std::endl;
 
     KRATOS_CATCH(" ")
   }
 
+  void ConstitutiveModel::CalculateInternalVariables(ModelDataType& rValues)
+  {
+    KRATOS_TRY
+
+    //KRATOS_ERROR << "calling ConstitutiveModel base class " << std::endl;
+
+    KRATOS_CATCH(" ")
+  }
 
   int ConstitutiveModel::Check(const Properties& rProperties,
 			       const ProcessInfo& rCurrentProcessInfo)

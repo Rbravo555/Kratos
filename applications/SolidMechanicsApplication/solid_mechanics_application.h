@@ -52,6 +52,8 @@
 #include "custom_elements/solid_elements/updated_lagrangian_V_element.hpp"
 #include "custom_elements/solid_elements/updated_lagrangian_segregated_V_P_element.hpp"
 
+#include "custom_elements/solid_elements/updated_lagrangian_U_J_element.hpp"
+
 //beam elements
 #include "custom_elements/beam_elements/beam_element.hpp"
 #include "custom_elements/beam_elements/small_displacement_beam_element.hpp"
@@ -419,9 +421,13 @@ typedef array_1d<double,6> Vector6;
    const UpdatedLagrangianSegregatedVPElement mUpdatedLagrangianSegregatedVPElement3D4N;
 
    //mixed elements UP
-   const UpdatedLagrangianUPElement         mUpdatedLagrangianUPElement2D3N;
+   const UpdatedLagrangianUPElement                   mUpdatedLagrangianUPElement2D3N;
    const AxisymmetricUpdatedLagrangianUPElement mAxisymUpdatedLagrangianUPElement2D3N;
-   const UpdatedLagrangianUPElement         mUpdatedLagrangianUPElement3D4N;
+   const UpdatedLagrangianUPElement                   mUpdatedLagrangianUPElement3D4N;
+
+   //mixed elements UJ
+   const UpdatedLagrangianUJElement                   mUpdatedLagrangianUJElement2D3N;
+   const UpdatedLagrangianUJElement                   mUpdatedLagrangianUJElement3D4N;
 
    //beams
    const SmallDisplacementBeamElement       mSmallDisplacementBeamElement3D2N;

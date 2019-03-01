@@ -165,7 +165,7 @@ namespace Kratos
       // calculate damaged stress
       this->CalculateAndAddStressTensor(Variables,rStressMatrix);
 
-      // set internal variables to output print
+      // set requested internal variables
       this->SetInternalVariables(rValues,Variables);
 
       if( rValues.State.Is(ConstitutiveModelData::UPDATE_INTERNAL_VARIABLES ) )
@@ -245,7 +245,7 @@ namespace Kratos
       	this->CalculateAndAddPlasticConstitutiveTensor(Variables,rConstitutiveMatrix);
       }
 
-      // set internal variables to output print
+      // set requested internal variables
       this->SetInternalVariables(rValues,Variables);
 
       Variables.State().Set(ConstitutiveModelData::CONSTITUTIVE_MATRIX_COMPUTED,true);
@@ -635,8 +635,27 @@ namespace Kratos
       KRATOS_CATCH(" ")
     }
 
-    //set internal variables for output print
+    // calculate requested internal variables
+    void CalculateInternalVariables(ModelDataType& rValues) override
+    {
+      KRATOS_TRY
 
+      PlasticDataType Variables;
+      this->InitializeVariables(rValues,Variables);
+
+      // calculate elastic stress
+      this->mElasticityModel.CalculateStressTensor(rValues,rValues.StressMatrix);
+
+      // calculate damaged stress
+      this->CalculateAndAddStressTensor(Variables,rValues.StressMatrix);
+
+      // set requested internal variables
+      this->SetInternalVariables(rValues,Variables);
+
+      KRATOS_CATCH(" ")
+    }
+
+    // set requested internal variables
     void SetInternalVariables(ModelDataType& rValues, PlasticDataType& rVariables) override
     {
       KRATOS_TRY

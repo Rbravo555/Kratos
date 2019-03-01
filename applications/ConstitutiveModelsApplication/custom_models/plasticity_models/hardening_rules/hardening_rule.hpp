@@ -78,6 +78,14 @@ namespace Kratos
       //default constructor (to initialize Variables)
       InternalVariables() { Variables.clear(); };
 
+      // not needed
+      //copy constructor
+      //InternalVariables (InternalVariables const& rOther) : Variables(rOther.Variables) {};
+
+      //assignment operator
+      //InternalVariables& operator=(InternalVariables const& rOther) {Variables=rOther.Variables;};
+      // not needed
+
       const array_1d<double, TVarSize>& GetVariables() {return Variables;};
 
       unsigned int size() {return TVarSize;}
@@ -224,14 +232,14 @@ namespace Kratos
     virtual double& CalculateDeltaHardening(const PlasticDataType& rVariables, double& rDeltaHardening, const MatrixType & rPlasticPotentialDerivative)
     {
       KRATOS_TRY
-	
-      KRATOS_ERROR << "calling the HardeningRule base class ... illegal operation" << std::endl;	
+
+      KRATOS_ERROR << "calling the HardeningRule base class ... illegal operation" << std::endl;
 
       return rDeltaHardening;
-	
+
       KRATOS_CATCH(" ")
     }
-    
+
     virtual double& CalculateDeltaThermalHardening(const PlasticDataType& rVariables, double& rDeltaThermalHardening)
     {
       KRATOS_TRY

@@ -505,6 +505,35 @@ namespace Kratos
   //************************************************************************************
   //************************************************************************************
 
+  void HypoElasticModel::CalculateInternalVariables(ModelDataType& rValues)
+  {
+    KRATOS_TRY
+
+    ElasticDataType Variables;
+    this->InitializeElasticData(rValues,Variables);
+
+    // set requested internal variables
+    this->SetInternalVariables(rValues,Variables);
+
+    KRATOS_CATCH(" ")
+  }
+
+
+  //************************************************************************************
+  //************************************************************************************
+
+  // set requested internal variables
+  void HypoElasticModel::SetInternalVariables(ModelDataType& rValues, ElasticDataType& rVariables)
+  {
+    KRATOS_TRY
+
+
+    KRATOS_CATCH(" ")
+  }
+
+  //************************************************************************************
+  //************************************************************************************
+
   int HypoElasticModel::Check(const Properties& rProperties, const ProcessInfo& rCurrentProcessInfo)
   {
     KRATOS_TRY

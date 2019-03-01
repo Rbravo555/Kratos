@@ -175,7 +175,7 @@ class SelectElementsMesherProcess
           if( (unsigned int)OutElementList[id] >= mrRemesh.NodalPreIds.size() ){
             if(mrRemesh.Options.Is(MesherUtilities::CONTACT_SEARCH))
               wrong_added_node = true;
-            std::cout<<" ERROR: something is wrong: node out of bounds "<<std::endl;
+            std::cout<<" ERROR: something is wrong: node added by the mesher"<<std::endl;
             break;
           }
 
@@ -319,6 +319,11 @@ class SelectElementsMesherProcess
       //   std::cout<<" DELETED ELEMENTS "<<std::endl;
       std::cout<<"   SELECT MESH ELEMENTS ("<<mrRemesh.Info->NumberOfElements<<") ]; "<<std::endl;
 
+      if( mrRemesh.Options.Is(MesherUtilities::CONSTRAINED) ){
+        int released_elements = mrRemesh.OutMesh.GetNumberOfElements()-mrRemesh.Info->NumberOfElements;
+        if( released_elements > 0 )
+          std::cout<<"   RELEASED ELEMENTS ("<<released_elements<<") IN CONSTRAINED MESH ]; "<<std::endl;
+      }
     }
 
     KRATOS_CATCH( "" )
@@ -1096,6 +1101,10 @@ class SelectElementsMesherProcess
             accepted = true;
           else
             accepted = false;
+
+          //do not release sliver elements in solid domains in constrained tessellation
+          if( mrRemesh.Options.Is(MesherUtilities::CONSTRAINED) )
+            accepted = true;
 
           ++number_of_slivers;
         }

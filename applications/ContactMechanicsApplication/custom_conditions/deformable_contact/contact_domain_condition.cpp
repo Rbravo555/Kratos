@@ -190,11 +190,11 @@ namespace Kratos
     for ( unsigned int i = 0; i < number_of_nodes; i++ )
       {
         unsigned int index = i * dimension;
-        rValues[index] = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_X, Step );
-        rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_Y, Step );
+        rValues[index] = GetGeometry()[i].FastGetSolutionStepValue( DISPLACEMENT_X, Step );
+        rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue( DISPLACEMENT_Y, Step );
 
         if ( dimension == 3 )
-	  rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( DISPLACEMENT_Z, Step );
+	  rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( DISPLACEMENT_Z, Step );
       }
 
 
@@ -204,11 +204,11 @@ namespace Kratos
 	unsigned int index = (number_of_nodes + i) * dimension;
 	Element::NodeType& MasterNode = GetValue(MASTER_NODES)[i];
 
-	rValues[index] = MasterNode.GetSolutionStepValue( DISPLACEMENT_X, Step );
-	rValues[index+1] = MasterNode.GetSolutionStepValue( DISPLACEMENT_Y, Step );
+	rValues[index] = MasterNode.FastGetSolutionStepValue( DISPLACEMENT_X, Step );
+	rValues[index+1] = MasterNode.FastGetSolutionStepValue( DISPLACEMENT_Y, Step );
 
 	if ( dimension == 3 )
-	  rValues[index+2] = MasterNode.GetSolutionStepValue( DISPLACEMENT_Z, Step );
+	  rValues[index+2] = MasterNode.FastGetSolutionStepValue( DISPLACEMENT_Z, Step );
       }
 
   }
@@ -229,11 +229,11 @@ namespace Kratos
     for ( unsigned int i = 0; i < number_of_nodes; i++ )
       {
         unsigned int index = i * dimension;
-        rValues[index] = GetGeometry()[i].GetSolutionStepValue( VELOCITY_X, Step );
-        rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( VELOCITY_Y, Step );
+        rValues[index] = GetGeometry()[i].FastGetSolutionStepValue( VELOCITY_X, Step );
+        rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue( VELOCITY_Y, Step );
 
         if ( dimension == 3 )
-	  rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( VELOCITY_Z, Step );
+	  rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( VELOCITY_Z, Step );
       }
 
     //ADD MASTER NODES
@@ -242,11 +242,11 @@ namespace Kratos
 	unsigned int index = (number_of_nodes + i) * dimension;
 	Element::NodeType& MasterNode = GetValue(MASTER_NODES)[i];
 
-	rValues[index] = MasterNode.GetSolutionStepValue( VELOCITY_X, Step );
-	rValues[index+1] = MasterNode.GetSolutionStepValue( VELOCITY_Y, Step );
+	rValues[index] = MasterNode.FastGetSolutionStepValue( VELOCITY_X, Step );
+	rValues[index+1] = MasterNode.FastGetSolutionStepValue( VELOCITY_Y, Step );
 
 	if ( dimension == 3 )
-	  rValues[index+2] = MasterNode.GetSolutionStepValue( VELOCITY_Z, Step );
+	  rValues[index+2] = MasterNode.FastGetSolutionStepValue( VELOCITY_Z, Step );
       }
 
   }
@@ -268,11 +268,11 @@ namespace Kratos
     for ( unsigned int i = 0; i < number_of_nodes; i++ )
       {
         unsigned int index = i * dimension;
-        rValues[index] = GetGeometry()[i].GetSolutionStepValue( ACCELERATION_X, Step );
-        rValues[index + 1] = GetGeometry()[i].GetSolutionStepValue( ACCELERATION_Y, Step );
+        rValues[index] = GetGeometry()[i].FastGetSolutionStepValue( ACCELERATION_X, Step );
+        rValues[index + 1] = GetGeometry()[i].FastGetSolutionStepValue( ACCELERATION_Y, Step );
 
         if ( dimension == 3 )
-	  rValues[index + 2] = GetGeometry()[i].GetSolutionStepValue( ACCELERATION_Z, Step );
+	  rValues[index + 2] = GetGeometry()[i].FastGetSolutionStepValue( ACCELERATION_Z, Step );
       }
 
     //ADD MASTER NODES
@@ -281,11 +281,11 @@ namespace Kratos
 	unsigned int index = (number_of_nodes + i) * dimension;
 	Element::NodeType& MasterNode = GetValue(MASTER_NODES)[i];
 
-	rValues[index] = MasterNode.GetSolutionStepValue( ACCELERATION_X, Step );
-	rValues[index+1] = MasterNode.GetSolutionStepValue( ACCELERATION_Y, Step );
+	rValues[index] = MasterNode.FastGetSolutionStepValue( ACCELERATION_X, Step );
+	rValues[index+1] = MasterNode.FastGetSolutionStepValue( ACCELERATION_Y, Step );
 
 	if ( dimension == 3 )
-	  rValues[index+2] = MasterNode.GetSolutionStepValue( ACCELERATION_Z, Step );
+	  rValues[index+2] = MasterNode.FastGetSolutionStepValue( ACCELERATION_Z, Step );
 
       }
   }

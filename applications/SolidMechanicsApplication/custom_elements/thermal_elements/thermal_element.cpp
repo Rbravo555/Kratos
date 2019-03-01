@@ -133,7 +133,7 @@ void ThermalElement::GetValuesVector( Vector& rValues, int Step )
 
     for ( unsigned int i = 0; i < number_of_nodes; i++ )
     {
-        rValues[i] = GetGeometry()[i].GetSolutionStepValue( TEMPERATURE, Step );
+        rValues[i] = GetGeometry()[i].FastGetSolutionStepValue( TEMPERATURE, Step );
     }
 }
 
@@ -308,6 +308,8 @@ void ThermalElement::InitializeGeneralVariables (GeneralVariables & rVariables, 
 
   //calculating the reference jacobian from cartesian coordinates to parent coordinates for all integration points [dx_n/d£]
   rVariables.J = GetGeometry().Jacobian( rVariables.J, mThisIntegrationMethod, rVariables.DeltaPosition );
+
+  KRATOS_ERROR_IF(!GetProperties().Has(HEAT_CAPACITY) || !GetProperties().Has(HEAT_CONDUCTIVITY))<<" Thermal element properties not assigned correctly "<<std::endl;
 
   //Thermal properties
   rVariables.HeatCapacity     = GetProperties()[HEAT_CAPACITY] * GetProperties()[DENSITY]; //unity factor: [kg/mm3 = 1e-3 Ns2/mm4]
@@ -734,30 +736,30 @@ inline void ThermalElement::CalculateAndAddThermalForces(GeneralVariables & rVar
     double NodalTemperature = 0;
 
     for ( unsigned int i = 0; i < number_of_nodes; i++ )
+    {
+      DeltaTemperature = GetGeometry()[i].FastGetSolutionStepValue(TEMPERATURE) - GetGeometry()[i].FastGetSolutionStepValue(TEMPERATURE,1);
+
+      rRightHandSideVector[i] += rVariables.N[i] * rVariables.PlasticDissipation * rIntegrationWeight;
+      rRightHandSideVector[i] -= rVariables.N[i] * rVariables.HeatCapacity * ( DeltaTemperature ) * (1.0/rVariables.DeltaTime) * rIntegrationWeight;
+
+      for ( unsigned int j = 0; j < number_of_nodes; j++ )
       {
-	DeltaTemperature = GetGeometry()[i].FastGetSolutionStepValue(TEMPERATURE) - GetGeometry()[i].FastGetSolutionStepValue(TEMPERATURE,1);
+        NodalTemperature = GetGeometry()[j].FastGetSolutionStepValue(TEMPERATURE);
 
-	rRightHandSideVector[i] += rVariables.N[i] * rVariables.PlasticDissipation * rIntegrationWeight;
-	rRightHandSideVector[i] -= rVariables.N[i] * rVariables.HeatCapacity * ( DeltaTemperature ) * (1.0/rVariables.DeltaTime) * rIntegrationWeight;
+        for ( unsigned int k= 0; k < dimension; k++ )
+        {
 
-	for ( unsigned int j = 0; j < number_of_nodes; j++ )
-	{
-	  NodalTemperature = GetGeometry()[j].FastGetSolutionStepValue(TEMPERATURE);
+          rRightHandSideVector[i] -= rVariables.HeatConductivity * NodalTemperature * ( rVariables.DN_DX(i,k)*rVariables.DN_DX(j,k) ) * rIntegrationWeight;
 
-	  for ( unsigned int k= 0; k < dimension; k++ )
-	    {
-
-	      rRightHandSideVector[i] -= rVariables.HeatConductivity * NodalTemperature * ( rVariables.DN_DX(i,k)*rVariables.DN_DX(j,k) ) * rIntegrationWeight;
-
-	    }
+        }
 
 
-	}
+      }
 
     }
 
     // std::cout<<std::endl;
-    // std::cout<<" Fint ["<<GetValue(MASTER_ELEMENTS).back()->Id()<<"] "<<rRightHandSideVector-Fh<<" [ Dissipation: "<<rVariables.PlasticDissipation<<" , HeatConductivity: "<<rVariables.HeatConductivity<<" , HeatCapacity: "<<rVariables.HeatCapacity<<" ]"<<std::endl;
+    // std::cout<<" Fint ["<<GetValue(MASTER_ELEMENT).lock()->Id()<<"] "<<rRightHandSideVector-Fh<<" [ Dissipation: "<<rVariables.PlasticDissipation<<" , HeatConductivity: "<<rVariables.HeatConductivity<<" , HeatCapacity: "<<rVariables.HeatCapacity<<" ]"<<" Nodal temperature "<<NodalTemperature<<" Delta temperature "<<DeltaTemperature<<std::endl;
 
     // if( rVariables.PlasticDissipation > 0 ){
     //   std::cout<<" ThermalElement Id["<<this->Id()<<"] Dissipation "<<rVariables.PlasticDissipation<<" Fint "<<rRightHandSideVector-Fh<<std::endl;

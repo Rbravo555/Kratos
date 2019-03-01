@@ -7,6 +7,7 @@ include(pybind11Tools)
 
 include_directories( ${CMAKE_SOURCE_DIR}/kratos )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/SolidMechanicsApplication )
+include_directories( ${CMAKE_SOURCE_DIR}/applications/SolversApplication )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/PoromechanicsApplication )
 include_directories( ${CMAKE_SOURCE_DIR}/applications/DamApplication )
 

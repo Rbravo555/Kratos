@@ -134,10 +134,10 @@ namespace Kratos
       //NEIGHBOUR NODES:
 
       std::vector<int> EmptyVector(0);
-      std::vector<std::vector<int> >  NeigbourNodesList(rNodes.size());
-      std::fill( NeigbourNodesList.begin(), NeigbourNodesList.end(), EmptyVector );
+      std::vector<std::vector<int> >  NeighbourNodesList(rNodes.size());
+      std::fill( NeighbourNodesList.begin(), NeighbourNodesList.end(), EmptyVector );
 
-      this->GetNeigbourNodes(NeigbourNodesList, PreservedElements, pElementsList, NumberOfPoints, nds);
+      this->GetNeighbourNodes(NeighbourNodesList, PreservedElements, pElementsList, NumberOfPoints, nds);
 
 
       //*******************************************************************
@@ -163,7 +163,7 @@ namespace Kratos
 
       ModelPart::NodesContainerType::iterator nodes_begin = rModelPart.NodesBegin();
 
-      while ( iters<smoothing_iters && converged==false ){
+      while ( iters<=smoothing_iters && converged==false ){
 
 	//std::cout<<" Iter "<< iters <<std::endl;
 
@@ -187,7 +187,7 @@ namespace Kratos
 	for(unsigned int in = 0; in<rNodes.size(); in++)
 	  {
 
-	    unsigned int NumberOfNeighbours = NeigbourNodesList[in+1].size();
+	    unsigned int NumberOfNeighbours = NeighbourNodesList[in+1].size();
 
 	    if(rNodes[in+1].IsNot(BOUNDARY) && rNodes[in+1].IsNot(RIGID) && rNodes[in+1].IsNot(TO_ERASE) && NumberOfNeighbours>1)
 	      {
@@ -207,9 +207,9 @@ namespace Kratos
 		for(unsigned int i = 0; i < NumberOfNeighbours; ++i)
 		  {
 		    //neighbour position
-		    Q[0] = (nodes_begin+(NeigbourNodesList[in+1][i]-1))->X();
-		    Q[1] = (nodes_begin+(NeigbourNodesList[in+1][i]-1))->Y();
-		    Q[2] = (nodes_begin+(NeigbourNodesList[in+1][i]-1))->Z();
+		    Q[0] = (nodes_begin+(NeighbourNodesList[in+1][i]-1))->X();
+		    Q[1] = (nodes_begin+(NeighbourNodesList[in+1][i]-1))->Y();
+		    Q[2] = (nodes_begin+(NeighbourNodesList[in+1][i]-1))->Z();
 
 		    D = P-Q;
 
@@ -229,11 +229,11 @@ namespace Kratos
 			Weight = 0;
 		    }
 
-		    if( (nodes_begin+(NeigbourNodesList[in+1][i]-1))->Is(BOUNDARY) ){
+		    if( (nodes_begin+(NeighbourNodesList[in+1][i]-1))->Is(BOUNDARY) ){
 
 		      contact_active = false;
-		      if( (nodes_begin+(NeigbourNodesList[in+1][i]-1))->SolutionStepsDataHas(CONTACT_FORCE) ){
-			array_1d<double, 3 > & ContactForce = (nodes_begin+(NeigbourNodesList[in+1][i]-1))->FastGetSolutionStepValue(CONTACT_FORCE);
+		      if( (nodes_begin+(NeighbourNodesList[in+1][i]-1))->SolutionStepsDataHas(CONTACT_FORCE) ){
+			array_1d<double, 3 > & ContactForce = (nodes_begin+(NeighbourNodesList[in+1][i]-1))->FastGetSolutionStepValue(CONTACT_FORCE);
 			if( norm_2(ContactForce) !=0 )
 			  contact_active = true;
 		      }
@@ -295,7 +295,7 @@ namespace Kratos
 
       //*******************************************************************
       //MOVE NODES: BOUNDARY PROJECTION
-      //SetInsideProjection (rModelPart, out, NeigbourNodesList);
+      //SetInsideProjection (rModelPart, out, NeighbourNodesList);
 
       //*******************************************************************
       //TRANSFER VARIABLES TO NEW NODES POSITION:
@@ -577,9 +577,9 @@ namespace Kratos
 
 	    //Set the position of boundary laplacian (Reset the flag)
 	    if ( i_node->Is(BOUNDARY) && i_node->IsNot(TO_ERASE) && i_node->Is(INSIDE) )
-	      {
-		i_node->Set(INSIDE, false); //LMV.
-	      }
+            {
+              i_node->Set(INSIDE, false); //LMV.
+            }
 
 	  }
 
@@ -612,16 +612,16 @@ namespace Kratos
       //NEIGHBOR NODES:
 
       std::vector<int> EmptyVector(0);
-      std::vector<std::vector<int> >  NeigbourNodesList(rNodes.size());
-      std::fill( NeigbourNodesList.begin(), NeigbourNodesList.end(), EmptyVector );
+      std::vector<std::vector<int> >  NeighbourNodesList(rNodes.size());
+      std::fill( NeighbourNodesList.begin(), NeighbourNodesList.end(), EmptyVector );
 
-      this->GetBoundaryNeigbourNodes(rNodes, NeigbourNodesList, PreservedElements, pElementsList, NumberOfPoints, nds);
+      this->GetCoplanarBoundaryNeighbourNodes(rNodes, NeighbourNodesList, PreservedElements, pElementsList, NumberOfPoints, nds);
 
       //*******************************************************************
       //MOVE BOUNDARY NODES: LAPLACIAN SMOOTHING:
 
       double convergence_tol =0.001;
-      double smoothing_factor=0.1; //0.1
+      double smoothing_factor=0.4; //0.1
       double smoothing_iters =4; //3,4
       double iters=0;
 
@@ -635,18 +635,19 @@ namespace Kratos
 
       ModelPart::NodesContainerType::iterator nodes_begin = rModelPart.NodesBegin();
 
-      while ( iters<smoothing_iters && converged==false ){
+      while ( iters<=smoothing_iters && converged==false ){
 
 	//std::cout<<" Iter "<< iters <<std::endl;
 
 	array_1d<double,3> P;
 	array_1d<double,3> Q;//neighbour position
 	array_1d<double,3> D;
-
+	//array_1d<double,3> DN;
 
 	double TotalWeight = 0;
 	double Weight = 0;
 	array_1d<double,3> TotalDistance;
+        //array_1d<double,3> TotalDirection;
 
 
 	//convergence variables
@@ -655,80 +656,95 @@ namespace Kratos
 	NewMaxLength  = 0;
 
 	for(unsigned int in = 0; in<rNodes.size(); ++in)
-	  {
-	    unsigned int NumberOfNeighbours = NeigbourNodesList[in+1].size();
+        {
+          unsigned int NumberOfNeighbours = NeighbourNodesList[in+1].size();
 
-	    if(rNodes[in+1].Is(BOUNDARY) && rNodes[in+1].IsNot(TO_ERASE) && rNodes[in+1].IsNot(BOUNDARY) &&
-	       rNodes[in+1].Is(INSIDE) && NumberOfNeighbours>1 )
-	      {
-		TotalDistance.clear();
-		TotalWeight = 0;
-		Weight = 0;
+          //if(rNodes[in+1].Is(BOUNDARY) && rNodes[in+1].IsNot(TO_ERASE) && rNodes[in+1].Is(INSIDE) && NumberOfNeighbours>1)
+          if(rNodes[in+1].Is(BOUNDARY) && rNodes[in+1].IsNot(TO_ERASE) && NumberOfNeighbours>1)
+          {
+            TotalDistance.clear();
+            //TotalDirection.clear();
+            TotalWeight = 0;
+            Weight = 0;
 
-		//point position
-		P[0] = (nodes_begin+in)->X();
-		P[1] = (nodes_begin+in)->Y();
-		P[2] = (nodes_begin+in)->Z();
+            //point position
+            P[0] = (nodes_begin+in)->X();
+            P[1] = (nodes_begin+in)->Y();
+            P[2] = (nodes_begin+in)->Z();
 
+            // array_1d<double, 3>&  Normal= (nodes_begin+in)->FastGetSolutionStepValue(NORMAL);
 
-		//std::cout<<" Initial Position: "<<P<<std::endl;
-		Length = 0;
+            //std::cout<<" Initial Position: "<<P<<std::endl;
+            Length = 0;
 
-		for(unsigned int i = 0; i < NumberOfNeighbours; ++i)
-		  {
-		    //neighbour position
-		    Q[0] = (nodes_begin+(NeigbourNodesList[in+1][i]-1))->X();
-		    Q[1] = (nodes_begin+(NeigbourNodesList[in+1][i]-1))->Y();
-		    Q[2] = (nodes_begin+(NeigbourNodesList[in+1][i]-1))->Z();
+            for(unsigned int i = 0; i < NumberOfNeighbours; ++i)
+            {
+              // array_1d<double,3>&  SNormal= (nodes_begin+(NeighbourNodesList[in+1][i]-1))->FastGetSolutionStepValue(NORMAL);
 
+              //neighbour position
+              Q[0] = (nodes_begin+(NeighbourNodesList[in+1][i]-1))->X();
+              Q[1] = (nodes_begin+(NeighbourNodesList[in+1][i]-1))->Y();
+              Q[2] = (nodes_begin+(NeighbourNodesList[in+1][i]-1))->Z();
 
-		    D = P-Q;
+              D = P-Q;
 
-		    Length =sqrt(D[0]*D[0]+D[1]*D[1]+D[2]*D[2]);
+              // if( inner_prod(SNormal,Normal) >= 0.99 ){
+              //   DN = D;
+              //   // project in the node normal direction
+              //   //DN -= inner_prod(DN,Normal)*DN;
+              // }
+              // else
+              //   DN.clear();
 
+              Length =sqrt(D[0]*D[0]+D[1]*D[1]+D[2]*D[2]);
 
-		    if( simple ){
+              if( simple ){
 
-		      Weight = 1;
+                Weight = 1;
 
-		    }
-		    else{
+              }
+              else{
 
-		      if(Length !=0)
-			Weight = ( 1.0/Length );
-		      else
-			Weight = 0;
-		    }
+                if(Length !=0)
+                  Weight = ( 1.0/Length );
+                else
+                  Weight = 0;
+              }
 
-		    if(NewMaxLength<Length)
-		      NewMaxLength = Length;
+              if(NewMaxLength<Length)
+                NewMaxLength = Length;
 
-		    TotalDistance += (Weight*(Q-P)) ;
-		    TotalWeight   += Weight ;
+              TotalDistance  += (Weight*(Q-P)) ;
+              TotalWeight    += Weight ;
+              //TotalDirection += DN;
 
-		  }
+            }
 
+            if(TotalWeight!=0)
+              D = ( smoothing_factor / TotalWeight ) * TotalDistance;
+            else
+              D.clear();
 
-		if(TotalWeight!=0)
-		  D = ( smoothing_factor / TotalWeight ) * TotalDistance;
-		else
-		  D.clear();
+            // double norm = norm_2(TotalDirection);
+            // if(norm)
+            //   TotalDirection/=norm;
+            // else
+            //   TotalDirection.clear();
 
+            // P += inner_prod(D,TotalDirection)*TotalDirection;
 
-		P += D;
+            P += D;
+            //std::cout<<" Final Position: "<<P<<std::endl;
 
+            (nodes_begin+in)->X() = P[0];
+            (nodes_begin+in)->Y() = P[1];
+            (nodes_begin+in)->Z() = P[2];
 
-		(nodes_begin+in)->X() = P[0];
-		(nodes_begin+in)->Y() = P[1];
-		(nodes_begin+in)->Z() = P[2];
+            number_of_nodes +=1;
+          }
 
-
-		number_of_nodes +=1;
-
-	      }
-
-	    //rNodes[in+1].Set(INSIDE,false); //LMV: Reset the flag after interpolation. Indeed, if the flag is set, only one iteration takes place
-	  }
+          //rNodes[in+1].Set(INSIDE,false); //LMV: Reset the flag after interpolation. Indeed, if the flag is set, only one iteration takes place
+        }
 
 
 	if( (NewMaxLength-MaxLength)/NewMaxLength < convergence_tol ){
@@ -879,7 +895,7 @@ namespace Kratos
     //*******************************************************************************************
     //*******************************************************************************************
 
-    void GetNeigbourNodes (std::vector<std::vector<int> >& list_of_neighbor_nodes, std::vector<int> & PreservedElements,const int* ElementList, const int& NumberOfPoints, const unsigned int& nds)
+    void GetNeighbourNodes (std::vector<std::vector<int> >& list_of_neighbor_nodes, std::vector<int> & PreservedElements,const int* ElementList, const int& NumberOfPoints, const unsigned int& nds)
     {
 
       KRATOS_TRY
@@ -930,7 +946,7 @@ namespace Kratos
     //*******************************************************************************************
     //*******************************************************************************************
 
-    void GetBoundaryNeigbourNodes (NodesContainerType& rNodes, std::vector<std::vector<int> >& list_of_neighbor_nodes, std::vector<int> & PreservedElements,const int* ElementList, const int& NumberOfPoints, const unsigned int& nds)
+    void GetBoundaryNeighbourNodes(NodesContainerType& rNodes, std::vector<std::vector<int> >& list_of_neighbor_nodes, std::vector<int> & PreservedElements,const int* ElementList, const int& NumberOfPoints, const unsigned int& nds)
     {
 
       KRATOS_TRY
@@ -945,40 +961,106 @@ namespace Kratos
       int  neighb_size = 0;
 
       for(unsigned int el = 0; el<PreservedElements.size(); ++el)
-	{
-	  if(PreservedElements[el])
-	    {
-	      //a) Create list of node neighbors (list_of_neighbor_nodes)
-	      for(unsigned int ipn=0; ipn<nds; ++ipn)
-		{
-		  if(rNodes[ElementList[el*nds+ipn]].Is(BOUNDARY)){
-		      for(unsigned int jpn=0; jpn<nds; ++jpn)
-			{
-			  if(ipn!=jpn && rNodes[ElementList[el*nds+jpn]].Is(BOUNDARY)){
-			    //add unique node neighbor
-			    neighb_size = list_of_neighbor_nodes[ElementList[el*nds+ipn]].size();
-			    neighb_set = false;
-			    for(int npn=0; npn<neighb_size; ++npn)
-			      {
-				if( list_of_neighbor_nodes[ElementList[el*nds+ipn]][npn]==(ElementList[el*nds+jpn]) ){
-				  neighb_set=true;
-				}
-			      }
-			    if(neighb_set==false){
-			      list_of_neighbor_nodes[ElementList[el*nds+ipn]].push_back(ElementList[el*nds+jpn]);
-			    }
-			  }
-			}
-		    }
-		}
-	    }
-	}
-
+      {
+        if(PreservedElements[el])
+        {
+          //a) Create list of node neighbors (list_of_neighbor_nodes)
+          for(unsigned int ipn=0; ipn<nds; ++ipn)
+          {
+            if(rNodes[ElementList[el*nds+ipn]].Is(BOUNDARY)){
+              for(unsigned int jpn=0; jpn<nds; ++jpn)
+              {
+                if(ipn!=jpn && rNodes[ElementList[el*nds+jpn]].Is(BOUNDARY)){
+                  //add unique node neighbor
+                  neighb_size = list_of_neighbor_nodes[ElementList[el*nds+ipn]].size();
+                  neighb_set = false;
+                  for(int npn=0; npn<neighb_size; ++npn)
+                  {
+                    if( list_of_neighbor_nodes[ElementList[el*nds+ipn]][npn]==(ElementList[el*nds+jpn]) ){
+                      neighb_set=true;
+                    }
+                  }
+                  if(neighb_set==false){
+                    list_of_neighbor_nodes[ElementList[el*nds+ipn]].push_back(ElementList[el*nds+jpn]);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
 
       KRATOS_CATCH( "" )
-
     }
 
+
+    //*******************************************************************************************
+    //*******************************************************************************************
+
+    void GetCoplanarBoundaryNeighbourNodes(NodesContainerType& rNodes, std::vector<std::vector<int> >& list_of_neighbor_nodes, std::vector<int> & PreservedElements,const int* ElementList, const int& NumberOfPoints, const unsigned int& nds)
+    {
+
+      KRATOS_TRY
+
+      if( (int)list_of_neighbor_nodes.size() != NumberOfPoints+1 ){
+	list_of_neighbor_nodes.resize(NumberOfPoints+1);
+	std::vector<int> empty_vector(0);
+	std::fill( list_of_neighbor_nodes.begin(), list_of_neighbor_nodes.end(), empty_vector );
+      }
+
+      bool neighb_set  = false;
+      int  neighb_size = 0;
+
+      for(unsigned int el = 0; el<PreservedElements.size(); ++el)
+      {
+        if(PreservedElements[el])
+        {
+          //a) Create list of node neighbors (list_of_neighbor_nodes)
+          for(unsigned int ipn=0; ipn<nds; ++ipn)
+          {
+            if(rNodes[ElementList[el*nds+ipn]].Is(BOUNDARY)){
+              for(unsigned int jpn=0; jpn<nds; ++jpn)
+              {
+                if(ipn!=jpn && rNodes[ElementList[el*nds+jpn]].Is(BOUNDARY)){
+                  //add unique node neighbor
+                  neighb_size = list_of_neighbor_nodes[ElementList[el*nds+ipn]].size();
+                  neighb_set = false;
+                  for(int npn=0; npn<neighb_size; ++npn)
+                  {
+                    if( list_of_neighbor_nodes[ElementList[el*nds+ipn]][npn]==(ElementList[el*nds+jpn]) ){
+                      neighb_set=true;
+                    }
+                  }
+                  if(neighb_set==false){
+                    if( this->CheckCoplanar(rNodes[ElementList[el*nds+ipn]], rNodes[ElementList[el*nds+jpn]]) )
+                      list_of_neighbor_nodes[ElementList[el*nds+ipn]].push_back(ElementList[el*nds+jpn]);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      KRATOS_CATCH( "" )
+    }
+
+
+    //*******************************************************************************************
+    //*******************************************************************************************
+
+    bool CheckCoplanar( const Node<3>& rNodeA, const Node<3>& rNodeB)
+    {
+
+      const array_1d<double,3>& NormalA = rNodeA.FastGetSolutionStepValue(NORMAL);
+      const array_1d<double,3>& NormalB = rNodeB.FastGetSolutionStepValue(NORMAL);
+
+      if( fabs(1.0-inner_prod(NormalA, NormalB)) < 1e-150 )
+        return true;
+      else
+        return false;
+
+    }
 
     //*******************************************************************************************
     //*******************************************************************************************

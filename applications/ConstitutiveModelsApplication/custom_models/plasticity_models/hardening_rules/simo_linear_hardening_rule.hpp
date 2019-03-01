@@ -61,7 +61,6 @@ namespace Kratos
     /// Default constructor.
     SimoLinearHardeningRule();
 
-
     /// Copy constructor.
     SimoLinearHardeningRule(SimoLinearHardeningRule const& rOther);
 
@@ -249,5 +248,3 @@ namespace Kratos
 }  // namespace Kratos.
 
 #endif // KRATOS_SIMO_LINEAR_HARDENING_RULE_H_INCLUDED  defined
-
-

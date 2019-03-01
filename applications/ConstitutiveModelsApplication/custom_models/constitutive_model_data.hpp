@@ -137,7 +137,7 @@ namespace Kratos
       void SetVariable                 (const Variable<T>& rVariable) {mpVariable = &rVariable;};
 
       //Get-Set Data
-      bool HasVariable                 (const Variable<T>& rVariable) const {return (rVariable == *mpVariable);};
+      bool Is                          (const Variable<T>& rVariable) const {return (rVariable == *mpVariable);};
 
       void SetValue                    (T& rValue) {*mpValue = rValue;};
 
@@ -310,31 +310,81 @@ namespace Kratos
 	}
       }
 
+      //Has Variable
+      bool Is(const Variable<int>& rVariable)
+      {
+	if(mpIntVariable != nullptr)
+	  if( mpIntVariable->Is(rVariable) )
+	    return true;
+        return false;
+      }
+
+      bool Is(const Variable<double>& rVariable)
+      {
+	if(mpDoubleVariable != nullptr)
+	  if( mpDoubleVariable->Is(rVariable) )
+	    return true;
+        return false;
+      }
+
+      bool Is(const Variable<Vector>& rVariable)
+      {
+	if(mpVectorVariable != nullptr)
+	  if( mpVectorVariable->Is(rVariable) )
+	    return true;
+        return false;
+      }
+
+      bool Is(const Variable<Matrix>& rVariable)
+      {
+	if(mpMatrixVariable != nullptr)
+	  if( mpMatrixVariable->Is(rVariable) )
+	    return true;
+        return false;
+      }
+
+      bool Is(const Variable<array_1d<double,3> >& rVariable)
+      {
+	if(mpArray3Variable != nullptr)
+	  if( mpArray3Variable->Is(rVariable) )
+	    return true;
+        return false;
+      }
+
+      bool Is(const Variable<array_1d<double,6> >& rVariable)
+      {
+	if(mpArray6Variable != nullptr)
+	  if( mpArray6Variable->Is(rVariable) )
+	    return true;
+        return false;
+      }
+
+      //Set Value
       void SetValue(const Variable<int>& rVariable, int& rValue)
       {
 	if(mpIntVariable != nullptr)
-	  if( mpIntVariable->HasVariable(rVariable) )
+	  if( mpIntVariable->Is(rVariable) )
 	    mpIntVariable->SetValue(rValue);
       }
 
       void SetValue(const Variable<double>& rVariable, double& rValue)
       {
 	if(mpDoubleVariable != nullptr)
-	  if( mpDoubleVariable->HasVariable(rVariable) )
+	  if( mpDoubleVariable->Is(rVariable) )
 	    mpDoubleVariable->SetValue(rValue);
       }
 
       void SetValue(const Variable<Vector>& rVariable, Vector& rValue)
       {
 	if(mpVectorVariable != nullptr)
-	  if( mpVectorVariable->HasVariable(rVariable) )
+	  if( mpVectorVariable->Is(rVariable) )
 	    mpVectorVariable->SetValue(rValue);
       }
 
       void SetValue(const Variable<Matrix>& rVariable, Matrix& rValue)
       {
 	if(mpMatrixVariable != nullptr)
-	  if( mpMatrixVariable->HasVariable(rVariable) )
+	  if( mpMatrixVariable->Is(rVariable) )
 	    mpMatrixVariable->SetValue(rValue);
 
       }
@@ -342,14 +392,14 @@ namespace Kratos
       void SetValue(const Variable<array_1d<double,3> >& rVariable, array_1d<double,3>& rValue)
       {
 	if(mpArray3Variable != nullptr)
-	  if( mpArray3Variable->HasVariable(rVariable) )
+	  if( mpArray3Variable->Is(rVariable) )
 	    mpArray3Variable->SetValue(rValue);
       }
 
       void SetValue(const Variable<array_1d<double,6> >& rVariable, array_1d<double,6>& rValue)
       {
 	if(mpArray6Variable != nullptr)
-	  if( mpArray6Variable->HasVariable(rVariable) )
+	  if( mpArray6Variable->Is(rVariable) )
 	    mpArray6Variable->SetValue(rValue);
       }
 

@@ -20,8 +20,6 @@
 #endif
 
 // External includes
-#include "boost/smart_ptr.hpp"
-#include "utilities/timer.h"
 
 // Project includes
 #include "includes/define.h"
@@ -1225,5 +1223,3 @@ namespace Kratos
 } // namespace Kratos.
 
 #endif // KRATOS_SPLINE_CURVE_UTILITIES_H_INCLUDED defined
-
-

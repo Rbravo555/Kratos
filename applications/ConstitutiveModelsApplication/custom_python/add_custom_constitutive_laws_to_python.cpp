@@ -49,6 +49,7 @@
 #include "custom_models/elasticity_models/isochoric_neo_hookean_model.hpp"
 #include "custom_models/elasticity_models/isochoric_neo_hookean_lnJ_squared_model.hpp"
 #include "custom_models/elasticity_models/incompressible_neo_hookean_model.hpp"
+#include "custom_models/elasticity_models/incompressible_neo_hookean_lnJ_squared_model.hpp"
 #include "custom_models/elasticity_models/borja_model.hpp"
 #include "custom_models/elasticity_models/ogden_model.hpp"
 #include "custom_models/elasticity_models/isochoric_ogden_model.hpp"
@@ -56,7 +57,10 @@
 
 // Plasticity models
 #include "custom_models/plasticity_models/von_mises_linear_elastic_plasticity_model.hpp"
+#include "custom_models/plasticity_models/von_mises_neo_hookean_linear_plasticity_model.hpp"
 #include "custom_models/plasticity_models/von_mises_neo_hookean_plasticity_model.hpp"
+#include "custom_models/plasticity_models/von_mises_neo_hookean_thermo_plasticity_model.hpp"
+#include "custom_models/plasticity_models/simo_J2_linear_plasticity_model.hpp"
 #include "custom_models/plasticity_models/simo_J2_plasticity_model.hpp"
 #include "custom_models/plasticity_models/simo_J2_thermo_plasticity_model.hpp"
 #include "custom_models/plasticity_models/johnson_cook_J2_thermo_plasticity_model.hpp"
@@ -213,6 +217,11 @@ void  AddCustomConstitutiveLawsToPython(pybind11::module& m)
       .def( py::init<>() )
       ;
 
+  py::class_< IncompressibleNeoHookeanLnJSquaredModel, typename IncompressibleNeoHookeanLnJSquaredModel::Pointer, ConstitutiveModelBaseType >
+      (m, "IncompressibleNeoHookeanLnJSquaredModel")
+      .def( py::init<>() )
+      ;
+
   py::class_< BorjaModel, typename BorjaModel::Pointer, ConstitutiveModelBaseType >
       (m, "BorjaModel")
       .def( py::init<>() )
@@ -249,8 +258,23 @@ void  AddCustomConstitutiveLawsToPython(pybind11::module& m)
       .def( py::init<>() )
       ;
 
+  py::class_< VonMisesNeoHookeanLinearPlasticityModel, typename VonMisesNeoHookeanLinearPlasticityModel::Pointer, ConstitutiveModelBaseType >
+      (m, "VonMisesNeoHookeanLinearPlasticityModel")
+      .def( py::init<>() )
+      ;
+
   py::class_< VonMisesNeoHookeanPlasticityModel, typename VonMisesNeoHookeanPlasticityModel::Pointer, ConstitutiveModelBaseType >
       (m, "VonMisesNeoHookeanPlasticityModel")
+      .def( py::init<>() )
+      ;
+
+  py::class_< VonMisesNeoHookeanThermoPlasticityModel, typename VonMisesNeoHookeanThermoPlasticityModel::Pointer, ConstitutiveModelBaseType >
+      (m, "VonMisesNeoHookeanThermoPlasticityModel")
+      .def( py::init<>() )
+      ;
+
+  py::class_< SimoJ2LinearPlasticityModel, typename SimoJ2LinearPlasticityModel::Pointer, ConstitutiveModelBaseType >
+      (m, "SimoJ2LinearPlasticityModel")
       .def( py::init<>() )
       ;
 

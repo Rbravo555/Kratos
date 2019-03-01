@@ -65,23 +65,27 @@ class ModelManager(object):
 
     #
     def ExecuteBeforeSolutionLoop(self):
-        pass
+        self._update_composite_solving_parts()
     #
     def ExecuteInitializeSolutionStep(self):
-        if( self._domain_parts_updated() ):
+        if self._update_solving_parts():
             self._update_composite_solving_parts()
             # print(" UPDATE_SOLVING_PARTS Initialize")
     #
     def ExecuteFinalizeSolutionStep(self):
         pass
+
     #
     def ExecuteBeforeOutputStep(self):
-        if( self._domain_parts_updated() ):
+        if self._domain_parts_changed():
+            self._clean_composite_solving_parts()
+        if self._update_solving_parts():
             self._update_composite_solving_parts()
             # print(" UPDATE_SOLVING_PARTS Before output")
+
     #
     def ExecuteAfterOutputStep(self):
-        if( self._domain_parts_updated() ):
+        if self._update_solving_parts():
             self._update_composite_solving_parts()
             # print(" UPDATE_SOLVING_PARTS After output")
 
@@ -137,11 +141,11 @@ class ModelManager(object):
 
             print( self.main_model_part )
 
-            self._build_composite_solving_parts()
-
         else:
             raise Exception("Other input options are not yet implemented.")
 
+        # build composite solving parts
+        self._build_composite_solving_parts()
 
         dofs = self.main_model_part.NumberOfNodes() * self.main_model_part.ProcessInfo[KratosMultiphysics.SPACE_DIMENSION]
         #print (self._class_prefix()+" Finished importing model part")
@@ -231,11 +235,10 @@ class ModelManager(object):
         self._build_solving_model_part()
 
         # Build composite solving model parts
-        self._build_composite_solving_parts()
-        self._update_composite_solving_parts()
+        # self._build_composite_solving_parts()
 
         # Build output model part
-        #self._create_sub_model_part(self.settings["output_model_part"].GetString())
+        # self._create_sub_model_part(self.settings["output_model_part"].GetString())
 
     #
     def _build_bodies(self):
@@ -375,6 +378,12 @@ class ModelManager(object):
             transfer.Execute()
 
     #
+    def _clean_composite_solving_parts(self):
+        print(self._class_prefix()+" Clean Solving Parts")
+        for transfer in self.transfer_solving_parts:
+            transfer.ExecuteFinalizeSolutionStep()
+
+    #
     def _clean_body_parts(self):
 
         #delete body parts: (materials have to be already assigned)
@@ -386,6 +395,27 @@ class ModelManager(object):
                 for j in range(body_parts_name_list.size()):
                     self.main_model_part.RemoveSubModelPart(body_parts_name_list[j].GetString())
                     #print(self._class_prefix()+" Body Part Removed: "+ body_parts_name_list[j].GetString())
+
+    #
+    def _update_solving_parts(self):
+        update_time = False
+        if self._domain_parts_updated():
+            update_time  = not self._check_current_time_step(self.current_update_time)
+
+        return update_time
+
+    #
+    def _domain_parts_changed(self):
+        update_time = False
+        if not update_time and self.process_info.Has(KratosSolid.MESHING_STEP_TIME):
+            update_time = self._check_current_time_step(self.process_info[KratosSolid.MESHING_STEP_TIME])
+            #print(" MESHING_STEP_TIME ",self.process_info[KratosSolid.MESHING_STEP_TIME], update_time)
+
+        if not update_time and self.process_info.Has(KratosSolid.CONTACT_STEP_TIME):
+            update_time = self._check_current_time_step(self.process_info[KratosSolid.CONTACT_STEP_TIME])
+            #print(" CONTACT_STEP_TIME ",self.process_info[KratosSolid.CONTACT_STEP_TIME], update_time)
+
+        return update_time
 
     #
     def _domain_parts_updated(self):
@@ -403,9 +433,6 @@ class ModelManager(object):
         if not update_time and self.process_info.Has(KratosSolid.CONTACT_STEP_TIME):
             update_time = self._check_previous_time_step(self.process_info[KratosSolid.CONTACT_STEP_TIME])
             #print(" CONTACT_STEP_TIME ",self.process_info[KratosSolid.CONTACT_STEP_TIME], update_time)
-
-        if update_time:
-            update_time  = not self._check_current_time_step(self.current_update_time)
 
         return update_time
     #

@@ -294,9 +294,9 @@ protected:
                                                ElementDataType & rVariables);
 
     /**
-     * Get element size from the dofs
+     * Get dof size of a node
      */
-    SizeType GetDofsSize() override;
+    SizeType GetNodeDofsSize() override;
 
     ///@}
     ///@name Protected  Access

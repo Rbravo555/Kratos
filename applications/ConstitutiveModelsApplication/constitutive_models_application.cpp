@@ -65,28 +65,23 @@ void KratosConstitutiveModelsApplication::Register() {
   KRATOS_REGISTER_VARIABLE(PRESSURE_VARIABLE)
   KRATOS_REGISTER_VARIABLE(PROPERTIES_LAYOUT)
 
-   KRATOS_REGISTER_VARIABLE( RHOS )   
-   KRATOS_REGISTER_VARIABLE( RHOT )   
-   KRATOS_REGISTER_VARIABLE( KSIM )   
-   KRATOS_REGISTER_VARIABLE( CHIS )   
-   KRATOS_REGISTER_VARIABLE( CHIT )   
-   KRATOS_REGISTER_VARIABLE( REFERENCE_PRESSURE )   
-    //strain rate laws
-    KRATOS_REGISTER_CONSTITUTIVE_LAW( "StrainRate3DLaw", mStrainRate3DLaw );
-    KRATOS_REGISTER_CONSTITUTIVE_LAW( "StrainRatePlaneStrain2DLaw", mStrainRatePlaneStrain2DLaw );
-    KRATOS_REGISTER_CONSTITUTIVE_LAW( "NewtonianFluid3DLaw", mNewtonianFluid3DLaw );
-    KRATOS_REGISTER_CONSTITUTIVE_LAW( "NewtonianFluidPlaneStrain2DLaw", mNewtonianFluidPlaneStrain2DLaw );
+   KRATOS_REGISTER_VARIABLE( RHOS )
+   KRATOS_REGISTER_VARIABLE( RHOT )
+   KRATOS_REGISTER_VARIABLE( KSIM )
+   KRATOS_REGISTER_VARIABLE( CHIS )
+   KRATOS_REGISTER_VARIABLE( CHIT )
+   KRATOS_REGISTER_VARIABLE( REFERENCE_PRESSURE )
 
-   KRATOS_REGISTER_VARIABLE( PS )   
-   KRATOS_REGISTER_VARIABLE( PT )   
-   KRATOS_REGISTER_VARIABLE( PM )   
+   KRATOS_REGISTER_VARIABLE( PS )
+   KRATOS_REGISTER_VARIABLE( PT )
+   KRATOS_REGISTER_VARIABLE( PM )
 
-   KRATOS_REGISTER_VARIABLE( PLASTIC_VOL_DEF )   
-   KRATOS_REGISTER_VARIABLE( NONLOCAL_PLASTIC_VOL_DEF )   
-   KRATOS_REGISTER_VARIABLE( PLASTIC_VOL_DEF_ABS )   
-   KRATOS_REGISTER_VARIABLE( NONLOCAL_PLASTIC_VOL_DEF_ABS )   
-   KRATOS_REGISTER_VARIABLE( PLASTIC_DEV_DEF )   
-   KRATOS_REGISTER_VARIABLE( NONLOCAL_PLASTIC_DEV_DEF )   
+   KRATOS_REGISTER_VARIABLE( PLASTIC_VOL_DEF )
+   KRATOS_REGISTER_VARIABLE( NONLOCAL_PLASTIC_VOL_DEF )
+   KRATOS_REGISTER_VARIABLE( PLASTIC_VOL_DEF_ABS )
+   KRATOS_REGISTER_VARIABLE( NONLOCAL_PLASTIC_VOL_DEF_ABS )
+   KRATOS_REGISTER_VARIABLE( PLASTIC_DEV_DEF )
+   KRATOS_REGISTER_VARIABLE( NONLOCAL_PLASTIC_DEV_DEF )
 
   //specific constitutive models variables must be REGISTERED here
 
@@ -128,6 +123,7 @@ void KratosConstitutiveModelsApplication::Register() {
   Serializer::Register( "IsochoricNeoHookeanModel", mIsochoricNeoHookeanModel );
   Serializer::Register( "IsochoricNeoHookeanLnJSquaredModel", mIsochoricNeoHookeanLnJSquaredModel );
   Serializer::Register( "IncompressibleNeoHookeanModel", mIncompressibleNeoHookeanModel );
+  Serializer::Register( "IncompressibleNeoHookeanLnJSquaredModel", mIncompressibleNeoHookeanLnJSquaredModel );
   Serializer::Register( "BorjaModel", mBorjaModel );
   Serializer::Register( "TamagniniModel", mTamagniniModel );
   Serializer::Register( "OgdenModel", mOgdenModel );
@@ -138,7 +134,11 @@ void KratosConstitutiveModelsApplication::Register() {
 
   //plasticity models
   Serializer::Register( "VonMisesLinearElasticPlasticityModel", mVonMisesLinearElasticPlasticityModel );
+  Serializer::Register( "VonMisesNeoHookeanLinearPlasticityModel", mVonMisesNeoHookeanLinearPlasticityModel );
+
   Serializer::Register( "VonMisesNeoHookeanPlasticityModel", mVonMisesNeoHookeanPlasticityModel );
+  Serializer::Register( "VonMisesNeoHookeanThermoPlasticityModel", mVonMisesNeoHookeanThermoPlasticityModel );
+  Serializer::Register( "SimoJ2LinearPlasticityModel", mSimoJ2LinearPlasticityModel );
   Serializer::Register( "SimoJ2PlasticityModel", mSimoJ2PlasticityModel );
   Serializer::Register( "CamClayModel", mCamClayModel );
   Serializer::Register( "NonlocalCamClayModel", mNonlocalCamClayModel );

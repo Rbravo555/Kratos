@@ -72,6 +72,7 @@
 #include "custom_models/elasticity_models/isochoric_neo_hookean_model.hpp"
 #include "custom_models/elasticity_models/isochoric_neo_hookean_lnJ_squared_model.hpp"
 #include "custom_models/elasticity_models/incompressible_neo_hookean_model.hpp"
+#include "custom_models/elasticity_models/incompressible_neo_hookean_lnJ_squared_model.hpp"
 #include "custom_models/elasticity_models/borja_model.hpp"
 #include "custom_models/elasticity_models/tamagnini_model.hpp"
 #include "custom_models/elasticity_models/ogden_model.hpp"
@@ -80,7 +81,10 @@
 
 //plasticity models
 #include "custom_models/plasticity_models/von_mises_linear_elastic_plasticity_model.hpp"
+#include "custom_models/plasticity_models/von_mises_neo_hookean_linear_plasticity_model.hpp"
 #include "custom_models/plasticity_models/von_mises_neo_hookean_plasticity_model.hpp"
+#include "custom_models/plasticity_models/von_mises_neo_hookean_thermo_plasticity_model.hpp"
+#include "custom_models/plasticity_models/simo_J2_linear_plasticity_model.hpp"
 #include "custom_models/plasticity_models/simo_J2_plasticity_model.hpp"
 #include "custom_models/plasticity_models/simo_J2_thermo_plasticity_model.hpp"
 #include "custom_models/plasticity_models/johnson_cook_J2_thermo_plasticity_model.hpp"
@@ -293,6 +297,7 @@ namespace Kratos {
     const IsochoricNeoHookeanModel                 mIsochoricNeoHookeanModel;
     const IsochoricNeoHookeanLnJSquaredModel       mIsochoricNeoHookeanLnJSquaredModel;
     const IncompressibleNeoHookeanModel            mIncompressibleNeoHookeanModel;
+    const IncompressibleNeoHookeanLnJSquaredModel  mIncompressibleNeoHookeanLnJSquaredModel;
     const BorjaModel                               mBorjaModel;
     const TamagniniModel                           mTamagniniModel;
     const OgdenModel                               mOgdenModel;
@@ -303,7 +308,10 @@ namespace Kratos {
 
     //plasticity models
     const VonMisesLinearElasticPlasticityModel     mVonMisesLinearElasticPlasticityModel;
+    const VonMisesNeoHookeanLinearPlasticityModel  mVonMisesNeoHookeanLinearPlasticityModel;
     const VonMisesNeoHookeanPlasticityModel        mVonMisesNeoHookeanPlasticityModel;
+    const VonMisesNeoHookeanThermoPlasticityModel  mVonMisesNeoHookeanThermoPlasticityModel;
+    const SimoJ2LinearPlasticityModel              mSimoJ2LinearPlasticityModel;
     const SimoJ2PlasticityModel                    mSimoJ2PlasticityModel;
     const SimoJ2ThermoPlasticityModel              mSimoJ2ThermoPlasticityModel;
     const JohnsonCookJ2ThermoPlasticityModel       mJohnsonCookJ2ThermoPlasticityModel;
@@ -323,7 +331,7 @@ namespace Kratos {
     const ModifiedMisesYieldSurface<HardeningRule>      mModifiedMisesYieldSurface;
     const ModifiedCamClayYieldSurface<HardeningRule>    mModifiedCamClayYieldSurface;
     const GensNovaYieldSurface<HardeningRule>           mGensNovaYieldSurface;
-    
+
     //hardening rules
     const SimoExponentialHardeningRule              mSimoExponentialHardeningRule;
     const SimoLinearHardeningRule                   mSimoLinearHardeningRule;
@@ -334,8 +342,8 @@ namespace Kratos {
     const ModifiedExponentialDamageHardeningRule    mModifiedExponentialDamageHardeningRule;
     const CamClayHardeningRule                      mCamClayHardeningRule;
     const GensNovaHardeningRule                     mGensNovaHardeningRule;
-      
-       
+
+
     ///@}
     ///@name Private Operators
     ///@{

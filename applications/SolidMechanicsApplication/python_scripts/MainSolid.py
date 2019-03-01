@@ -8,7 +8,6 @@ import os
 
 # Import kratos core and applications
 import KratosMultiphysics
-import KratosMultiphysics.ExternalSolversApplication
 import KratosMultiphysics.SolidMechanicsApplication as KratosSolid
 
 sys.stdout.flush()
@@ -107,8 +106,11 @@ class Solution(object):
         while self.time < self.end_time:
 
             self.InitializeSolutionStep()
-            if self.SolveSolutionStep():
-                self.FinalizeSolutionStep()
+            #uncomment once adaptive time step ready
+            #if self.SolveSolutionStep():
+            #    self.FinalizeSolutionStep()
+            self.SolveSolutionStep()
+            self.FinalizeSolutionStep()
 
             if self.echo_level >= 0:
                 sys.stdout.flush()
@@ -309,16 +311,13 @@ class Solution(object):
 
     def _get_solver(self):
 
-        '''
         if self.ProjectParameters["solver_settings"].Has("kratos_module"):
             kratos_module = __import__(self.ProjectParameters["solver_settings"]["kratos_module"].GetString())
         else:
             import KratosMultiphysics.SolversApplication
 
         solver_module = __import__(self.ProjectParameters["solver_settings"]["solver_type"].GetString().split("solid_mechanics_",1)[1])
-        '''
-        python_module = __import__(self.ProjectParameters["solver_settings"]["solver_type"].GetString())
-        return python_module.CreateSolver(self.ProjectParameters["solver_settings"]["Parameters"], self.model.GetModel())
+        return solver_module.CreateSolver(self.ProjectParameters["solver_settings"]["Parameters"], self.model.GetModel())
 
     def _get_time_settings(self):
 

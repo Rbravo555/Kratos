@@ -86,7 +86,7 @@ namespace Kratos
 
     for ( unsigned int j = 0; j < number_of_nodes; j++ )
       {
-     	rTemperature += ShapeFunctionsValues[j] * DomainGeometry[j].GetSolutionStepValue(TEMPERATURE);
+     	rTemperature += ShapeFunctionsValues[j] * DomainGeometry[j].FastGetSolutionStepValue(TEMPERATURE);
       }
 
 

@@ -159,16 +159,16 @@ void RigidBodyElement::GetValuesVector(Vector& rValues, int Step)
     if ( rValues.size() != dofs_size )
       rValues.resize( dofs_size, false );
 
-    rValues[0] = GetGeometry()[0].GetSolutionStepValue( DISPLACEMENT_X, Step );
-    rValues[1] = GetGeometry()[0].GetSolutionStepValue( DISPLACEMENT_Y, Step );
+    rValues[0] = GetGeometry()[0].FastGetSolutionStepValue( DISPLACEMENT_X, Step );
+    rValues[1] = GetGeometry()[0].FastGetSolutionStepValue( DISPLACEMENT_Y, Step );
     if( dimension == 2 ){
-      rValues[2] = GetGeometry()[0].GetSolutionStepValue( ROTATION_Z, Step );
+      rValues[2] = GetGeometry()[0].FastGetSolutionStepValue( ROTATION_Z, Step );
     }
     else{
-      rValues[2] = GetGeometry()[0].GetSolutionStepValue( DISPLACEMENT_Z, Step );
-      rValues[3] = GetGeometry()[0].GetSolutionStepValue( ROTATION_X, Step );
-      rValues[4] = GetGeometry()[0].GetSolutionStepValue( ROTATION_Y, Step );
-      rValues[5] = GetGeometry()[0].GetSolutionStepValue( ROTATION_Z, Step );
+      rValues[2] = GetGeometry()[0].FastGetSolutionStepValue( DISPLACEMENT_Z, Step );
+      rValues[3] = GetGeometry()[0].FastGetSolutionStepValue( ROTATION_X, Step );
+      rValues[4] = GetGeometry()[0].FastGetSolutionStepValue( ROTATION_Y, Step );
+      rValues[5] = GetGeometry()[0].FastGetSolutionStepValue( ROTATION_Z, Step );
     }
 
     KRATOS_CATCH("")
@@ -187,16 +187,16 @@ void RigidBodyElement::GetFirstDerivativesVector(Vector& rValues, int Step)
     if ( rValues.size() != dofs_size )
       rValues.resize( dofs_size, false );
 
-    rValues[0] = GetGeometry()[0].GetSolutionStepValue( VELOCITY_X, Step );
-    rValues[1] = GetGeometry()[0].GetSolutionStepValue( VELOCITY_Y, Step );
+    rValues[0] = GetGeometry()[0].FastGetSolutionStepValue( VELOCITY_X, Step );
+    rValues[1] = GetGeometry()[0].FastGetSolutionStepValue( VELOCITY_Y, Step );
     if( dimension == 2 ){
-      rValues[2] = GetGeometry()[0].GetSolutionStepValue( ANGULAR_VELOCITY_Z, Step );
+      rValues[2] = GetGeometry()[0].FastGetSolutionStepValue( ANGULAR_VELOCITY_Z, Step );
     }
     else{
-      rValues[2] = GetGeometry()[0].GetSolutionStepValue( VELOCITY_Z, Step );
-      rValues[3] = GetGeometry()[0].GetSolutionStepValue( ANGULAR_VELOCITY_X, Step );
-      rValues[4] = GetGeometry()[0].GetSolutionStepValue( ANGULAR_VELOCITY_Y, Step );
-      rValues[5] = GetGeometry()[0].GetSolutionStepValue( ANGULAR_VELOCITY_Z, Step );
+      rValues[2] = GetGeometry()[0].FastGetSolutionStepValue( VELOCITY_Z, Step );
+      rValues[3] = GetGeometry()[0].FastGetSolutionStepValue( ANGULAR_VELOCITY_X, Step );
+      rValues[4] = GetGeometry()[0].FastGetSolutionStepValue( ANGULAR_VELOCITY_Y, Step );
+      rValues[5] = GetGeometry()[0].FastGetSolutionStepValue( ANGULAR_VELOCITY_Z, Step );
     }
 
     KRATOS_CATCH("")
@@ -215,16 +215,16 @@ void RigidBodyElement::GetSecondDerivativesVector(Vector& rValues, int Step)
     if ( rValues.size() != dofs_size )
       rValues.resize( dofs_size, false );
 
-    rValues[0] = GetGeometry()[0].GetSolutionStepValue( ACCELERATION_X, Step );
-    rValues[1] = GetGeometry()[0].GetSolutionStepValue( ACCELERATION_Y, Step );
+    rValues[0] = GetGeometry()[0].FastGetSolutionStepValue( ACCELERATION_X, Step );
+    rValues[1] = GetGeometry()[0].FastGetSolutionStepValue( ACCELERATION_Y, Step );
     if( dimension == 2 ){
-      rValues[2] = GetGeometry()[0].GetSolutionStepValue( ANGULAR_ACCELERATION_Z, Step );
+      rValues[2] = GetGeometry()[0].FastGetSolutionStepValue( ANGULAR_ACCELERATION_Z, Step );
     }
     else{
-      rValues[2] = GetGeometry()[0].GetSolutionStepValue( ACCELERATION_Z, Step );
-      rValues[3] = GetGeometry()[0].GetSolutionStepValue( ANGULAR_ACCELERATION_X, Step );
-      rValues[4] = GetGeometry()[0].GetSolutionStepValue( ANGULAR_ACCELERATION_Y, Step );
-      rValues[5] = GetGeometry()[0].GetSolutionStepValue( ANGULAR_ACCELERATION_Z, Step );
+      rValues[2] = GetGeometry()[0].FastGetSolutionStepValue( ACCELERATION_Z, Step );
+      rValues[3] = GetGeometry()[0].FastGetSolutionStepValue( ANGULAR_ACCELERATION_X, Step );
+      rValues[4] = GetGeometry()[0].FastGetSolutionStepValue( ANGULAR_ACCELERATION_Y, Step );
+      rValues[5] = GetGeometry()[0].FastGetSolutionStepValue( ANGULAR_ACCELERATION_Z, Step );
     }
 
     KRATOS_CATCH("")

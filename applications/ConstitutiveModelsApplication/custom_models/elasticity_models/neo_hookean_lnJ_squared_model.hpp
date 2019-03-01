@@ -183,7 +183,7 @@ namespace Kratos
       const MaterialDataType& rMaterial = rVariables.GetMaterialParameters();
 
       //g(J) = (lambda/2)*ln(J)² - (mu)*lnJ
-      rVolumetricDensityFunction = rMaterial.GetLameLambda() * 0.5 * std::log( rVariables.Strain.Invariants.J );
+      rVolumetricDensityFunction = rMaterial.GetLameLambda() * 0.5 * pow(std::log(rVariables.Strain.Invariants.J), 2);
       rVolumetricDensityFunction -= rMaterial.GetLameMu() * std::log( rVariables.Strain.Invariants.J );
 
       KRATOS_CATCH(" ")

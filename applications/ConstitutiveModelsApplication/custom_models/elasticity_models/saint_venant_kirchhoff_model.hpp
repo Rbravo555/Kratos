@@ -159,6 +159,8 @@ namespace Kratos
 
       }
 
+      // set requested internal variables
+      this->SetInternalVariables(rValues,Variables);
 
       KRATOS_CATCH(" ")
     }
@@ -224,6 +226,8 @@ namespace Kratos
         ConstitutiveModelUtilities::PushForwardConstitutiveMatrix(rConstitutiveMatrix, rTotalDeformationMatrix);
       }
 
+      // set requested internal variables
+      this->SetInternalVariables(rValues,Variables);
 
       KRATOS_CATCH(" ")
     }
