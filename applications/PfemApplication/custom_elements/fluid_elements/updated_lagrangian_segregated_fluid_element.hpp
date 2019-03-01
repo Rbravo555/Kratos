@@ -59,6 +59,8 @@ public:
   ///Type for size
   typedef GeometryData::SizeType SizeType;
 
+  typedef WeakPointerVector<Element> ElementWeakPtrVectorType;
+
   /// Counted pointer of UpdatedLagrangianSegregatedFluidElement
   KRATOS_CLASS_POINTER_DEFINITION( UpdatedLagrangianSegregatedFluidElement );
   ///@}

@@ -5,9 +5,6 @@ import os
 import KratosMultiphysics
 import KratosMultiphysics.SolidMechanicsApplication as KratosSolid
 
-# Check that KratosMultiphysics was imported in the main script
-KratosMultiphysics.CheckForPreviousImport()
-
 #Base class to develop other solvers
 class ModelManager(object):
     """The base class for solid mechanic model build process.
@@ -362,7 +359,7 @@ class ModelManager(object):
 
     #
     def _build_composite_solving_parts(self):
-
+        self.current_update_time = self.process_info[KratosMultiphysics.TIME]
         print(self._class_prefix()+" Composite Solving Parts")
         solving_parts = self.settings["composite_solving_parts"]
         for i in range(0,solving_parts.size()):

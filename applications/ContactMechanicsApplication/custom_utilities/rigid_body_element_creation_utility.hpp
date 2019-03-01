@@ -59,6 +59,7 @@ public:
     typedef Point2D<ModelPart::NodeType>       Point2DType;
     typedef Point3D<ModelPart::NodeType>       Point3DType;
 
+    typedef WeakPointerVector<Element> ElementWeakPtrVectorType;
     ///@}
     ///@name Life Cycle
     ///@{
@@ -90,7 +91,6 @@ public:
 
       Parameters DefaultParameters( R"(
             {
-                "model_part_name": "RigidBodyDomain",
                 "element_type": "TranslatoryRigidElement3D1N",
                 "constrained": true,
                 "compute_parameters": false,
@@ -110,7 +110,7 @@ public:
 
       ModelPart& rMainModelPart = *(rModelPart.GetParentModelPart());
 
-      std::cout<<rMainModelPart<<std::endl;
+      //std::cout<<rMainModelPart<<std::endl;
 
       //create properties for the rigid body
       unsigned int NumberOfProperties = rMainModelPart.NumberOfProperties();
@@ -203,10 +203,6 @@ public:
       rModelPart.AddElement(pRigidBodyElement);
       rModelPart.AddNode(NodeCenterOfGravity);
 
-      if(BodyIsFixed){
-        pRigidBodyElement->Set(RIGID,true);
-        //pRigidBodyElement->Set(ACTIVE,false);
-      }
 
       //add rigid body element node to boundary model part where there is an imposition:
       for(ModelPart::SubModelPartIterator i_mp= rMainModelPart.SubModelPartsBegin(); i_mp!=rMainModelPart.SubModelPartsEnd(); i_mp++)
@@ -248,8 +244,13 @@ public:
         }
       }
 
-      WeakPointerVector<Element> MasterElements;
-      MasterElements.push_back(Element::WeakPointer(pRigidBodyElement));
+      if(BodyIsFixed){
+        pRigidBodyElement->Set(RIGID,true);
+        //pRigidBodyElement->Set(ACTIVE,false); //if parametric body in dynamics -> check element build matrices
+      }
+
+      ElementWeakPtrVectorType MasterElements;
+      MasterElements.push_back(pRigidBodyElement);
 
       for(ModelPart::NodesContainerType::iterator j_node = rModelPart.NodesBegin(); j_node != rModelPart.NodesEnd(); ++j_node)
       {
@@ -286,7 +287,9 @@ public:
 
       ModelPart& rMainModelPart = *(rModelPart.GetParentModelPart());
 
-      unsigned int LastConditionId = rMainModelPart.Conditions().back().Id() + 1;
+      unsigned int LastConditionId = 1;
+      if( rMainModelPart.Conditions().size() != 0 )
+        LastConditionId = rMainModelPart.Conditions().back().Id() + 1;
 
       std::string ConditionName = CustomParameters["condition_type"].GetString();
 
@@ -328,6 +331,8 @@ public:
 
       // add links to rigid body model part:
       rModelPart.AddConditions(LinkConditions.begin(),LinkConditions.end());
+
+      std::cout<<" Created Link Conditions "<<LinkConditions.size()<<std::endl;
 
       // add links to solving model part:
       for(ModelPart::SubModelPartIterator i_mp= rMainModelPart.SubModelPartsBegin() ; i_mp!=rMainModelPart.SubModelPartsEnd(); i_mp++)

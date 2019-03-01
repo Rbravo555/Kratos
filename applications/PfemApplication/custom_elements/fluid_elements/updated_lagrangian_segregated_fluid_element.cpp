@@ -213,27 +213,6 @@ void UpdatedLagrangianSegregatedFluidElement::InitializeSolutionStep( ProcessInf
 
     FluidElement::InitializeExplicitContributions();
 
-    switch(mStepVariable)
-    {
-      case VELOCITY_STEP:
-        {
-
-          for ( unsigned int i = 0; i < mConstitutiveLawVector.size(); i++ )
-            mConstitutiveLawVector[i]->InitializeSolutionStep( GetProperties(),
-                                                               GetGeometry(),
-                                                               row( GetGeometry().ShapeFunctionsValues( mThisIntegrationMethod ), i ),
-                                                               rCurrentProcessInfo );
-          break;
-        }
-      case PRESSURE_STEP:
-        {
-          break;
-        }
-      default:
-        KRATOS_ERROR << "Unexpected value for SEGREGATED_STEP index: " << rCurrentProcessInfo[SEGREGATED_STEP] << std::endl;
-    }
-
-
     KRATOS_CATCH( "" )
 
 }
@@ -1499,11 +1478,11 @@ void UpdatedLagrangianSegregatedFluidElement::GetFreeSurfaceFaces(std::vector<st
   // }
 
   //based in existance of neighbour elements (proper detection for triangles and tetrahedra)
-  WeakPointerVector<Element>& neighb_elems = this->GetValue(NEIGHBOUR_ELEMENTS);
+  ElementWeakPtrVectorType& nElements = this->GetValue(NEIGHBOUR_ELEMENTS);
   unsigned int face=0;
-  for(WeakPointerVector< Element >::iterator ne = neighb_elems.begin(); ne!=neighb_elems.end(); ++ne)
+  for(auto& i_nelem : nElements)
   {
-    if (ne->Id() == this->Id())  // If there is no shared element in face nf (the Id coincides)
+    if(i_nelem.Id() == this->Id())  // If there is no shared element in face nf (the Id coincides)
     {
       std::vector<SizeType> Nodes;
       unsigned int WallNodes  = 0;

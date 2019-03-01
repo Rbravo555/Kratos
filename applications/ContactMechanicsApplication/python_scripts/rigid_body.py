@@ -4,9 +4,6 @@ import KratosMultiphysics
 import KratosMultiphysics.DelaunayMeshingApplication as KratosDelaunay
 import KratosMultiphysics.ContactMechanicsApplication as KratosContact
 
-# Check that KratosMultiphysics was imported in the main script
-KratosMultiphysics.CheckForPreviousImport()
-
 import sys
 
 def CreateRigidBody(main_model_part, custom_settings):
@@ -61,7 +58,6 @@ class RigidBody(object):
         self.model_part.Set(KratosMultiphysics.RIGID)
 
         for node in self.model_part.Nodes:
-            print(" node ",node.Id)
             node.Set(KratosMultiphysics.RIGID,True)
 
         #for node in self.model_part.Elements:
@@ -121,6 +117,7 @@ class RigidBody(object):
     ###
 
     #
+    @classmethod
     def _get_upper_point(self, model_part):
 
         dimension = model_part.ProcessInfo[KratosMultiphysics.SPACE_DIMENSION]
@@ -143,6 +140,7 @@ class RigidBody(object):
             return [max_x, max_y, max_z]
 
     #
+    @classmethod
     def _get_lower_point(self, model_part):
 
         dimension = model_part.ProcessInfo[KratosMultiphysics.SPACE_DIMENSION]

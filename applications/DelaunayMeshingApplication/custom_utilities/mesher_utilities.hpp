@@ -68,6 +68,9 @@ public:
     typedef ModelPart::MeshType::GeometryType::PointsArrayType      PointsArrayType;
     typedef MeshDataTransferUtilities::TransferParameters    TransferParametersType;
 
+    typedef WeakPointerVector<Node<3> > NodeWeakPtrVectorType;
+    typedef WeakPointerVector<Element> ElementWeakPtrVectorType;
+    typedef WeakPointerVector<Condition> ConditionWeakPtrVectorType;
 
     enum ContactElementType //(contact domain definition)
     {
@@ -899,6 +902,8 @@ public:
     ///@}
     ///@name Operations
     ///@{
+
+    void SetModelPartNameToElements (ModelPart& rModelPart);
 
     void SetModelPartNameToConditions (ModelPart& rModelPart);
 

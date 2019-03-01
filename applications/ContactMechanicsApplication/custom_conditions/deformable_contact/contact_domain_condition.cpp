@@ -433,8 +433,8 @@ namespace Kratos
     TransferVariables.SetVariable(DEFORMATION_GRADIENT);
 
     MeshDataTransferUtilities DataTransfer;
-    Element::Pointer   MasterElement   = GetValue(MASTER_ELEMENTS)(0).lock();
-    Condition::Pointer MasterCondition = GetValue(MASTER_CONDITION);
+    Element*   MasterElement   = &GetValue(MASTER_ELEMENTS).front();
+    Condition* MasterCondition = GetValue(MASTER_CONDITION).lock().get();
     DataTransfer.TransferBoundaryData(MasterElement,MasterCondition,TransferVariables,CurrentProcessInfo);
 
     KRATOS_CATCH( "" )

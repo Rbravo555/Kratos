@@ -42,21 +42,22 @@ namespace Kratos
  * Implements a Contact Point Load definition for structural analysis.
  * This works for arbitrary geometries in 3D and 2D (base class)
  */
-class RigidBodyPointLinkCondition
+class KRATOS_API(CONTACT_MECHANICS_APPLICATION) RigidBodyPointLinkCondition
     : public Condition
 {
  public:
 
   ///@name Type Definitions
 
-  typedef Vector                             VectorType;
-  typedef Element                           ElementType;
-  typedef Node<3>::Pointer             PointPointerType;
-  typedef Quaternion<double>             QuaternionType;
-  typedef Node<3>::DofsContainerType  DofsContainerType;
-  typedef GeometryData::SizeType               SizeType;
-  typedef BeamMathUtils<double>       BeamMathUtilsType;
+  typedef Vector                                VectorType;
+  typedef Element                              ElementType;
+  typedef Node<3>::Pointer                PointPointerType;
+  typedef Quaternion<double>                QuaternionType;
+  typedef Node<3>::DofsContainerType     DofsContainerType;
+  typedef GeometryData::SizeType                  SizeType;
+  typedef BeamMathUtils<double>          BeamMathUtilsType;
 
+  typedef WeakPointerVector<Element> ElementWeakPtrVectorType;
   ///@{
   // Counted pointer of RigidBodyPointLinkCondition
   KRATOS_CLASS_POINTER_DEFINITION( RigidBodyPointLinkCondition );
@@ -69,7 +70,6 @@ class RigidBodyPointLinkCondition
    */
   KRATOS_DEFINE_LOCAL_FLAG(COMPUTE_RHS_VECTOR);
   KRATOS_DEFINE_LOCAL_FLAG(COMPUTE_LHS_MATRIX);
-
   /**
    * Parameters to be used in the Condition as they are.
    */
@@ -81,8 +81,8 @@ class RigidBodyPointLinkCondition
     SizeType          MasterAngularBlockSize;
 
     SizeType          SlaveNode;
-    SizeType          SlaveNodeLinearBlockSize;
-    SizeType          SlaveNodeAngularBlockSize;
+    SizeType          SlaveLinearBlockSize;
+    SizeType          SlaveAngularBlockSize;
 
     std::vector<SizeType> RigidNodes;
     std::vector<SizeType> DeformableNodes;
@@ -90,7 +90,7 @@ class RigidBodyPointLinkCondition
     BoundedMatrix<double,3,3>               SlaveSkewSymDistance;
     std::vector<BoundedMatrix<double,3,3>> RigidSkewSymDistances;
 
-    Element::Pointer   pSlaveElement;
+    Element*   pSlaveElement;
 
   } GeneralVariables;
 
@@ -367,7 +367,7 @@ class RigidBodyPointLinkCondition
    */
   virtual void CalculateConditionSystem(LocalSystemComponents& rLocalSystem,
                                         LocalSystemComponents& rLinkedSystem,
-                                        Element::Pointer& rSlaveElement,
+                                        Element* rSlaveElement,
                                         ProcessInfo& rCurrentProcessInfo);
   /**
    * Calculation and addition of the matrices of the LHS
@@ -393,6 +393,21 @@ class RigidBodyPointLinkCondition
   virtual void CalculateAndAddForces(VectorType& rRightHandSideVector,
                                      VectorType& rLinkedRightHandSideVector,
                                      GeneralVariables& rVariables);
+
+  /**
+   * Calculation of the Link Stiffness Matrix
+   */
+  virtual void CalculateAndAddTangentBeam(MatrixType& rLeftHandSideMatrix,
+                                          MatrixType& rLinkedLeftHandSideMatrix,
+                                          GeneralVariables& rVariables);
+  /**
+   * Calculation of the Link Force Vector
+   */
+  virtual void CalculateAndAddForcesBeam(VectorType& rRightHandSideVector,
+                                         VectorType& rLinkedRightHandSideVector,
+                                         GeneralVariables& rVariables);
+
+
   /**
    * Assemble Local LHS
    */
