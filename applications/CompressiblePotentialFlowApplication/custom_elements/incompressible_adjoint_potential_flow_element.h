@@ -7,8 +7,10 @@
 //  License:		 BSD License
 //					 Kratos default license: kratos/license.txt
 //
-//  Main authors:    Riccardo Rossi
 //
+//  Main authors:    Marc Nuñez, based on Armin Geiser and Martin Fusseder work
+//
+
 
 #if !defined(KRATOS_INCOMPRESSIBLE_ADJOINT_POTENTIAL_FLOW_ELEMENT_H_INCLUDED )
 #define KRATOS_INCOMPRESSIBLE_ADJOINT_POTENTIAL_FLOW_ELEMENT_H_INCLUDED
@@ -18,15 +20,13 @@
 #include "includes/element.h"
 #include "includes/kratos_flags.h"
 #include "compressible_potential_flow_application_variables.h"
-#include "utilities/geometry_utilities.h"
-#include "utilities/divide_triangle_2d_3.h"
-#include "modified_shape_functions/triangle_2d_3_modified_shape_functions.h"
-#include "utilities/enrichment_utilities.h"
 namespace Kratos
 {
+// template <int Dim,int NumNodes>
+// class TPrimalElement
+// {};
 
-
-template< int Dim, int NumNodes >
+template <class TPrimalElement<int Dim,int NumNodes>>
 class IncompressibleAdjointPotentialFlowElement : public Element
 {
 public:
@@ -49,12 +49,6 @@ public:
      * Constructor.
      */
     IncompressibleAdjointPotentialFlowElement(IndexType NewId = 0) {};
-
-    IncompressibleAdjointPotentialFlowElement(Element::Pointer pPrimalElement)
-                    : Element(pPrimalElement->Id(), pPrimalElement->pGetGeometry(), pPrimalElement->pGetProperties())
-                    , mpPrimalElement(pPrimalElement)
-    {
-    };
 
     /**
      * Constructor using an array of nodes
@@ -147,13 +141,10 @@ public:
 
     void PrintData(std::ostream& rOStream) const override;
 
-   Element::Pointer pGetPrimalElement();
-
-
 protected:
 
 
-    Element::Pointer mpPrimalElement;
+    TPrimalElement mPrimalElement;
 
     void GetWakeDistances(array_1d<double,NumNodes>& distances);
 
